@@ -1,15246 +1,3771 @@
-/**
- * RUBYTABS JAVASCRIPT PLUGIN
- * @package       RubyTabs-JS
- * @author        HaiBach
- * @link          http://haibach.net/rubytabs-js
- * @version       1.7
- * @lastUpdate    Nov 28, 2017
- */
-
-
-(function($) {
-'use strict';
-
-
-/**
- * INITIALIZE GLOBAL VARIABLES IN JAVASCRIPT
- */
-window.rt01MODULE = window.rt01MODULE || {};
-if( !window.rt01VA ) {
-
-  window.rt01VA = {
-    "rubyName"  : "rubytabs",
-    "rubyData"  : "tabs",
-    "namespace" : "rt01",
-
-    "$ruby"   : $(),
-    "numID"   : 0
-  };
-
-  /**
-   * OPTIONS DEFAULTS
-   *  + Upto 300 options
-   */
-  rt01VA.optsDefault = {
-    "tagCanvas"   : "div",
-    "nameCanvas"  : "canvas",
-    "nameViewport"  : "viewport",
-    "nameSlide"   : "slide",
-    "nameImageBack" : "imgback",
-    "nameImageLazy" : "img",
-    "nameNav"     : "nav",
-    "namePag"     : "pag",
-    "nameCap"     : "cap",
-    "nameNext"    : "nav-next",
-    "namePrev"    : "nav-prev",
-    "namePlay"    : "playpause",
-    "nameTimer"   : "timer",
-    "nameLayer"   : "layer",
-    "nameOverlay"   : "overlay",
-    "nameDataSlide" : "slide",
-
-    // Name to be replaced in "data-src" on <img> tag using image lazyload function.
-    "nameDataLazy"  : "src",
-
-    // The proper name for each rubytabs in the site. Used to link components markup outside with main markup of rubytabs.
-    "name"      : null,
-    "current"     : "cur",
-    "actived"     : "actived",
-    "deactived"   : "deactived",
-
-
-
-
-
-    /**
-     * OPTIONS TYPE OF ELEMENTS
-     */
-    // Change multiple options at once, like shortcut to a group priority options. included value: ["slider", "tabs"]
-    "type"      : "tabs",
-
-    // Option beta: layout size. List of value: "auto", "fullwidth", "fullscreen"
-    "layout"    : "auto",
-
-    // Setup main effect.
-    "fx"      : "line",
-
-    // Easing of main effect.
-    "fxEasing"    : "easeOutCubic",
-
-    // Setup CSS One effect.
-    "cssOne"    : "roDeal",
-
-    // Setup name for out effect of CSS Two effects.
-    "cssTwoOut"   : "pullOut",
-
-    // Setup name for in effect of CSS Two effects.
-    "cssTwoIn"    : "pushIn",
-    "cssThreePrev"  : "pullIn",
-    "cssThreeNext"  : "pushIn",
-
-    // Setup name for CSS Four effect when swap to next slide out.
-    "cssFourNextOut": "roEdgeLeftOut",
-
-    // Setup name for CSS Four effect when swap to next slide in.
-    "cssFourNextIn" : "roEdgeRightIn",
-
-    // Setup name for CSS Four effect when swap to previous slide out.
-    "cssFourPrevOut": "roEdgeRightOut",
-
-    // Setup name for CSS Four effect when swap to previous slide in.
-    "cssFourPrevIn" : "roEdgeLeftIn",
-
-    // Easing of effect in CSS One, Two, Four effects.
-    "cssEasing"   : null,
-
-    // Position and size of imageback to fit the viewport slider. List value: "center", "fill", "fit", "stretch", "tile".
-    "imagePosition" : null,
-
-    // Swipe direction, default is horizontal. List of value : "hor", "ver"
-    "direction"   : "hor",
-
-    // Enable responsive and settings width-begin(or maximum) of the slider.
-    "width"     : null,
-
-    // Height of the slider. By default, it depends on the height image-background per slide.
-    "height"    : null,
-
-    "responsiveLevels" : [1200, 992, 768, 576],
-
-    // Width of center slide compared to width of slider.
-    // + Example for unit "percent(%)" : "100%" (string)
-    // + Example for unit "pixel" : 300 (number)
-    // + Support value depend on "responsiveLevels" option
-    "widthSlide"  : "100%",
-
-    // Surrounding areas of image-background to slide in th range width of the page.
-    // + Support value depend on "responsiveLevels" option
-    "padding"     : null,
-
-    // Distance between slides.
-    // + Support value depend on "responsiveLevels" option
-    "margin"    : 0,
-
-    // Duration of the effect. Unit millisecond.
-    "speed"     : 400,
-    "speedHeight"   : 400,
-
-    "skin"      : null,
-
-    // Duration check and update rubytabs
-    "delayUpdate"   : 1000,
-
-    // Perspective property for layer
-    "perspective"   : 800,
-
-    // List of value : "auto", number
-    "slot"      : "auto",
-
-    // List of value : "visible", number >= 1
-    "stepNav"     : 1,
-    "stepPlay"    : 1,
-
-    // Set the slide will appear as rubytabs initialization, ID of slides started with 0. List of value option:
-    // + "begin": begin position, equivalent to idBegin = 0
-    // + "center": center position. If the total number of slides is an even number, then the position will be located near the left side. Example: Num of slide is 6, value of idBegin is 2
-    // + "centerRight": similar "center" value, but located near the right side. Example: Num of slide is 6, value of idBegin is 3
-    // + "end": end position
-    // + 0 1 2 ...: specific value of the ID slide
-    "idBegin"     : 0,
-
-    // Set rubytabs initialized only on the specified device. List value: "desktop", "mobile" and "all".
-    "showBy"    : "all",
-
-    // Set rubytabs will appear in range width of the site. Range-width have 2 values "min-width" and "max-width"(optional).
-    "showInRange"   : 0,
-
-    // In coverscreen - fullscreen mode, the heigth of slider equal to the height of window browser minus the height of offset objects.
-    "offsetBy"    : null,
-
-    // Event Wheel, list of value: "auto", "both", false
-    "wheel"     : false,
-
-
-
-
-
-    /**
-     * SETUP WITH BOOLEAN VALUE
-     */
-    // Option exclusively for HTML5 data. RubyTabs is automatically initialized after markup have loaded.
-    "isAutoInit"  : true,
-
-    // Enable layout center in effect "line"
-    "isCenter"    : true,
-    // Enable caption each slide.
-    "isCap"     : false,
-    "isLoop"    : true,
-    "isAnimRebound" : true,
-    "isOverlay"   : false,
-    "isViewGrabStop": false,
-    "isLoader"    : true,
-    "isParallaxScroll"  : false,
-    "isLayerParallax"   : false,
-    "isMask"      : "auto",
-
-    // Auto insert "mask" class on <body> tag when swiping / toggle-slide in FxCSS
-    "isBodyMaskInFxCSS" : true,
-
-    // Native fullscreen enable
-    "isNativeFS"  : false,
-
-
-
-
-
-    /**
-     * OBJECT OPTIONS
-     */
-    /**
-     * LOADING
-     */
-    // Type of lazyload. List of value: "all", "smart", "single", "none"
-    "lazyType"    : "smart",
-    "lazySmart"   : {
-              // The number of slides preloaded before the rubytabs appears.
-              // List of value : type number, "all"
-              "preload"     : 1,
-
-              // The number next slides will load after rubytabs appears, the slides will load in parallel.
-              "amountEachLoad": 2
-              },
-
-    // Enable swipe (touch) gestures on rubytabs
-    "isSwipe"     : true,
-    "swipe"     : {
-              // Easing for transition of effect after swipe end.
-              "easing"    : "easeOutQuint",
-
-              // Turn on/off swipe gestures in body content of tabs.
-              "isBody"    : true,
-
-              // Turn on/off auto swipe gestures on pagination when the total size of pagItems larger size pagination.
-              "isAutoOnPag"   : true,
-              "isLiveEffect"  : true
-              },
-
-    /**
-     * OPTIONS FOR ONLY 1 SLIDE EXIST
-     */
-    "oneSlide"    : {
-              "isNav"     : false,
-              "isPag"     : true,
-              "isSwipe"     : false
-              },
-
-    "className"   : {
-              "grab"      : ["grab", "grabbing"],
-              "swipe"     : ["", "swiping"],
-              "stop"      : ["stopLeft", "stopRight"]
-              },
-
-    /**
-     * RUBYANIMATE KEYFRAMES FOR RUBYTABS
-     */
-    "rubyAnimateKeyframes"   : {
-              "fadeOut"     : [{ "pos": 100, "opacity": 0 }],
-              "fadeIn"    : [{ "pos": 0, "opacity": 0 }]
-              },
-
-    "rubyAnimateOne" : {
-              "fade" : {
-                "next" : [ "fadeOut", "fadeIn" ],
-                "prev" : [ "fadeOut", "fadeIn" ]
-              }
-              },
-
-    /**
-     * LIST NAME OF MATH EFFECTS
-     *  + Random effect : "randomMath"
-     */
-    "fxMathName"  : [
-              "rectMove", "rectRun", "rectSlice",
-              "rubyFade", "rubyMove", "rubyRun", "rubyScale",
-              "zigzagRun",
-              "randomMath"
-              ],
-
-    "coverflow3D"   : {
-              "widthSlide"  : "80%",
-              "perspective" : 1200,
-              "zDeep"     : 600,
-              "rotate"    : 30,
-              "opacity"   : 1,
-              "isDeepMulti" : true
-              },
-
-    // Enable navigation control: next/previous button.
-    "isNav"     : false,
-    "nav"       : {
-              "isEventTap"  : true,
-              "markup"    : "<div class='{ns}nav'><div class='{ns}nav-prev'>prev</div><div class='{ns}nav-next'>next</div></div>",
-              "markupOutside" : "<div class='{ns}nav-prev'>prev</div><div class='{ns}nav-next'>next</div>"
-              },
-
-    /**
-     * PAGINATION
-     *  + Support direction, value : "hor", "ver"
-     *  + Support position, value : "begin", "end"
-     *  + Support align, value : "begin", "center", "end", "justify"
-     *  + Support link thumbnail "data-thumbnail-link" on Imageback
-     */
-    "isPag"     : true,
-    "pag"       : {
-              // Type of pagination(tablist). List OF value : "thumbnail", "tabs", "bullet", "list".
-              "type"      : "thumbnail",
-
-              // Setup fixed width for pagItem. By default, the pagItem will get largest width in the pagItems.
-              "width"     : null,
-
-              // Setup fixed height for pagItem. By default, the pagItem will get largest height in the pagItems.
-              "height"    : null,
-              "minWidth"    : null,
-              "minHeight"   : null,
-              "maxWidth"    : null,
-              "maxHeight"   : null,
-
-              // Setup the direction of pagination. List of value : "hor", "ver".
-              "direction"   : "hor",
-
-              // Setup the position of pagination compared to the content tabs. List of value: "begin", "center".
-              "position"    : "end",
-
-              // Align of pagItems compared to pagination. List of value: "begin", "center", "end", "justify".
-              "align"     : "center",
-              "cssPosition"   : "relative",
-              "hOffset"     : null,
-              "vOffset"     : null,
-
-              // Time to transition of pagItem current automatically move to the center position.
-              "speed"     : 300,
-
-              // Easing transition of pagItem current automatically move to the center position.
-              "easing"    : "easeOutCubic",
-
-              // Setup width(horizontal direction) / height(vertical direction) of pagination compared to width/height of rubytabs.
-              // + "null": size of pagination depends on css.
-              // + "self": size pagination is equal to size all pagItems combined.
-              // + "full": size pagination is equal to size content of rubytabs.
-              "sizeAuto"    : "full",
-
-              // Get the size of each pagItem compared to the size of other pagItems. List of value: "self", "min", "max".
-              "typeSizeItem"  : "self",
-
-              // Event tap on pagItem
-              "isEventTap"  : true,
-
-              // Turn on/off the current pagItem automatically moves into the center position of pagination.
-              // Only for Tabs horizontal, also tabs vertical allways have ItemCur in center position
-              "isItemCurCenterWhenTap" : true,
-              "isJustifyWhenLarge"   : false,
-
-              // Turn on/off navigation next/previous of pagItem.
-              "isArrow"     : true,
-
-              // Add tap event on navigation next/previous
-              "isTapOnArrow"  : true,
-
-              // Turn on/off mark of pagItem current. Supported animation.
-              "isMark"    : true,
-              "isMarkTransition" : true,
-
-              // Adding classes to the pagination markup.
-              "moreClass"   : null,
-
-              // Minimum width of RubyTabs to switch to horizontal direction.
-              "widthMinToHor" : 0,
-
-              // Minimum width of browser-document to switch to horizontal direction.
-              "rangeMinToHor" : 0,
-
-              // Event wheel for pagination, list of value : "auto", "both", false
-              "wheel"     : "auto",
-
-              "markupArrow"   : "<div class='{ns}pagarrow-item {ns}pagarrow-{dirs}'><div class='{ns}pagarrow-icon'></div></div>",
-              "markupMark"  : "<div class='{ns}pagmark'><div class='{ns}pagmark-item {ns}pagmark-margin'></div><div class='{ns}pagmark-item {ns}pagmark-border'></div><div class='{ns}pagmark-item {ns}pagmark-padding'></div><div class='{ns}pagmark-item {ns}pagmark-self'></div></div>"
-
-              },
-
-    "image"     : {
-              "isResponsive"  : true
-              },
-
-    /**
-     * IMAGEBACK
-     *  + Support options only for Imageback by "data-imageback"
-     */
-    "imageback"   : {
-              // List of value : "center", "fill", "fit", "stretch", "tile"
-              "position"    : "center",
-              "pixelRatio"  : 1,
-              "isResponsive"  : true
-              },
-
-    "video"     : {
-              "height"    : 480,
-              "isBtnPause"  : false,
-              "isPauseThenRemove" : false
-              },
-
-    /**
-     * VIDEOBACK
-     *  + Support options only for Videoback by "data-videoback"
-     */
-    "videoback"   : {
-              // List of value : "fill", "fit"
-              "position"    : "fill",
-
-              // List of value : "fill", "fit"
-              "posterPosition": "fill",
-              "opacity"     : 0.3,
-              "isResponsive"  : true
-              },
-
-    /**
-     * HOTSPOT
-     *  + Support RubyTween for hotspot
-     *  + Support FxCSS for hotspot
-     *  + Support Layer for hotspot
-     *  + Support Responsive option for hotspot
-     */
-    "hotspot"     : {
-              "widthItem"   : null,
-              "sizeArea"    : 10,
-
-              // List of value : "top", "bottom", "left", "right"
-              "position"    : "top",
-
-              // Event to open hotspot. List of value : "tap", "hover"
-              "eventToOpen"   : 'tap',
-
-              "animIn"    : [{ "y": "100%", "opacity": 0 }, { "y": 0, "opacity": 1, "duration": 200 }],
-              "animOut"     : [{ "y": 0 }, { "y": "100%", "opacity": 0, "duration": 200 }],
-              "animTopIn"   : null,
-              "animTopOut"  : null,
-              "animBottomIn"  : null,
-              "animBottomOut" : null,
-              "animLeftIn"  : null,
-              "animLeftOut"   : null,
-              "animRightIn"   : null,
-              "animRightOut"  : null,
-
-              "markupPoint"   : "<div class='{ns}hspoint'></div>",
-              "isActivedAtFirst" : false,
-              "isResponsive"  : false
-              },
-
-    /**
-     * LAYER
-     *  + x/y/z position supported string value : "top", "bottom", "left", "right"
-     *  + x/y position supported short string value : "topOut", "bottomOut", "leftOut", "rightOut"
-     */
-    "layer"     : {
-              "width"     : null,
-              "height"    : null,
-              "count"     : 1,
-              "direction"   : "normal",
-              "duration"    : 400,
-              "delay"     : 0,
-              "easing"    : "easeOutQuad",
-
-              // List of value : "click", "hover"
-              "eventToPlay"   : null,
-
-              "isPlayWhenSlideActived" : true,
-              "isAutoPlay"  : true,
-              "isResponsive"  : true,
-              "isRandom"    : false,
-
-              // Add class to clipping $layer-item on $layer
-              "isMask"    : false,
-
-              // Animate-end for layer before toggle to the other slide
-              "animateEnd"  : [{ "opacity": 0, "duration": 400 }]
-              },
-
-    /**
-     * LAYER PARALLAX
-     */
-    "layerParallax" : {
-              "isParallax"  : true,
-              "radiusLevelValue"  : [0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50],
-              "radiusLevel"   : 3,
-              "radius"    : null,
-
-              // List of value : "reverse", "same"
-              "direction"   : "reverse"
-              },
-
-    "parallax"    : {
-              "scrollDirection"   : "same",
-              "scrollDepth"     : 80,
-              "scrollBgDepth"   : 80,
-              "scrollLayerDepth"  : 50,
-              "isScroll"      : false,
-              "isScrollLayerFade" : true
-              },
-
-    "parallaxScroll" : {
-              "direction"   : "same",
-              "bgDepth"     : 80,
-              "layerDepth"  : 50,
-              "isLayerEnable" : true,
-              "isLayerFade"   : true
-              },
-
-    // Enable slideshow
-    "isSlideshow"   : false,
-    "slideshow"   : {
-              "delay"     : 8000,
-
-              // List of value : "line" , "arc"
-              "timer"     : "arc",
-
-              // Turn on/off auto play slideshow at first
-              // Only actived false when have playpause button
-              "isAutoRun"   : true,
-              "isPlayPause"   : true,
-              "isTimer"     : true,
-              "isLoop"    : true,
-              "isHoverPause"  : false,
-
-              // Only play slideshow when rubytabs in the display area.
-              "isRunInto"   : false,
-              "isRandom"    : false
-              },
-
-    "timerArc"    : {
-              "width"     : null,
-              "height"    : null,
-              "fps"       : 30,
-              "rotate"    : 0,
-
-              "radius"    : 14,
-              "weight"    : 4,
-              "stroke"    : "hsla(0,0%,0%,.6)",
-              "fill"      : "transparent",
-
-              "radiusOuter"   : 14,
-              "weightOuter"   : 2,
-              "strokeOuter"   : "hsla(0,0%,0%,.1)",
-              "fillOuter"   : "transparent"
-              },
-
-    /**
-     * FLICKR
-     *  + Support get photo from URL
-     *  + Support get photo from "Photo Recent", "Photo Album", "Photo Faves"
-     *  + Support get photo depends on size
-     *  + Support get source photo by "data-flickr"
-     *  + Support get source photo by URL and photoID
-     *  + Support get ID by "Path Name" instead of "NSID"
-     */
-    "flickr"    : {
-              "urlRequest"    : "https://api.flickr.com/services/rest/?method=flickr.{method}&api_key={key}{typeID}&format=json&nojsoncallback=1",
-              "apiKey"      : "a85720e2fbb21eccea51fcb75cb22184",
-
-              // List of value : number, "all"
-              "photoNum"    : 10,
-              "photoRecentNum"  : null,
-              "photoAlbumNum"   : null,
-              "photoFavesNum"   : null,
-
-              // List of value : "Square", "Large Square", "Thumbnail", "Small", "Small 320", "Medium", "Medium 640", "Medium 800", "Large", "Large 1600", "Large 2048", "Original"
-              "photoSize"     : "Large",
-
-              // List of value : "begin", "last", number
-              "photoPosition"   : "last",
-
-              "getPhotoRecentByUrl" : null,
-              "getPhotoAlbumByUrl"  : null,
-              "getPhotoFavesByUrl"  : null,
-
-              "recentID"    : null,
-              "albumID"     : null,
-              "favesID"     : null,
-              "isRandomPhoto"   : false,
-
-              "markupSlide"    : "<div><a class='{ns}imgback' data-flickr='{\"numID\": {numID}, \"photoID\": \"{photoID}\"}'>{photoTitle}</a>{markupInfo}</div>",
-              "markupInfo"     : "<div class='{ns}flickr-info {ns}layeritem' data-animate-start='{infoLayer}'>{markupPhotoTitle}{markupAlbumTitle}{markupSplit}{markupAuthor}</div>",
-              "markupSplit"    : " | ",
-
-              "markupPhotoTitle" : "<a class='{ns}flickr-photo-title' href='{photoURL}'>{photoTitle}</a>",
-              "markupAlbumTitle" : "<a class='{ns}flickr-album-title' href='{albumURL}'>{albumTitle}</a>",
-              "markupAuthor"   : "<a class='{ns}flickr-author' href='{authorURL}'>{author}</a>",
-
-              "infoLayer"  : [
-                { "x": 20, "y": "100%{parent}" },
-                { "y": "100%{parent} - 100% - 20", "duration": 400 }
-              ],
-
-              "isInfo"       : true,
-              "isPhotoTitle"   : true,
-              "isAlbumTitle"   : true,
-              "isAuthor"     : true
-              },
-
-    "markup"    : {
-              "loader"    : "<div class='{ns}loader'><svg class='{ns}loader-circular'><circle class='{ns}loader-path' cx='50%' cy='50%' r='20' fill='none' stroke-width='4' stroke-miterlimit='15'/></svg></div>",
-              "loaderThumb"   :"<div class='{ns}loader {ns}loader-small'><svg class='{ns}loader-circular'><circle class='{ns}loader-path' cx='50%' cy='50%' r='10' fill='none' stroke-width='3' stroke-miterlimit='15'/></svg></div>",
-
-              "ssControl"   : "<div class='{ns}ss-control'></div>",
-
-              // List of value : "ruby", "viewport", "nav", "ssControl"
-              "navInto"     : "viewport",
-              "pagInto"     : "ruby",
-              "ssControlInto" : "ruby",
-              "timerInto"   : "ssControl",
-              "playInto"    : "ssControl"
-              },
-
-    // Enable keyboard navigation, left/right arrow on keyboard to go prev/next slide.
-    "isKeyboard"  : false,
-    // Options for keyboard navigation features
-    "keyboard"    : {
-              "nextKey"     : 39,
-              "prevKey"     : 37,
-              "nextAlterKey"  : null,
-              "prevAlterKey"  : null
-              },
-
-    // Enable deep-linking features
-    "isDeeplinking" : false,
-    // Options for deeplinking features
-    "deeplinking"   : {
-              // Prefix 0 is name of rubytabs, support multi-liking on the same page.
-              // Prefix 1 is name of slide on that rubytabs.
-              "prefixDefault" : ["ruby", "slide"],
-
-              // Prefix of #hash combine with order of slide, begin by 0.
-              "prefix"    : null,
-
-              // Deeplinking auto convert ID of slide to #hash corresponds on URL
-              "isIDConvert"   : true,
-
-              // URL only change if slide have ID on dom
-              "isOnlyShowID"  : true
-              },
-
-    // Enable cookie features
-    "isCookie"    : false,
-    // Options for cookie features
-    "cookie"    : {
-              // Unique name of cookie to stored rubytabs, avoid conflict with other cookies on different pages. Default is empty-string.
-              "name"      : "",
-
-              // Days storing of cookie on the browser
-              "days"      : 7
-              },
-
-    // Options in the native fullscreen mode
-    "nativeFS"    : {
-              // Render button toggle fullscreen mode
-              "isButton"     : true,
-
-              // Markup of button toggle
-              "markupButton"   : "<a class='{ns}toggle-nativeFS'></a>"
-              },
-
-    "updateOptsInNativeFS" : {
-              // "imageback"    : { "position": "fit" }
-              },
-
-    // Trigger events
-    events      : {},
-
-    // Options for the desktop device
-    "desktop"     : {},
-
-    // Options for the mobile device
-    "mobile"    : {
-              "speedHeight"   : null,
-              "direction"   : "hor"
-              },
-
-    // Options for the browser not support CSS Transform
-    "fallback"    : {
-              "markup" : {
-                "loader" : "<div class='{ns}loader {ns}loader-old'>loading</div>"
-              }
-              },
-
-    "rev"       : ["erp"],      // ["omed", "ten.hcabiah"], ["eerf"], ["erp"]
-    "versionBrand"  : "1",
-    "version"     : "1.7"
-  };
-
-
-
-
-
-
-
-
-
-
-  /**
-   * OPTIONS DEFAULT PLUS
-   */
-  rt01VA.optsPlus = {
-
-    /**
-     * OPTIONS PLUS DEFAULT FOR TABS
-     */
-    "tabs" : {
-      "lazyType"  : "single",
-      "margin"  : 30,
-      "pag"     : {
-              "type"    : "tabs",
-              "position"  : "begin",
-              "align"   : "begin"
-              }
-    },
-
-    /**
-     * OPTIONS PLUS DEFAULT FOR SLIDER
-     */
-    "slider" : {
-      "lazyType"  : "smart",
-      "margin"  : 0,
-      "pag"     : {
-              "type"    : "thumbnail",
-              "position"  : "end",
-              "align"   : "center"
-              }
-    },
-
-    /**
-     * OPTIONS PLUG DEFAULT FOR CAROUSEL
-     */
-    "carousel" : {
-      "lazyType"   : "smart",
-      "fx"     : "line",
-      "speed"    : 600,
-      "widthSlide" : 300,
-      "margin"   : 15,
-
-      "isCenter"   : false,
-      "isLoop"   : false,
-      "isPag"    : false,
-      "isNav"    : true
-    }
-  };
-
-
-
-
-
-
-
-
-
-
-
-  /**
-   * FUNCTION M
-   */
-  rt01VA.M = {
-
-    /**
-     * DISPLAY ERROR MESSAGES
-     */
-    Message : function(message, detail) {
-      if( typeof console === 'object' && message !== undefined ) {
-        var str = '['+ rt01VA.rubyName +': '+ message +']';
-
-        if( !!detail ) str += ' -> '+ detail;
-        console.warn(str);
-      }
-    },
-
-    /**
-     * CONVERT 'STRING' TO 'JSON'
-     */
-    StringToJson : function(str, messageError) {
-      if( typeof str == 'string' ) {
-
-        // Replace quotes to single quotes
-        str = str.replace(/\u0027/g, '\u0022');
-
-
-        /**
-         * PARSE 'STRING' TO 'JSON'
-         */
-        try    { str = $.parseJSON(str) }
-        catch(e) { rt01VA.M.Message(messageError) }
-      }
-
-      // Return value depending on each case
-      return $.isPlainObject(str) ? $.extend(true, {}, str)
-                    : $.isArray(str) ? $.extend(true, [], str)
-                             : {};
-    },
-
-    /**
-     * CONVERT 'JSON' TO 'STRING'
-     */
-    JsonToString : function(json, messageError) {
-      if( typeof json == 'object' ) {
-
-        /**
-         * PARSE 'JSON' TO 'STRING'
-         */
-        try    { json = JSON.stringify(json) }
-        catch(e) { rt01VA.M.Message(messageError) }
-      }
-      return (typeof json == 'string') ? json : '';
-    },
-
-
-
-
-
-
-
-
-
-
-    /**
-     * CONVERT VALUE TO NUMBER
-     */
-    PFloat : function(n) {
-
-      // Check and convert to number float
-      // Condition < 9007199254740992 : larger for incorrect results
-      if( /^\-?\d*\.?\d+/g.test(n) ) {
-        var n1 = parseFloat(n);
-        if (n1 < 9007199254740992 ) return n1;
-      }
-
-
-      // Case : value Boolean
-      else if( /^(true|on)$/g.test(n) ) return true;
-      else if( /^(false|off)$/g.test(n) ) return false;
-      return 0;
-    },
-
-    // Convert value to number integer
-    PInt : function(v) { return /^\-?\d+/g.test(v) ? parseInt(v, 10) : 0; },
-
-
-
-
-
-
-
-
-
-
-    /**
-     * GET SIZE OF OJBECT
-     *  + Get size not included css transformed
-     *  + Size base on "offsetWidth", "offsetHeight"
-     *  + Check getComputedStyle by document.defaultView otherwise error
-     */
-    SizeNoTransform : function($el, type, isMargin) {
-
-      /**
-       * CONDITONAL EXECUTION
-       *  + First paramater $el : forced to Element Node
-       */
-      if( !($el && !!$el[0]) ) return 0;
-
-
-
-      /**
-       * INITIAL SETUP
-       */
-      var that  = this,
-        el    = $el[0],
-        style   = document.defaultView ? getComputedStyle(el) : el.currentStyle,
-
-        isWidth = /Width/i.test(type),
-        size  = el[isWidth ? 'offsetWidth' : 'offsetHeight'],
-
-        padding = isWidth ? that.PFloat(style.paddingLeft) + that.PFloat(style.paddingRight)
-                  : that.PFloat(style.paddingTop) + that.PFloat(style.paddingBottom),
-
-        border  = isWidth ? that.PFloat(style.borderLeftWidth) + that.PFloat(style.borderRightWidth)
-                  : that.PFloat(style.borderTopWidth) + that.PFloat(style.borderBottomWidth),
-
-        margin  = isWidth ? that.PFloat(style.marginLeft) + that.PFloat(style.marginRight)
-                  : that.PFloat(style.marginTop) + that.PFloat(style.marginBottom);
-
-
-
-      /**
-       * SETUP SIZE DEPENDING ON EACH CASE
-       */
-      // Case : get size OuterWidth - OuterHeight
-      if( /^Outer\w+/.test(type) ) {
-        if( isMargin ) size += margin;
-      }
-
-      // Case : get size InnerWidth - InnerHeight
-      else if( /^Inner\w+/.test(type) ) {
-        size -= border;
-      }
-
-      // Case : get size Width - Height
-      else if( /^(Width|Height)$/.test(type) ) {
-        size -= border + padding;
-      }
-
-      // Return results
-      return size;
-    },
-
-    Width     : function($el) { return this.SizeNoTransform($el, 'Width') },
-    Height    : function($el) { return this.SizeNoTransform($el, 'Height') },
-    InnerWidth  : function($el) { return this.SizeNoTransform($el, 'InnerWidth') },
-    InnerHeight : function($el) { return this.SizeNoTransform($el, 'InnerHeight') },
-    OuterWidth  : function($el, isMargin) { return this.SizeNoTransform($el, 'OuterWidth', isMargin) },
-    OuterHeight : function($el, isMargin) { return this.SizeNoTransform($el, 'OuterHeight', isMargin) }
-  };
-}
-
-
-
-
-
-
-
-
-
-
-/**
- * MAIN RUBYTABS PLUGIN
- */
-$[rt01VA.rubyName] = function($ruby, OptsJS) {
-
-  /**
-   * GLOBAL VARIABLES IN THE PLUGIN
-   */
-  var cs  = {
-      $ruby   : $ruby                 // Stored $rubytabs in 'cs' variable
-    },
-    va  = {
-      $w    : $(window),
-      $doc  : $(document),
-      $body   : $('body'),
-      rubykey : Math.ceil( Math.random()*1e9 ),     // Rubykey : prevent conflicts when initialize multiple rubytabs
-      ns    : rt01VA.namespace,           // Namespace of the plugin
-      data  : {},                   // Stored all properties of the slides
-      numNSID : 0                   // Number of NSID in the plugin
-    },
-    is   = {},
-    ti   = {},
-    o  = {},    // Variable 'o' : merge all options Data + js + default options
-    oo   = {},    // Variable 'oo' : store the initial options
-    vava = {},
-    isis = {},
-
-    // Variable 'one' : support for module
-    one = { 'cs': cs, 'o': o, 'oo': oo, 'va': va, 'is': is, 'ti': ti },
-
-    $w = $(window), $doc = $(document),
-    $canvas, $viewport,
-
-    num, cssTf, i, j,
-    divdiv = '<div/>';
-
-
-
-
-
-
-
-
-
-
-  /**
-   * INIT METHODS
-   */
-  var INIT = {
-
-    Check : function() {
-
-      M.Browser();              // Detect the name browser
-      M.CssName();              // CSS: get prefixed css style
-      M.FirstSetup();             // Initialize the variables at first
-      M.RunEvent('init');           // Trigger callback event 'init'
-
-
-
-      /**
-       * FIRST CHECK
-       */
-      if( NOISREV.Check() ) {
-
-        /**
-         * NEXT CHECK
-         *  + Check inside the rubytabs with content
-         */
-        if( is.DISPLAY ){
-          DISPLAY.SetupInit();
-        }
-        else {
-
-          // Display rubytabs if no module
-          is.showInRange = is.wake = true;
-          INIT.Ready();
-        }
-      }
-      else $ruby.remove();
-    },
-
-
-    Ready : function() {
-      M.RunEvent('ready');                // Trigger event 'ready'
-      $ruby.removeClass(va.ns + 'none');          // Remove initially hidden rubytabs
-
-      is.RUBYANIMATE && RUBYANIMATE.UpdateAllKeyframes(); // Update RubyAnimate keyframe into rubytabs
-      RENDER.Structure();                 // Ruby: create structure system
-      PROP.Ruby();                    // Ruby: get properties system
-                                // -> located above 'PAG.RenderSelf' because need to 'is.pag'
-
-      is.SLIDESHOW && SLIDESHOW.RenderControl();      // Slideshow : render markup
-      is.TIMER && TIMER.Render();             // Timer: render markup
-      is.FULLSCREEN && FULLSCREEN.Render();         // Render the elemnts in fullscreen mode
-
-      is.NAV && NAV.Render();               // Navigation: render markup
-      is.PAG && PAG.RenderSelf();             // Pagination: render markup
-      is.CAP && CAPTION.Render();             // Caption: render markup
-
-      // Add loader icon in the case: lazyType == all
-      o.lazyType === 'all' && RENDER.LoaderAdd($ruby, $ruby, '$rubyLoader');
-
-      PROP.Slides();                    // Slide: properties, below 'PAG.RenderSelf' -> need to '$pagItem' defined
-      RENDER.Other();                   // Ruby: render other elements
-      is.APIREMOTE && APIREMOTE.Init();           // API remote control: initialize
-
-      PROP.DeepLinkCookie();                // Get ID initially by deeplinking and cookie -> need 'va.IDsOnNode'
-
-
-      is.FLICKR && FLICKR.Init();
-      LOAD.Way();                     // Arrange the order of ID to load before after
-
-
-
-
-
-      /**
-       * DISPLAY RUBY INITIALLY
-       *  + The function repeated in 'UPDATE.Resize()'
-       */
-      // Support for 'POSSIZE.CombineAtFirst()' + position of tabs vertical at first
-      is.pag && !is.pagList && PAG.TypeSizeItem();
-
-      // Insert 'init' class to detect rubytabs initialize
-      $ruby.addClass(M.NS('{ns}init {ns}no-loaded'));
-
-      // Get size width of ruby
-      SIZE.WidthForRuby();
-
-      // Responsive: calculate padding & va.rate
-      is.res && RESPONSIVE.UpdateVars();
-      va.rateInit = va.rate;
-
-      // Check & convert pagination horizontal -> vertical at first
-      is.pag && PAG.VerToHor();
-      POSSIZE.CombineAtFirst();
-
-
-
-
-      /**
-       * CHECK + LOAD LAYER IMAGE OF HOME
-       *  + If no module Layer -> Setup load first slide
-       */
-      if( is.LAYER ) LAYER.LoadHomeBegin();
-      else       LOAD.Next();
-    },
-
-
-    Load : function() {
-      is.initLoaded = true;                 // Store rubytabs initially loaded
-      M.RunEvent('loaded');                 // Trigger event 'loaded'
-
-      is.pag && !is.pagList && PAG.TypeSizeItem();    // Support for 'POSSIZE.CombineAtFirst()' below + position tabs vertical at first
-
-      is.res && is.fullscreen && FULLSCREEN.Variable();   // Fullscreeen: calculate padding + va.rate
-      POSSIZE.CombineAtFirst();               // Setup position & size at first (need height ruby if vertical direction)
-
-
-      EVENTS.Setup();                   // Arrange & setup the events
-      EVENTS.LoadAll();                   // Setup event loaded everything
-
-      M.LastSetup();                     // Setup everything left after initialize
-      is.initEnd = true;                  // Notify the initialization end
-
-
-      if( is.LAYER ) {
-        LAYER.Init($viewport);              // Initialize home layer
-        LAYER.Play('home');               // Play tween for home layer
-      }
-
-
-      // Add timer for slideshow -> Fixed IE at first: get value of scrollTop incorrect
-      setTimeout(function() {
-        is.slideshow && SLIDESHOW.Init();
-      }, 400);
-    }
-  },
-
-
-
-
-
-
-
-
-
-
-  /**
-   * METHODS M EXTEND
-   */
-  M = $.extend(true, {}, rt01VA.M, {
-
-    /**
-     * FIRST SETUP OF VARIABLE IN RUBY
-     */
-    FirstSetup : function() {
-
-      /**
-       * MERGE ALL MODULES
-       */
-      PROP.MergeAllModules();
-
-
-      /**
-       * MERGE ALL OPTIONS
-       */
-      PROP.MergeAllOpts();
-
-
-      /**
-       * MERGE THE FUNCTION INTO GLOBAL VARIABLE
-       *  + Combine api-base & api into 'cs'
-       *  + Store 'cs' variable into ruby
-       */
-      cs.one = one;
-      cs = $.extend(true, cs, API);
-      $.data($ruby[0], rt01VA.rubyName, cs);
-
-
-
-      /**
-       * SETUP THE VARIABLE OF SYSTEM
-       */
-      rt01VA.$ruby = rt01VA.$ruby.add($ruby);
-      rt01VA.numID++;
-
-
-
-      /**
-       * SETUP ID OF RUBY
-       *  + Support multiply ruby awareness on page
-       *  + va.rubyID: index ID of the particular ruby
-       */
-      va.rubyID = rt01VA.numID;
-
-
-
-      /**
-       * SETUP THE INITIAL VALUES
-       */
-      va.ns = rt01VA.namespace;
-
-      // Name of ruby
-      va.name = o.name || $ruby.attr('id') || null;
-
-      // Support for slideshow have video -> all videos must be closed when slideshow playing
-      va.nVideoOpen = 0;
-
-      // Lock tap events on navigation && pagination -> prevent multiply setting running same time
-      is.tapEnable = true;
-
-      // Store name of effect -> support for toggle class effect
-      va.fxLast = va.fxCur = 'none';
-
-      // Add custom classes into ruby depends on each slide
-      va.classAdd = [];
-
-      // Variable actived & deactived
-      va.actived   = va.ns + o.actived;
-      va.deactived = va.ns + o.deactived;
-
-      // Variable support for ruby full update -> additional info
-      // Variable will reset to null if go to end 'API.update()'
-      va.addInfo = null;
-
-      // Layout size of ruby
-      if( o.layout === 'fullwidth' ) is.fullwidth = true;
-      if( o.layout === 'fullscreen' && !!rt01MODULE.FULLSCREEN ) is.fullscreen = true;
-    },
-
-    /**
-     * SETUP THE REMAINING PROPERTIES WHEN THE END OF INIT
-     */
-    LastSetup : function() {
-
-      // Fixed for IE7: calculate incorrect size of pagination
-      !is.tf && setTimeout(UPDATE.Resize, 50);
-    },
-
-
-
-
-
-
-
-
-
-
-    /**
-     * BROWSER DETEAC + CHECK HTML5/CSS3 PROPERTIES
-     */
-    Browser : function() {
-
-      // Variable shortcut & initialize at first
-      var navAgent = navigator.userAgent;
-        navAgentAll = navAgent || navigator.vender || window
-
-      is.ie = /*@cc_on!@*/false || document.documentMode;     // IE 6 - 11
-      is.edge = !is.ie && !!window.StyleMedia;          // Edge 12+
-      is.safari = /Constructor/i.test(Object.prototype.toString.call(window.HTMLElement));  // Safari 3+
-      is.opera = !!window.opera || /\sOPR\//i.test(navAgent);   // Opera 8+
-      is.chrome = !!window.chrome && !!window.chrome.webstore;  // Chrome 1+
-      is.firefox = window.InstallTrigger !== undefined;       // Firefox 1+
-
-      // Check IE11 : IE11 not support 'conditional compilation' anymore
-      is.ie11 = !!(is.ie && !new Function('/*@cc_on return @_jscript_version; @*/')());
-      is.ie7  = !!(is.ie && /MSIE\s7\./i.test(navAgent));
-
-
-      // Name of browser - return undefined if not found
-      var browser = ['ie', 'edge', 'safari', 'opera', 'chrome', 'firefox'];
-      for( i = browser.length; i >= 0; i-- ) {
-        if( !!is[browser[i]] ) { va.browser = browser[i]; break; }
-      }
-
-
-      // Check browser support touch event
-      // Remove 'is.msGesture' -> incorrect & no needed, replace by 'is.evPoinerAll'
-      // is.msGesture = !!(window.navigator && window.navigator.msPointerEnabled) || !!window.MSGesture;
-      is.evPointer = !!window.PointerEvent;
-      is.evMSPointer = !!window.MSPointerEvent;
-      is.evPointerAll = is.evPointer || is.evMSPointer;
-      is.evSwipe = !!(("ontouchstart" in window) || (window.DocumentTouch && document instanceof DocumentTouch));
-      is.swipeSupport = is.evSwipe || is.evPointer || is.evMSPointer;
-
-
-      // Check is mobile, base on 3 elements:
-      // + Support touch/pointer events
-      // + Support 'orientation' direction -> not support on mobile simular
-      // + UserAgent of comnmon browsers 'Android|webOS|iPhone|iPad..'
-      // + Used test script on page 'detectmobilebrowsers.com'
-      var navAgentAll = navAgent || navigator.vender || window.opera;
-      is.mobile = is.swipeSupport &&
-      ( /(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(navAgentAll) || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(navAgentAll.substr(0, 4)) );
-
-      // Check whether Android native browser (not Chrome) & version < 4.4
-      is.androidNative = is.mobile && /Mozilla\/5\.0/i.test(navAgent) && /Android/i.test(navAgent)
-                     && /AppleWebKit/i.test(navAgent) && !(/Chrome/i.test(navAgent))
-                     && !(/Android\s+4\.4/i.test(navAgent));
-      // Check iOS
-      is.iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
-
-
-      // Setting all kinds of events
-      // Prevent conflicts with other rubytabs by add rubykey, ex: '.rt011234'
-      var suffix  = '.'+ va.ns + va.rubykey,
-        swipeName = ['', '', ''];
-
-      if   ( is.evSwipe )   swipeName = ['touchstart', 'touchmove', 'touchend'];
-      else if( is.evPointer )   swipeName = ['pointerdown', 'pointermove', 'pointerup'];
-      else if( is.evMSPointer ) swipeName = ['MSPointerDown', 'MSPointerMove', 'MSPointerUp'];
-
-      va.ev = {
-        click   : 'click'    + suffix,
-        drag  : 'dragstart'  + suffix + ' selectstart'+ suffix,     // 'selectstart' --> ho tro IE7-8
-        resize  : 'resize'   + suffix,
-        scroll  : 'scroll'   + suffix,
-        key   : 'keyup'    + suffix,
-        hash  : 'hashchange' + suffix,
-
-        swipe   : {
-          start : swipeName[0] + suffix,
-          move  : swipeName[1] + suffix,
-          end   : swipeName[2] + suffix,
-          type  : 'swipe'
+!function(e) {
+    "use strict";
+    window.rt01MODULE = window.rt01MODULE || {}, window.rt01VA || (window.rt01VA = {
+        rubyName: "rubytabs",
+        rubyData: "tabs",
+        namespace: "rt01",
+        $ruby: e(),
+        numID: 0
+    }, rt01VA.optsDefault = {
+        tagCanvas: "div",
+        nameCanvas: "canvas",
+        nameViewport: "viewport",
+        nameSlide: "slide",
+        nameImageBack: "imgback",
+        nameImageLazy: "img",
+        nameNav: "nav",
+        namePag: "pag",
+        nameCap: "cap",
+        nameNext: "nav-next",
+        namePrev: "nav-prev",
+        namePlay: "playpause",
+        nameTimer: "timer",
+        nameLayer: "layer",
+        nameOverlay: "overlay",
+        nameDataSlide: "slide",
+        nameDataLazy: "src",
+        name: null,
+        current: "cur",
+        actived: "actived",
+        deactived: "deactived",
+        type: "tabs",
+        layout: "auto",
+        fx: "line",
+        fxEasing: "easeOutCubic",
+        cssOne: "roDeal",
+        cssTwoOut: "pullOut",
+        cssTwoIn: "pushIn",
+        cssThreePrev: "pullIn",
+        cssThreeNext: "pushIn",
+        cssFourNextOut: "roEdgeLeftOut",
+        cssFourNextIn: "roEdgeRightIn",
+        cssFourPrevOut: "roEdgeRightOut",
+        cssFourPrevIn: "roEdgeLeftIn",
+        cssEasing: null,
+        imagePosition: null,
+        direction: "hor",
+        width: null,
+        height: null,
+        responsiveLevels: [ 1200, 992, 768, 576 ],
+        widthSlide: "100%",
+        padding: null,
+        margin: 0,
+        speed: 400,
+        speedHeight: 400,
+        skin: null,
+        delayUpdate: 1e3,
+        perspective: 800,
+        slot: "auto",
+        stepNav: 1,
+        stepPlay: 1,
+        idBegin: 0,
+        showBy: "all",
+        showInRange: 0,
+        offsetBy: null,
+        wheel: !1,
+        isAutoInit: !0,
+        isCenter: !0,
+        isCap: !1,
+        isLoop: !0,
+        isAnimRebound: !0,
+        isOverlay: !1,
+        isViewGrabStop: !1,
+        isLoader: !0,
+        isParallaxScroll: !1,
+        isLayerParallax: !1,
+        isMask: "auto",
+        isBodyMaskInFxCSS: !0,
+        isNativeFS: !1,
+        lazyType: "smart",
+        lazySmart: {
+            preload: 1,
+            amountEachLoad: 2
         },
-
-        mouse   : {
-          start : 'mousedown' + suffix,
-          move  : 'mousemove' + suffix,
-          end   : 'mouseup'   + suffix,
-          type  : 'mouse'
+        isSwipe: !0,
+        swipe: {
+            easing: "easeOutQuint",
+            isBody: !0,
+            isAutoOnPag: !0,
+            isLiveEffect: !0
         },
-
-        mouseenter : 'mouseenter' + suffix,
-        mouseleave : 'mouseleave' + suffix
-      };
-
-      // If no touch event, reset 'ev.touch'
-      if( swipeName[0] == '' ) va.ev.swipe = { start: '', move: '', end: '', type: 'swipe' };
-
-
-
-
-      /**
-       * OTHER SETUP
-       */
-      // Check browser support wheel native event
-      is.wheelNative = !!('onwheel' in document.createElement('div'));
-
-      // Check browser support 'console'
-      is.console = typeof console === 'object';
-
-      // Check browser support HTML5 cavans
-      is.canvas2d = (function() {
-        var el = document.createElement('canvas');
-        return !!(el.getContext && el.getContext('2d'));
-      }());
-
-      // Check browser is running online file
-      is.online = /https?/g.test(window.location.protocol);
-    },
-
-    /**
-     * GET PREFIX OF CSS3 + NAME OF CSS
-     */
-    CssName : function() {
-
-      /**
-       * FUNCTION CHECK PREFIX VENDER OF BROWSER
-       *  + Remove '-' mark. ex: from 'abc-def' to 'abcdef'
-       */
-      var test = {
-        CamelCase : function(prop) {
-          return prop.replace(/-([a-z])/gi, function(m, prop) {
-            return prop.toUpperCase();
-          });
+        oneSlide: {
+            isNav: !1,
+            isPag: !0,
+            isSwipe: !1
         },
-
-        // MAIN TEST CSS
-        CSS : function(prop, isPrefix) {
-
-          var style  = document.createElement('p').style,
-            vender = 'Webkit Moz ms O'.split(' '),
-            prefix = '-webkit- -moz- -ms- -o-'.split(' ');
-
-
-          // First, check vender of style
-          var styleCase = this.CamelCase(prop);
-          if( style[styleCase] !== undefined ) return (isPrefix ? '' : true);
-
-
-          // Next, check vender
-          // Convert string of style to Upper, ex: 'flex-wrap' to 'FlexWrap'
-          var preStyle = M.ProperCase(styleCase);
-
-          // Check each vender
-          for( var i = 0, len = vender.length; i < len; i++ ) {
-            if( style[vender[i] + preStyle] !== undefined ) return (isPrefix ? prefix[i] : true);
-          }
-
-          // Return false if not support
-          return false;
+        className: {
+            grab: [ "grab", "grabbing" ],
+            swipe: [ "", "swiping" ],
+            stop: [ "stopLeft", "stopRight" ]
         },
-
-        // PREFIX OF CSS STYLE
-        Prefix : function(prop) { return this.CSS(prop, true) }
-      };
-
-
-
-
-
-      /**
-       * CHECK PREFIX + VARIABLE CSS TRANSFORM BASIC
-       */
-      var tf = 'transform', ts = 'transition';
-
-      // CSS check
-      is.tf    = test.CSS(tf);
-      is.tf3D  = test.CSS('perspective');
-      is.ts    = test.CSS(ts);
-      is.opacity = test.CSS('opacity');
-
-      // Variable related to CSS
-      var prefix = va.prefix = test.Prefix(tf);
-      va.cssTf = cssTf = prefix + tf;
-
-
-
-
-
-      /**
-       * TRANSLATE TYPE : FIXED IN SAFARI MOBILE + IE
-       */
-      var tl3D = 'translate3d(', isTf3D = is.tf3D;
-
-      va.tl0   = isTf3D ? tl3D    : 'translate(';
-      va.tl1   = isTf3D ? ',0)'     : ')';
-      va.tlx0  = isTf3D ? tl3D    : 'translateX(';
-      va.tlx1  = isTf3D ? ',0,0)'   : ')';
-      va.tly0  = isTf3D ? tl3D +'0,'  : 'translateY(';
-      va.tly1  = isTf3D ? ',0)'     : ')';
-    },
-
-
-
-
-
-
-
-
-
-
-    /**
-     * TOGGLE CLASS 'CURRENT' BETWEEN SLIDES
-     */
-    ToggleSlide : function() {
-
-      /**
-       * CONDITIONAL EXECUTION
-       */
-      if( !(cs.num >= 1) ) return;
-
-
-
-      /**
-       * SETUP CONTINUE
-       */
-      var idCur   = cs.idCur,
-        idLast  = cs.idLast,
-        $slCur  = va.$s.eq(idCur),
-        $slLast = va.$s.eq(idLast),
-        current = va.ns + o.current,
-        deactived = va.deactived;
-
-
-      // Slide: toggle class actived
-      va.$s.not($slCur).removeClass(current).addClass(deactived);
-      $slCur.addClass(current).removeClass(deactived);
-
-      // Callback event toggle
-      idLast !== undefined && M.RunEvent('deselectID', idLast);
-      M.RunEvent('selectID', idCur);
-
-
-      // Setting number of slide left & right into layer center(no loop)
-      !is.centerLoop && PROP.CenterNoLoop();
-
-
-      // Pagination: toggle class actived
-      // Using similar methods above!
-      if( is.pag ) {
-        var $pagitemCur = va.$pagItem.eq(idCur);
-
-        va.$pagItem.not($pagitemCur).removeClass(current);
-        $pagitemCur.addClass(current);
-        o.pag.isMark && PAG.SizePosOfMark();
-      }
-
-      // Navigation: toggle class inactive
-      is.nav && NAV.Toggle();
-
-      // Caption: toggle content
-      is.cap && CAPTION.Toggle($slCur, $slLast);
-
-      // Setting load current slide, although not to load
-      LOAD.Add($slCur);
-
-      // Toggle classAdd on ruby
-      is.CLASSADD && CLASSADD.Toggle();
-
-      // Toggle class mask on Canvas
-      UPDATE.CanvasMask();
-
-      // Toggle Deeplinking & Cookie
-      // Prevent running at first
-      if( idLast !== undefined ) {
-        o.isDeeplinking && is.DEEPLINKING && DEEPLINKING.Write();
-        o.isCookie && is.COOKIE && COOKIE.Write();
-      }
-
-      // Toggle source link on Iframe lazy
-      is.IFRAME && IFRAME.ToggleSource($slCur);
-
-      // Update nested ruby in the current slide
-      is.NESTED && NESTED.RefreshInSlide($slCur);
-
-      // Toggle swipe gestures on the current slide
-      is.SWIPE && SWIPE.ToggleEvent();
-    },
-
-    /**
-     * CASES:
-     *  + Value = -1 : remove all classes
-     *  + Value = 0 : toggle to class[0]
-     *  + Value = 1 : toggle to class[1]
-     */
-    ToggleClass : function(type, value, $obj) {
-
-      /**
-       * CONDITIONAL EXECUTION
-       */
-      // Ver 1.7 - Jan 14, 2017: Toggle grab support for mobile device
-      // if( is.mobile && type == 'grab' ) return;
-
-
-      /**
-       * SETUP CONTINUE
-       */
-      var classes  = o.className[type],
-        class0   = va.ns + classes[0],
-        class1   = va.ns + classes[1],
-        classAdd = value ? class1 : class0,
-        classDel = value ? class0 : class1;
-
-      // Setting default object
-      if( $obj === undefined ) $obj = $viewport;
-
-
-      // Value = -1 : remove all classes
-      if( value == -1 ) $obj.removeClass(class0 +' '+ class1);
-
-      // Value = 0 : toggle to class[0]
-      // Value = 1 : toggle to class[1]
-      else $obj.addClass(classAdd).removeClass(classDel);
-    },
-
-    /**
-     * GET VALUE IN STRING
-     */
-    ValueX : function(str) {
-
-      // Array: get value
-      var a = str.substr(7, str.length - 8).split(', ');
-
-      // Array: return value 5
-      return M.PInt(a[4]);
-    },
-
-    /**
-     * SETUP VARIABLES WHEN SCROLL BROWSER
-     */
-    Scroll : {
-      Setup : function() {
-
-        /**
-         * CASE SLIDESHOW ONLY RUN IN DISPLAY AREA
-         */
-        if( is.ssRunInto ) {
-          is.into = false;
-          M.Scroll.Check();
-
-          var t = 200;
-          $w.off(va.ev.scroll);
-          $w.on(va.ev.scroll, function() {
-            clearTimeout(ti.scroll);
-            ti.scroll = setTimeout(function() { !is.ssPauseAbsolute && M.Scroll.Check() }, t);
-          });
-        }
-
-
-        /**
-         * CASE SLIDESHOW ALWAYS PLAYING
-         */
-        else {
-          is.into = true;
-        }
-      },
-
-
-      /**
-       * CHECK RUBY INTO DISPLAY AREA
-       */
-      Check : function(isNoGo) {
-        M.Scroll.Position();
-
-        // Check ruby in display area of browser
-        var isInto = !(va.topW > va.botRuby || va.botW < va.topRuby),
-          isGoSlideshow = !isNoGo && is.slideshow && is.ssRunInto;
-
-        if( isInto ) {
-          if( !is.into ) {
-            is.into = true;
-            isGoSlideshow && SLIDESHOW.Go('scrollInto');
-          }
-        }
-        else {
-          if( is.into ) {
-            is.into = false;
-            isGoSlideshow && SLIDESHOW.Go('scrollOut');
-          }
-        }
-      },
-
-
-      /**
-       * POSITION OF RUBY COMPARE TO WINDOW
-       */
-      Position : function() {
-
-        // Get top/bottom position of window
-        va.hWin = $w.height();
-        va.topW = $w.scrollTop();
-        va.botW = va.hWin + va.topW;
-
-        // Ruby offset
-        va.topRuby = $ruby.offset().top;
-        va.botRuby = va.topRuby + M.OuterHeight($ruby);
-      }
-    },
-
-
-
-
-    /**
-     * METHODS RELATE TO MATH
-     */
-    A   : function(v)     { return Math.abs(v) },
-    R   : function(v)     { return Math.round(v) },
-    C   : function(v)     { return Math.ceil(v) },
-    Ra  : function()      { return Math.random() },
-    Rm  : function(m ,n)    { return M.Ra() * (n - m) + m },
-    Sum : function(a, to) {
-      var total = 0;
-      if( to < 0 ) return total;
-
-      // Case not 'to' paramater
-      if( to === undefined ) to = a.length;
-
-      // Loop plus all values in the array[]
-      for( var i = 0; i < to; i++ ) {
-        total += a[i];
-      }
-      return total;
-    },
-
-
-
-    /**
-     * METHODS RELATE TO CONVERT NUMBER
-     */
-    // Convert value to percent(%)
-    PPercent : function(v, source) {
-      if( v > 0 && v < 1 ) v *= source;
-      return M.R(v);
-    },
-
-    // Parse the value have percent unit to Pixel unit
-    PercentToPixel : function(value, source) {
-      var result = null;
-
-      // Case: The value is string with format '+/-100%'
-      if( /^\-?\d*\.?\d+\%$/.test(value) ) {
-        result = M.R(M.PFloat(value) * source / 100);
-      }
-      // Case: The value is numeric
-      else if( $.isNumeric(value) ) {
-        result = value;
-      }
-      return result;
-    },
-
-    // Convert string of style to json
-    PStyleToJson : function($obj) {
-      var style = $obj.attr('style'),
-        re  = /\s*([\w-]+)\s*:\s*([^;]*)/g,
-        json  = {},
-        match;
-
-      // Merge Width/Height attributes on object into json
-      if( $obj.attr('width') !== undefined )  json.width = $obj.attr('width');
-      if( $obj.attr('height') !== undefined ) json.height = $obj.attr('height');
-
-      // Create loop to get value each object
-      while( match = re.exec(style) ) {
-        json[ match[1] ] = match[2];
-      }
-
-      // Convert value pixel of Width/Height to number
-      var rePixel = /^-?\d*.?\d+px$/;
-      if( rePixel.test(json.width) )  json.width = parseFloat(json.width);
-      if( rePixel.test(json.height) ) json.height = parseFloat(json.height);
-
-      return json;
-    },
-
-    // Check all values in the array is number
-    ElesIsNumber : function(arr, lenCheck) {
-      var len   = arr.length,
-        isNum = $.isArray(arr) && len === lenCheck;
-
-      if( isNum ) {
-        for( var i = 0; i < len; i++ ) {
-          isNum = isNum && $.isNumeric(arr[i]);
-        }
-      }
-      return isNum;
-    },
-
-
-
-
-
-    /**
-     * METHODS RELATE TO TRANSFORM + TRANSITION
-     */
-    Tl : function(x,y,u) {
-      var u = u || 'px';
-      return va.tl0 + x + u +', '+ y + u + va.tl1;
-    },
-
-    // Translate x/y, support fallback transition
-    Tlx : function(x,u) {
-      var u = u || 'px';
-      return is.tf ? (va.tlx0 + x + u + va.tlx1) : (x + u);
-    },
-    Tly : function(y,u) {
-      var u = u || 'px';
-      return is.tf ? (va.tly0 + y + u + va.tly1) : (y + u);
-    },
-
-    // Remove transform on object
-    TfRemove : function($obj) {
-      var tf = {};
-      tf[cssTf] = '';
-      $obj.css(tf);
-    },
-
-
-
-    /**
-     * METHODS RELATE TO ARRAY[]
-     */
-    Shift : function($obj, isShift) { return isShift ? $obj.shift() : $obj.pop() },
-    Push  : function($obj, v, isPush) { return isPush ? $obj.push(v) : $obj.unshift(v) },
-
-    /**
-     * RANDOM EFFECT IN THE EFFECT ARRAY[]
-     */
-    RandomInArray : function(arr, except) {
-
-      // Conditional execution : arr is array
-      if( $.isArray(arr) ) {
-
-        /**
-         * CASE: ARRAY HAVE 1 OBJECT
-         */
-        if( arr.length === 1 ) return arr[0];
-
-
-
-        /**
-         * CASE: ARRAY HAVE MULTIPLE OBJECT
-         */
-        var itemCur     = $.extend(true, [], arr),
-          indexItemLast = $.inArray(except, itemCur);
-
-        // Remove the newly effect
-        // If not found in effect array -> add 1 to fixed select
-        if( indexItemLast === -1 ) indexItemLast = itemCur.length + 1;
-        itemCur.splice(indexItemLast, 1);
-
-        // Select random effect in the new array has removed old effect
-        return itemCur[ M.R(M.Rm(0, itemCur.length - 1)) ];
-      }
-      return arr;
-    },
-
-    RandomInArray2 : function(arrSource, arrCopy, except) {
-      if( $.isArray(arrSource) ) {
-
-        // Reset the copy array if it empty
-        // Reset the copy array if ramaining 1 object like 'except'
-        if( !arrCopy.length || (arrCopy.length == 1 && arrCopy[0] == except) ) {
-          arrCopy = $.extend(true, arrCopy, arrSource);
-        }
-
-        // Remove 'except' first
-        if( except !== undefined ) {
-          var indexExcept = $.inArray(except, arrCopy);
-          if( indexExcept !== -1 ) arrCopy.splice(indexExcept, 1);
-        }
-
-
-
-        // Get random value in the copy array
-        var idCur   = M.R(M.Rm(0, arrCopy.length - 1)),
-          itemCur = arrCopy[idCur];
-
-        // Remove value selected in the copy array
-        arrCopy.splice(idCur, 1);
-
-        // Return value selected
-        return itemCur;
-      }
-      return arrSource;
-    },
-
-
-
-
-
-    /**
-     * OTHER METHODS
-     */
-    // Swipe swap variable
-    SwapVaOnSwipe : function() { return va.$swipeCur.is($canvas) ? va.can : va.pag; },
-
-    // Toggle add/removeClass on object
-    XClass : function($obj, isAdd, str) { $obj[(isAdd ? 'add' : 'remove') +'Class'](str); },
-
-    // Capitalize the first letter of sting
-    ProperCase : function(str) { return str.charAt(0).toUpperCase() + str.slice(1); },
-
-    // Convert '{ns}' to namespace
-    NS : function(str) {
-      return (typeof str == 'string') ?  str.replace(/\{ns\}/g, va.ns)
-                      : '';
-    },
-
-    /**
-     * CHECK WIDTH VALUE OF WINDOW/RUBY IN RANGE - SIMILAR MEDIA CSS
-     */
-    MatchMedia : function(min, max, isWidthOfRuby) {
-
-      /**
-       * CASE: GET WIDTH OF RUBY
-       */
-      if( !!isWidthOfRuby ) {
-        var wRuby = M.OuterWidth($ruby);
-        if( min <= wRuby && wRuby <= max ) return true;
-      }
-
-
-      /**
-       * CASE: GET WIDTH OF WINDOW BROWSER
-       */
-      else {
-        // Case : browser support matchMedia
-        if( !!window.matchMedia ) {
-          var str = '(min-width: WMINpx) and (max-width: WMAXpx)'.replace('WMIN', min).replace('WMAX', max);
-          if( window.matchMedia(str).matches ) return true;
-        }
-
-        // Case default : not support matchMedia
-        else {
-          var wWin = $w.width();
-          if( min <= wWin && wWin <= max ) return true;
-        }
-      }
-
-      return false;
-    },
-
-    /**
-     * SEARCH FOR NECESSARY VALUE IN ARRAY
-     * @return int  Value width of ruby
-     */
-    GetValueInRange : function(value, valueName) {
-      var name = !!valueName ? valueName : 'value';
-
-      // additional : allow default value & get minimun value
-      var wMin = 1e5, id = -1;
-      for( i = value.num - 1; i >= 0; i-- ) {
-
-        // 'from' & 'to' compared to width window
-        if( M.MatchMedia(value[i].from, value[i].to ) ) {
-
-          if( wMin >= value[i].to ) {
-            wMin = value[i].to;
-            id = i;
-          }
-        }
-      }
-
-      // Return value
-      return (id > -1 ? value[id][name] : null);
-    },
-
-    // Get index in Responsive Level
-    GetIndexInResponsive : function(resLevels) {
-      var index = null;
-      for( var i = 0, len = resLevels.length; i < len; i++ ) {
-
-        var min = resLevels[i],
-          max = (i === 0) ? 10000 : resLevels[i - 1];
-
-        if( M.MatchMedia(min, max) ) {
-          index = i;
-          break;
-        }
-      }
-
-      // Case: not found index
-      if( index === null ) index = resLevels.length - 1;
-      return index;
-    },
-
-    // Parse Grid from a value
-    ParseGrid : function(fromValue, isInherit) {
-      var resLevelsLen = o.responsiveLevels.length,
-        grid     = null;
-
-      // Case: Size is Numeric
-      if( $.isNumeric(fromValue) || typeof fromValue === 'string' ) {
-        grid = [];
-
-        for( var i = 0; i < resLevelsLen; i++ ) {
-          if( isInherit ) grid[i] = fromValue;
-          else      grid[i] = (i == 0) ? fromValue : null;
-        }
-      }
-      // Case: Size is array
-      else if( $.isArray(fromValue) ) {
-
-        // Case: Size length < ResponsiveLevels length -> Additional item in the array of Size
-        if( fromValue.length < resLevelsLen ) {
-          var valueLen  = fromValue.length;
-            valueLast = fromValue[valueLen - 1];
-
-          grid = fromValue.slice();
-          for( var i = valueLen; i < resLevelsLen; i++ ) {
-            grid[i] = isInherit ? valueLast : null;
-          }
-        }
-
-        // Case else: copy array
-        else grid = fromValue.slice();
-      }
-      return grid;
-    },
-
-    /**
-     * SEARCH ELEMENTS EXCEPT FORM RUBY-NESTED
-     *  + Remove nested ruby
-     */
-    Find : function($target, selector) {
-
-      var $result     = $target.find(selector),
-        $rubyNested   = $target.find('.' + va.ns),
-        $resultNested = $rubyNested.find(selector);
-
-      // Loai bo doi tuong trong Ruby Nested
-      $result = $result.not($resultNested);
-      return $result;
-    },
-
-
-
-
-
-    /**
-     * GET OBJECT PROPERTIES IN 'DATA' VARIABLE
-     *  + Allow pass number parameter for slide
-     */
-    Data : function($obj, opts) {
-      var vData = va.data;
-
-
-      /**
-       * CONVERT NUMBER PARAMETER TO JQUERY OBJECT
-       */
-      if( $.isNumeric($obj) && (0 <= $obj && $obj < cs.num) ) {
-        $obj = va.$s.eq($obj);
-      }
-      else if( $obj === 'home' ) {
-        $obj = $viewport;
-      }
-
-
-
-      /**
-       * CONDITIONAL EXECUTION
-       */
-      if( !($obj instanceof jQuery) ) return false;
-
-
-
-
-      /**
-       * SETUP EXTEND OBJECT
-       */
-      if( $.isPlainObject(opts) ) {
-
-        opts = $.extend(true, {}, opts);
-        delete opts.$self;
-        delete opts.nsid;
-      }
-      else opts = {};
-
-
-
-
-
-      /**
-       * FIRST, SEARCH NSID OF OBJECT IN 'DATA' VARIABLE
-       */
-      var nsid;
-      for( nsid in vData ) {
-
-        if( $obj.is(vData[nsid]['$self']) ) {
-          return $.extend(true, vData[nsid], opts);
-        }
-      }
-
-
-
-
-      /**
-       * CREATE NEW PROPERTIES IN 'DATA' VARIABLE IF NSID NOT EXIST
-       */
-      nsid = va.numNSID;
-      va.numNSID++;
-
-      // Create new object
-      vData[nsid] = { '$self': $obj, 'nsid': nsid };
-
-      // Return the newly created 'data'
-      return $.extend(true, vData[nsid], opts);
-    },
-
-    /**
-     * GET TWEEN ANIMATE STORED IN 'DATA' OF OBJECT
-     */
-    GetTween : function($obj) {
-      var objData = M.Data($obj);
-
-      // Get tween animate on self object
-      objData.tweenSelf = objData.tweenSelf || new RubyTween();
-      return objData.tweenSelf;
-    },
-
-
-
-
-
-    /**
-     * RETURN MODULES COMBINE WITH PROPERTIES
-     */
-    Module : function(name) {
-      return $.extend({}, rt01MODULE[name], one);
-    },
-
-    // Execute the events
-    RunEvent : function(name, param1, param2) {
-
-      // Trigger event on option
-      $.isFunction(o.events[name]) && o.events[name](cs);
-
-      // Trigger event on jQuery event
-      cs.ev.trigger(name, [param1, param2]);
-    }
-  }),
-
-
-
-
-
-
-
-
-
-
-  /**
-   * VALUE OF PROPERTIES
-   */
-  PROP = {
-
-    /**
-     * MERGE ALL MODULES INTO GLOBAL VARIABLE
-     */
-    MergeAllModules : function() {
-
-      // Move module available to 'one' variable
-      one.INIT    = INIT;
-      one.M       = M;
-      one.PROP    = PROP;
-      one.RENDER    = RENDER;
-      one.LOAD    = LOAD;
-      one.EVENTS    = EVENTS;
-      one.POSITION  = POSITION;
-      one.SIZE    = SIZE;
-      one.POSSIZE   = POSSIZE;
-      one.TOSLIDE   = TOSLIDE;
-      one.FX      = FX;
-      one.VIEW    = VIEW;
-
-
-
-      // Embbed 'one' variable into module outside
-      SWIPE     = M.Module('SWIPE');
-      RESPONSIVE  = M.Module('RESPONSIVE');
-      NAV       = M.Module('NAV');
-      PAG       = M.Module('PAG');
-      CAPTION     = M.Module('CAPTION');
-      IMAGE     = M.Module('IMAGE');
-      VIDEOBACK   = M.Module('VIDEOBACK');
-      VIDEOIFRAME   = M.Module('VIDEOIFRAME');
-      IFRAME    = M.Module('IFRAME');
-      HOTSPOT     = M.Module('HOTSPOT');
-      LAYER     = M.Module('LAYER');
-      LAYERPARALLAX = M.Module('LAYERPARALLAX');
-      PARALLAX    = M.Module('PARALLAX');
-      RUBYANIMATE   = M.Module('RUBYANIMATE');
-      SLIDESHOW   = M.Module('SLIDESHOW');
-      TIMER     = M.Module('TIMER');
-      FLICKR    = M.Module('FLICKR');
-      DISPLAY     = M.Module('DISPLAY');
-      DEEPLINKING   = M.Module('DEEPLINKING');
-      COOKIE    = M.Module('COOKIE');
-      FULLSCREEN  = M.Module('FULLSCREEN');
-      NESTED    = M.Module('NESTED');
-      CLASSADD    = M.Module('CLASSADD');
-      OLD       = M.Module('OLD');
-      APIREMOTE   = M.Module('APIREMOTE');
-
-      API       = $.extend(
-                API,
-                rt01MODULE.APIMORE
-              );
-
-      VIEW      = $.extend(
-                VIEW,
-                rt01MODULE.VIEWMATH,
-                rt01MODULE.VIEWCSS,
-                rt01MODULE.VIEWCOVERFLOW3D,
-                one
-              );
-
-
-      // Check module outside exist
-      is.SWIPE     = !!rt01MODULE.SWIPE;
-      is.RESPONSIVE  = !!rt01MODULE.RESPONSIVE;
-      is.NAV       = !!rt01MODULE.NAV;
-      is.PAG       = !!rt01MODULE.PAG;
-      is.CAP       = !!rt01MODULE.CAPTION;
-      is.IMAGE     = !!rt01MODULE.IMAGE;
-      is.VIDEOBACK   = !!rt01MODULE.VIDEOBACK;
-      is.VIDEOIFRAME   = !!rt01MODULE.VIDEOIFRAME;
-      is.IFRAME    = !!rt01MODULE.IFRAME;
-      is.HOTSPOT     = !!rt01MODULE.HOTSPOT;
-      is.LAYER     = !!rt01MODULE.LAYER;
-      is.LAYERPARALLAX = !!rt01MODULE.LAYERPARALLAX;
-      is.PARALLAX    = !!rt01MODULE.PARALLAX;
-      is.RUBYANIMATE   = !!rt01MODULE.RUBYANIMATE;
-      is.SLIDESHOW   = !!rt01MODULE.SLIDESHOW;
-      is.TIMER     = !!rt01MODULE.TIMER;
-      is.FLICKR    = !!rt01MODULE.FLICKR;
-      is.DISPLAY     = !!rt01MODULE.DISPLAY;
-      is.DEEPLINKING   = !!rt01MODULE.DEEPLINKING;
-      is.COOKIE    = !!rt01MODULE.COOKIE;
-      is.FULLSCREEN  = !!rt01MODULE.FULLSCREEN;
-      is.NESTED    = !!rt01MODULE.NESTED;
-      is.CLASSADD    = !!rt01MODULE.CLASSADD;
-      is.APIREMOTE   = !!rt01MODULE.APIREMOTE;
-    },
-
-    /**
-     * MERGE ALL OPTIONS TOGETHER
-     */
-    MergeAllOpts : function() {
-      var optsDefault = rt01VA.optsDefault;
-
-
-      /**
-       * GET DATA ON HTML5
-       *  + Check option of 'data' is json
-       *  + Make sure convert to json if it's object
-       */
-      var optsData = $ruby.data(rt01VA.rubyData);
-      optsData = M.StringToJson(optsData);
-
-
-      /**
-       * MERGE OPTIONS :
-       *  + Merge all options on data html5 + data js into default options of ruby
-       *  + Priority order: [optsData] > [OptsJS] > [options type ruby] > [default options]
-       *  + Priority special options for the browser not support transform
-       *  + Priority special options for mobile
-       */
-      var nameOptsPlus = null;
-      if( !!optsData.type )        nameOptsPlus = optsData.type;
-      if( !nameOptsPlus && !!OptsJS.type ) nameOptsPlus = OptsJS.type;
-      if( !nameOptsPlus )             nameOptsPlus = optsDefault.type;
-
-      var optsPlus = rt01VA.optsPlus[nameOptsPlus];
-      o = $.extend(true, o, optsDefault, optsPlus, OptsJS, optsData);
-
-      if( !is.tf )  o = $.extend(true, o, o.fallback);
-      if( is.mobile ) o = $.extend(true, o, o.mobile);
-      else      o = $.extend(true, o, o.desktop);
-    },
-
-
-
-
-
-
-
-
-
-
-    /**
-     * SPLIT & STORE ARRAY HAS 3 ELEMENTS
-     */
-    Chain3 : function(val, nameValue) {
-
-      // Check 'nameValue', default is 'value'
-      if( !nameValue ) nameValue = 'value';
-
-
-      /**
-       * CONVERT TYPE OF VALUE TO ARRAY
-       *  + Case 1: nummber
-       *  + Case 2: array has 3 item & value of each item is number
-       */
-      if   ( $.isNumeric(val) )     val = [[val, 0, 100000]];
-      else if( M.ElesIsNumber(val, 3) ) val = [val];
-
-
-      // CONDITIONAL EXECUTION
-      if( !$.isArray(val) ) return false;
-
-
-      // SETUP CONTINUE
-      var chain = { num : val.length },
-        wMax  = 0;    // Maximun value in array[]
-
-      for( i = chain.num-1; i >= 0; i-- ) {
-        var a = val[i];
-
-        // Additional automated missing value
-        if( $.isNumeric(a) ) a = [a, 0, 100000];
-
-        // Convert string to other type
-        a[1] = M.PInt(a[1]);
-        a[2] = M.PInt(a[2]);
-
-        chain[i] = {
-          'from' : a[1],
-          'to'   : a[2]
-        };
-
-        chain[i][nameValue] = parseFloat(a[0]);    // included float number
-
-        // Search maxiumum value in array[]
-        wMax = (wMax < a[2]) ? a[2] : wMax;
-      }
-
-      chain.wMax = M.PInt(wMax);
-      return chain;
-    },
-
-    /**
-     * SPLIT && STORE ARRAY HAS 4 ELEMENTS
-     *  + Similar 'chain3()'
-     *  + Case 2 value -> remove value 3 & 4
-     */
-    Chain4 : function(val) {
-
-      // Convert to standard array
-      if   ( $.isNumeric(val) )     val = [[val, val, 0, 100000]];
-      else if( M.ElesIsNumber(val, 2) ) val = [[val[0], val[1], 0, 100000]];
-      else if( M.ElesIsNumber(val, 4) ) val = [val];
-
-      // Conditional execution
-      if( !$.isArray(val) ) return false;
-
-
-
-      /**
-       * SETUP CONTINUE
-       */
-      var chain = { num : val.length },
-        wMax  = 0;
-
-      for( i = chain.num - 1; i >= 0; i-- ) {
-        var a = val[i];
-
-        // Additional automated missing value
-        if( $.isNumeric(a) ) a = [a, a, 0, 100000];
-
-        // Case: auto set from/to
-        if( a.length == 2 ) { a[2] = 0; a[3] = 1e5; }
-
-        // Case: double first value -> value left = value right
-        else if( a.length == 3 ) { a.unshift(a[0]) }
-
-
-        // Array: setting chain
-        chain[i] = {
-          'left'  : parseFloat(a[0]),
-          'right' : parseFloat(a[1]),
-          'from'  : M.PInt(a[2]),
-          'to'  : M.PInt(a[3])
-        };
-
-        // wMax: width-to maximum
-        wMax = (wMax < M.PInt(a[3])) ? a[3] : wMax;
-      }
-
-      chain.wMax = M.PInt(wMax);
-      return chain;
-    },
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * SETUP PROPERTIES OF DEEPLINKING & COOKIE AT FIRST
-     */
-    DeepLinkCookie : function() {
-
-      // Update idCur & idBegin if 'deeplinking' or 'cookie' actived
-      // Priority 'deeplinking' than 'cookie' if actived same time
-      if( o.isDeeplinking ) is.DEEPLINKING && DEEPLINKING.Read();
-      else if( o.isCookie ) is.COOKIE && COOKIE.Read();
-    },
-
-
-
-
-
-
-
-
-
-
-    /**
-     * SETUP PROPERTIES AT FIRST
-     */
-    FirstSetup : function() {
-
-      /**
-       * THE VALUE SETUP ONLY ONCE
-       */
-      if( !va.stepSetupInit ) {
-
-        // Create tween object
-        va.tweenView  = new RubyTween();
-        va.tweenSlide   = new RubyTween();
-        va.tweenCaption = new RubyTween();
-
-        va.tweenClone = new RubyTween();
-        va.tweenMath  = new RubyTween();
-        va.tweenParallaxScroll = new RubyTween();
-
-        // Initialize object at first
-        va.fxCSS    = {};
-        va.fxMath     = {};
-        va.ssIDRandom   = [];
-        va.fxMathRandom = [];
-
-        // Variable of Flickr
-        va.flickrData    = {};
-        va.flickrListPhoto = [];
-
-
-
-        // Shortcut for isLoop
-        is.loop = o.isLoop;
-
-        // Default swipe object is Canvas
-        va.$swipeCur = $canvas;
-
-        // Varible of position
-        va.xBuffer = 0;
-
-        // Properties of Canvas & pagination -> support for swipe
-        va.can = { 'viewport' : $viewport };
-        // Initialize at first, not setting because no 'isPag' & '$pag'
-        va.pag = {};
-
-        // Variable of loadding
-        va.nLoadAtFirst = 0;    // Number of slide add to loading
-        va.nLoaded    = 0;    // Number of slide already loaded
-        is.preloaded  = false;  // Check preload finish
-
-        // Add name of browser into ruby -> support fixed transform by css
-        var ns    = ' ' + va.ns,
-          classes = ns + va.browser;
-        if( is.ie7 )       classes += ns +'ie7';
-        if( is.mobile )    classes += ns +'mobile';
-        if( is.androidNative ) classes += ns +'androidNative';
-        $ruby.addClass(classes);
-
-
-
-        /**
-         * SETUP PROPERTIES EACH SLIDE
-         */
-        va.fx  = {};
-        va.slot  = {};
-        va.speed = {};
-        va.delay = {};
-
-        // Array storage ID-Node on each slide
-        va.IDsOnNode = [];
-
-
-
-        /**
-         * ADDITION: DATA FOR RUBY LIKE DATA SLIDE
-         */
-        M.Data($viewport, {
-          'id'      : 'home',
-          'opts'    : $.extend(true, {}, o),
-          'tweenLayer'  : new RubyTween()
-        });
-      }
-
-
-
-      /**
-       * SETUP VARIABLE & PROPERTIES AT FRIST CAN BE UPDATE
-       */
-      // Get WidthRange of Slide
-      // Priority 'width' properties in special effect
-      var wName  = 'widthSlide',
-        fxName = o.fx,
-        wSlide = (!!o[fxName] && !!o[fxName][wName]) ? o[fxName][wName]
-                               : o[wName];
-
-      va.wSlideGrid = M.ParseGrid(wSlide, true);
-
-
-
-
-      /**
-       * GET GRID SIZE FOR RESPONSIVE
-       */
-      // Get grid size for the Responsive
-      var resLevels = o.responsiveLevels;
-      if( $.isArray(resLevels) && resLevels.length ) {
-
-        // Get Grid-width / Grid-heihgt
-        va.wGrid = M.ParseGrid(o.width, true);
-        va.hGrid = M.ParseGrid(o.height, o.width === null ? true : false);
-
-        // Get grid-padding for Responsive
-        va.maGrid = M.ParseGrid(o.margin, true);
-        va.paGrid = M.ParseGrid(o.padding2, false);
-      }
-
-      // Get type-height of Ruby
-      // is.heightFixed = $.isNumeric(o.height);
-      is.heightFixed = $.isArray(va.hGrid);
-      // Covert to height-fixed when Fullscreen
-      if( is.fullscreen ) is.heightFixed = true;
-    },
-
-    /**
-     * SETUP CAC THUOC TINH THANH TUNG MUC RIENG BIET
-     */
-    IDNum : function() {
-
-      // So luo.ng slide trong Ruby
-      num = cs.num = va.$s.length;
-
-      // ID slide current setup
-      // Tu dong chuyen doi vi tri 'begin', 'center', 'end' sang gia tri number
-      // Tu dong chuyen doi id dau neu gia tri la '<= 0'
-      // Tu dong chuyen doi id cuoi neu '>= num'
-      if( !va.stepSetupInit ) {
-        var idBegin = o.idBegin;
-
-        if   ( idBegin == 'begin' )     idBegin = 0;
-        else if( idBegin == 'center' )    idBegin = ~~((num/2) - .5);
-        else if( idBegin == 'centerRight' ) idBegin = ~~( num/2 );
-        else if( idBegin == 'end' )     idBegin = num-1;
-
-        else if (idBegin == -1 || idBegin >= num ) idBegin = num-1;
-        else if( idBegin <= 0 )          idBegin = 0;
-
-        if( cs.idCur === undefined ) cs.idCur = va.idBegin = idBegin;
-      }
-
-
-
-      // Khoa cac thuoc tinh Ruby
-      is.nav    = o.isNav && is.NAV;
-      is.pag    = o.isPag && is.PAG;
-      is.cap    = o.isCap && is.CAP;
-
-
-
-      /**
-       * SETUP FOR CASE: SPECIAL NUMBER OF SLIDE
-       */
-      // Case: 1 slide
-      // Priority order: options oneSlide > options Main
-      if( num == 1 ) {
-        is.nav = o.oneSlide.isNav ? (o.isNav && is.NAV) : false;
-        is.pag = o.oneSlide.isPag ? (o.isPag && is.PAG) : false;
-      }
-    },
-
-    Transform : function() {
-
-      // CSS duration options
-      va.xTimer = 100;
-
-
-      // Canvas: set Transition timing function
-      va.easing = o.swipe.easing;
-      va.moveBy = va.moveLastBy = 'swipe';
-    },
-
-    Direction : function() {
-
-      // Swipe direction
-      // Check 'va.addInfo' -> support update 'ver' to 'hor' dirction
-      va.can.dirs = (o.direction == 'ver' && !is.mobile) ? 'ver' : 'hor';
-      if( !(va.addInfo && va.addInfo.pagDirs) ) va.pag.dirs = o.pag.direction;
-
-      // Shortcut vertical direction
-      is.dirsHor = (va.can.dirs == 'hor');
-
-      // Variable 'cssTf' changes in swipe direction
-      // Only use on Canvas
-      if( !is.tf ) cssTf = va.cssTf = (!is.dirsVer ? 'left' : 'top');
-
-
-      // Setting properties of canvas & pagination
-      function SameValue(name) {
-        var isHor = va[name].dirs == 'hor';
-
-        // Name of transform, support for fallback
-        va[name].cssTf = is.tf ? cssTf
-                     : (isHor ? 'left' : 'top');
-
-        // Name of pageX changes depending on direction of canvas & pagination
-        va[name].pageXY = isHor ? 'pageX' : 'pageY';
-      }
-      SameValue('can');
-      SameValue('pag');
-    },
-
-    Fx : function() {
-
-      /**
-       * CHECK TYPE OF EFFECT
-       */
-      var aFxDefault = ['cssOne', 'cssTwo', 'cssThree', 'cssFour', 'none'],
-        aFx3D    = ['coverflow3D'];
-
-      function FxType() {
-
-        /**
-         * CHECK TYPE OF EFFECT IN ARRAY AFX
-         */
-        for( i = 0; i < aFxDefault.length; i++ ) {
-          if( o.fx == aFxDefault[i] ) return aFxDefault[i];
-        }
-
-
-
-        /**
-         * CASE THE SPECIAL TYPE
-         */
-        // Case: type is 'line'
-        if( o.fx === 'line' ) return 'line';
-
-        // Case: type is '3D'
-        else if( $.inArray(o.fx, aFx3D) !== -1 ) return '3d';
-
-        // The remaining case: Math effect
-        else return 'math';
-      }
-
-      va.fxType = FxType();
-
-
-
-
-      /**
-       * AUTOMATICALLY CONVERTED INTO 'DOT' LAYOUT BY NAME OF EFFECT
-       */
-      var a = ['randomMath'];
-      a = $.merge(a, aFxDefault);
-      a = $.merge(a, o.fxMathName);
-      va.fxInLayoutDot = a;
-    },
-
-    Layout : function() {
-
-      /**
-       * SETUP LAYOUT VIEW
-       */
-      var viewList = ['mask', 'coverflow3D', 'zoom3D'],
-        viewCSS  = ['cssOne', 'cssTwo', 'cssThree', 'cssFour'];
-
-      // Setup 'view' option at first
-      va.fxView = 'basic';
-      if( $.inArray(o.fx, viewList) !== -1 )          va.fxView = o.fx;
-      // Effect need RubyAnimate object
-      if( $.inArray(o.fx, viewCSS) !== -1 && is.RUBYANIMATE ) va.fxView = 'css';
-      if( $.inArray(o.fx, o.fxMathName) !== -1 )        va.fxView = 'math';
-
-      // Automatically converted 'view' if module FX not available or vertical direction
-      if( num === 1 ) va.fxView = 'basic';
-      if( !is.dirsHor ) va.fxView = 'basic';
-      if( /^(mask|coverflow3D)$/.test(va.fxView) && !rt01MODULE['VIEW'+ va.fxView.toUpperCase()] ) va.fxView = 'basic';
-
-      // Capitailize the first letter of 'view'
-      va.View = M.ProperCase(va.fxView);
-
-
-
-
-      /**
-       * SETUP LAYOUT
-       */
-      va.fxLayout = 'line';
-      o.stepNav = o.stepPlay = 1;
-
-
-
-
-      /**
-       * CONVERT TO OTHER LAYOUT
-       * @param string va.fxLayout
-       */
-      if( o.fx == 'line') va.fxLayout = 'line';
-
-      // If 'o.fx' is name of list 'o.fxMathName' or is array -> convert to 'dot' layout
-      else if( $.inArray(o.fx, va.fxInLayoutDot) !== -1 || $.isArray(o.fx) ) va.fxLayout = 'dot';
-
-      // Convert to other layout depends on 'view' options
-      var viewListToLine = ['mask', 'coverflow3D'];
-      if( $.inArray(o.fx, viewListToLine) !== -1 ) va.fxLayout = 'line';
-    },
-
-    Center : function() {
-
-      /**
-       * SETUP IN CASE: HAS SPECIAL NUMBER OF SLIDE
-       */
-      if( num == 1 || num == 2 ) {
-        if( va.fxLayout === 'line' ) {
-          is.center = is.loop = false;
-        }
-      }
-
-      else {
-        is.center = o.isCenter;
-        is.loop   = o.isLoop;
-      }
-
-      // Create new variable to easy comparision -> center & loop same time
-      // Case: pagination is 'tabs' -> loading normal
-      is.centerLoop = is.center && is.loop;
-
-
-
-
-      /**
-       * SETUP VALUE OF 'CENTER' VARIABLE
-       */
-      var center = va.center = {
-        'isOdd' : M.C(num / 2) > num / 2
-      };
-
-
-
-      /**
-       * SETUP FOR CENTER LAYOUT
-       */
-      if( is.centerLoop ) {
-
-        // Slide clone be reset -> focus support for 'fillHole'
-        !!va.$slClone && va.$slClone.remove();
-        va.$slClone = $('');
-
-
-        // Number of slide left & right
-        center.nLeft  = ~~((num - 1) / 2);
-        center.nRight = center.nLeft + (center.isOdd ? 0 : 1);
-      }
-
-
-
-      /**
-       * SETUP FOR LAYOUT NOT CENTER
-       */
-      else {
-
-        // Number of slide left & right
-        PROP.CenterNoLoop();
-      }
-    },
-
-    /**
-     * SETUP VALUE OF CENTER LAYOUT NOT LOOP
-     */
-    CenterNoLoop : function() {
-      va.center.nLeft  = cs.idCur;
-      va.center.nRight = num - cs.idCur - 1;
-    },
-
-    SwipeEvent : function() {
-
-      // Setup options at first
-      if( !va.stepSetupInit ) {
-        va.swipeTypeCur = null;
-      }
-    },
-
-    Responsive : function() {
-
-      // Declare the variable at first
-      va.pa = [];
-
-
-      /**
-       * SETUP IN CASE: HAVE RESPONSIVE
-       */
-      // is.res = $.isNumeric(o.width) && is.RESPONSIVE;
-      is.res = $.isArray(va.wGrid) && is.RESPONSIVE;
-      if( is.res ) {
-
-        // va.wRes = o.width;
-        va.wRes = va.wGrid[0];
-        // va.hRes = is.heightFixed ? o.height : 0;
-        va.hRes = is.heightFixed ? va.hGrid[0] : 0;
-
-        // Fullscreen: setup
-        if( is.fullscreen ) {
-
-          // Height responsive : auto add value when not setup --> used for fullscreen
-          if( va.hRes == 0 ) va.hRes = va.wRes;
-
-          // Ratio responsive
-          va.rRes = va.wRes / va.hRes;
-        }
-      }
-
-
-
-      /**
-       * SETUP VARIABLE AT FIRST
-       */
-      if( !va.stepSetupInit ) {
-        va.rate = 1;
-      }
-    },
-
-    Grab : function() {
-
-      // Grab stop
-      if( o.isViewGrabStop ) $viewport.addClass(va.ns +'grabstop');
-      else           $viewport.removeClass(va.ns +'grabstop');
-    },
-
-    Pagination : function() {
-      var op = o.pag;
-
-      // Support for old version
-      if( op.type == 'tab' ) op.type = 'tabs';
-
-      // Setup for 'list' type of pagination -> only render not setup event
-      is.pagList  = op.type == 'list';
-      is.pagTabs  = op.type == 'tabs';
-      is.pagThumb = op.type == 'thumbnail';
-      is.alignJustify = op.align == 'justify';
-      if( is.pagList ) is.swipeOnPag = false;
-
-
-      // CHECK VERTICAL TABS
-      function IsPagVer(opts, pag) {
-        return !is.pagOutside
-          && !is.pagList
-          && (opts.isPag && pag.direction == 'ver');
-      }
-
-
-      // CHECK TYPE OF VERTICAL TABS
-      va.pagVer = IsPagVer(o, o.pag) && va.pag.dirs == 'ver' ? (o.pag.position == 'begin' ? 'begin' : 'end')
-                                   : null;
-
-      // Reset margin oin Viewport if before is vertical tabs
-      if( !!va.stepSetupInit && IsPagVer(oo, oo.pag) ) {
-        $viewport.css({ 'margin-left': '', 'margin-right': '' });
-      }
-
-      // Check size of pagItem = size of Item
-      // If there is fixed size -> size Self pagItem = false
-      is.pagItemSizeSelf = (op.typeSizeItem == 'self' && !is.alignJustify);
-      if( $.isNumeric(op.width) || $.isNumeric(op.height) ) is.pagItemSizeSelf = false;
-    },
-
-    Slideshow : function() {
-
-      // Timer
-      var ss = o.slideshow;
-      is.slideshow = o.isSlideshow && is.SLIDESHOW;
-      is.timer = is.slideshow && ss.isTimer && is.TIMER;
-      va.timer = (ss.timer == 'arc' && !is.canvas2d) ? 'line' : ss.timer;
-
-      // Button PlayPause
-      is.playpause = is.slideshow && ss.isPlayPause;
-      is.ssControl = is.timer || is.playpause;
-
-      // Setup autoRun -> autoRun = false, when at same time the playpause & isAutoRun = false
-      is.autoRun = !(ss.isPlayPause && !ss.isAutoRun);
-      is.ssPauseAbsolute = !is.autoRun;
-
-      // Setup other
-      is.ssRunInto   = ss.isRunInto;
-      is.hoverAction = false;
-      is.stop    = false;
-    },
-
-    LastSetup : function() {
-
-      // Update value when refresh ruby
-      if( va.stepSetupInit ) {
-
-        // Update fixed: remove Viewport-height inline
-        is.heightFixed && $viewport.css('height', '');
-      }
-
-      // Remove all options in free version
-      o.rev[0] == 'eerf' && NOISREV.Eerf();
-    },
-
-    /**
-     * SETUP THE PROPERTIES OF RUBY IN SEPARATE FUNCTION
-     */
-    Ruby : function() {
-
-      /**
-       * SETUP THE PROPERTIES AT FIRST -> PRIORITY ORDER IMPORTANT
-       */
-      PROP.FirstSetup();
-      PROP.IDNum();
-      PROP.Transform();
-      PROP.Direction();       // Affecting 'view' direction
-
-      PROP.Fx();
-      PROP.Layout();
-      PROP.Center();
-      PROP.SwipeEvent();      // Affecting fx & layout
-      PROP.Responsive();
-
-      PROP.Grab();
-      PROP.Pagination();      // Below swipe event
-      PROP.Slideshow();
-      PROP.LastSetup();
-
-
-
-      /**
-       * SETUP THE REST
-       */
-      // Ruby: clear datas after first setup Ruby
-      !va.stepSetupInit && $ruby.removeAttr('data-'+ rt01VA.rubyData).removeData(rt01VA.rubyData);
-
-      // Variable to recognize call PROP.Setup() run first
-      if( va.stepSetupInit === undefined ) va.stepSetupInit = 1;
-
-      // Add class after setup properties
-      UPDATE.AddClass();
-    },
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * PROPERTIES & OPTIONS EACH SLIDE
-     */
-    Slides : function() {
-
-      // Reset position of slide at first in fallback mode
-      if( !is.tf ) va.$s.css({ 'left': '', 'top': '' });
-
-
-
-      /**
-       * SETUP EACH SLIDE
-       */
-      var fxType = va.fxType;
-      va.$s.each(function(i) {
-
-        var $slCur  = $(this),
-          slData  = M.Data($slCur),
-          optsCur = slData['opts'] || {};
-
-
-        /**
-         * SETUP REQUIRED PART
-         *  + Store ID for each slide
-         *  + Store ID for each pagitem
-         */
-        slData['id'] = i;
-        is.pag && M.Data(va.$pagItem.eq(i), { 'id': i });
-
-
-
-        /**
-         * SETUP CURRENT OPTIONS OF EACH SLIDE
-         *  + Case: at first setup slide after initialize ruby || no options in data of current slide
-         *  + Case: update properties of ruby
-         *  + Case: update properties of each slide
-         *  + Case: change number of slide || add slide by api
-         */
-        if( va.fx[i] === undefined || $.isEmptyObject(optsCur) || slData.loadBy == 'apiAdd' ) {
-          var nameData = 'data-'+ o.nameDataSlide,
-            optsData = $slCur.data(o.nameDataSlide),
-            msgError = 'options on "XX" in Slide YY not valid'
-                  .replace(/XX/, nameData)
-                  .replace(/YY/, i);
-
-          optsData = M.StringToJson(optsData, msgError);
-          optsCur  = $.extend(true, optsCur, o, optsData);
-
-          // Remove 'data-slide' attribute on each slide
-          $slCur.removeAttr(nameData);
-        }
-
-        // Case: update properties of ruby
-        else if( $.isPlainObject(va.optsUpdate) && !$.isEmptyObject(va.optsUpdate) ) {
-          optsCur = $.extend(true, optsCur, va.optsUpdate);
-        }
-
-        // Case: update properties of each slide
-        else if( $.isPlainObject(va.optsSlides) && $.isPlainObject(va.optsSlides[i]) ) {
-          optsCur = $.extend(true, optsCur, va.optsSlides[i]);
-        }
-
-        // Case: remove slide by api
-        else if( is.apiRemove ) {}
-
-        // The remaining case -> not setup anymore
-        else return;
-
-
-
-        /**
-         * SETUP PROPERTIES OF EFFECT
-         */
-        // Setup Fx name
-        if( /^(cssOne|cssTwo|cssThree|cssFour)$/.test(fxType) ) {
-
-          // Setup & store current effect into variable
-          va.fx[i] = VIEW.GetFxCss(fxType, optsCur);
-        }
-
-        else if( fxType == 'none' ) va.fx[i] = 'none';
-        else            va.fx[i] = (va.fxLayout == 'line') ? null : optsCur.fx;
-
-
-        // Setup Others options
-        va.slot[i]  = optsCur.slot;
-        va.speed[i] = optsCur.speed;
-        va.delay[i] = optsCur.slideshow.delay;
-        optsCur.imageback.posGrid = M.ParseGrid(optsCur.imageback.position, true);
-        slData['opts'] = optsCur;
-
-        // Check minimum value of 'speed' & 'delay'
-        if( va.speed[i] < 200 ) va.speed[i] = 200;
-        if( va.delay[i] < 500 ) va.delay[i] = 500;
-
-
-
-
-        /**
-         * SETUP OTHER PROPERTIES
-         */
-        // Store classAdd of each slide
-        if( is.CLASSADD ) va.classAdd[i] = CLASSADD.Filter(optsCur);
-
-        // Check have id-text & store all id-text of slide into array variable
-        va.IDsOnNode[i] = $slCur.attr('id');
-
-        // Check + setup Iframe lazy
-        is.IFRAME && IFRAME.Init($slCur);
-
-        // Store 'control' element
-        // Store all current options on each slide
-        slData['control']  = optsCur.control;
-        slData['tweenLayer'] = slData['tweenLayer'] || new RubyTween();
-      });
-
-
-
-      /**
-       * SETUP THE END VARIABLE
-       */
-      va.tDelay = va.delay[cs.idCur];
-
-      // value 1: for init Ruby; value 2: for init slide
-      if( va.stepSetupInit === 1 ) va.stepSetupInit = 2;
-
-      // Toggle 'first' & 'last' class for pagitems
-      is.pag && PAG.FirstLastClass();
-    }
-  },
-
-
-
-
-
-
-
-
-
-
-  /**
-   * UPDATE VALUE PROPERTIES
-   */
-  UPDATE = {
-
-    // Add class into ruby after update
-    AddClass : function() {
-
-      // Ruby: class layout & height type
-      var ns    = ' ' + va.ns,
-        classRuby = '{ns}type-{type} {ns}layout-{layout} {ns}fxlayout-{fxlayout} {ns}fxview-{fxview} {ns}fxtype-{fxtype} {ns}height-{height} {ns}lazy-{lazytype}'
-                .replace(/\{ns\}/g, va.ns)
-                .replace(/\{type\}/, o.type)
-                .replace(/\{layout\}/, o.layout)
-                .replace(/\{fxlayout\}/, va.fxLayout)
-                .replace(/\{fxview\}/, va.fxView)
-                .replace(/\{fxtype\}/, va.fxType)
-                .replace(/\{height\}/, is.heightFixed ? 'fixed' : 'auto')
-                .replace(/\{lazytype\}/, o.lazyType);
-
-      // Class recognize browser support transform & showInRange
-      classRuby += ns + (is.tf ? 'transform' : 'no-transform');
-      classRuby += is.opacity ? '' : ns +'no-opacity';
-      classRuby += o.skin !== null ? ns + o.skin : '';
-      if( !is.showInRange ) classRuby += ns +'none';
-
-      // Add class into ruby after setup
-      $ruby.addClass(classRuby);
-
-      // Pagination add type class
-      is.pag && PAG.ToggleClass(true);
-    },
-
-    // Remove current class on ruby -> used for update properties
-    RemoveClass : function() {
-
-      // Ruby: remove exist class
-      var classRuby = '{ns}type-{type} {ns}layout-{layout} {ns}fxlayout-{fxlayout} {ns}fxview-{fxview} {ns}fxtype-{fxtype} {ns}height-{height} {ns}lazy-{lazytype}'
-                .replace(/\{ns\}/g, va.ns)
-                .replace(/\{type\}/, oo.type)
-                .replace(/\{layout\}/, oo.layout)
-                .replace(/\{fxlayout\}/, vava.fxLayout)
-                .replace(/\{fxview\}/, vava.fxView)
-                .replace(/\{fxtype\}/, vava.fxType)
-                .replace(/\{height\}/, isis.heightFixed ? 'fixed' : 'auto')
-                .replace(/\{lazytype\}/, oo.lazyType);
-
-
-      // First, remove class in ruby
-      classRuby += oo.skin !== null ? (' ' + va.ns + oo.skin) : '';
-      $ruby.removeClass(classRuby);
-
-      // Remove class added on pagination
-      is.pag && PAG.ToggleClass(false);
-    },
-
-    // Reset other when update options
-    Reset : function() {
-
-      // Layout dot: remove translate
-      if( va.fxLayout == 'dot' ) {
-        var _tf = {}; _tf[cssTf] = '';
-        va.$s.css(_tf);
-        POSITION.AnimateX($canvas, 0, 1, 1);
-      }
-
-      // Remove 'perspective' on Viewport
-      if( /^(basic)$/.test(va.fxView) ) {
-        var tf = {}; tf[va.prefix +'perspective'] = '';
-        $viewport.css(tf);
-      }
-    },
-
-
-    /**
-     * UPDATE 'MASK' ON CAVAS
-     */
-    CanvasMask : function() {
-      var isMaskCur = M.Data(cs.idCur)['opts']['isMask'],
-        classMask = va.ns + 'mask';
-
-
-      /**
-       * CASE: MASK AUTO
-       */
-      if( isMaskCur == 'auto' ) {
-
-        /**
-         * CASE TYPE FX IS 'CSS'
-         */
-        if( /^css/.test(va.fxType) ) {
-          $viewport.removeClass(classMask);
-        }
-
-
-        /**
-         * CASE OTHER TYPE OF FX
-         */
-        else {
-          $viewport.addClass(classMask);
-        }
-      }
-
-
-
-      /**
-       * CASE OTHER MASK
-       */
-      else if( isMaskCur === false ) $viewport.removeClass(classMask);
-      else               $viewport.addClass(classMask);
-    },
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * REUPDATE WHEN WINDOW RESIZE
-     *  + Order functions is important !!!
-     */
-    Resize : function() {
-      // console.log('resize');
-      M.RunEvent('resize');                 // Trigger event 'resize'
-
-      // Setup size of pagItem
-      // + Search value of wItem/hItem
-      // + In vertical tabs -> need reset size of pagination at first
-      is.pag && !is.pagList && PAG.TypeSizeItem();
-
-
-      SIZE.WidthForRuby();                // First, get 'width' of ruby
-      is.res && RESPONSIVE.UpdateVars();          // Responsive: calculation padding & va.rate
-      is.IMAGE && IMAGE.UpdateAllImageBy('size');     // Update size of Image item when there is width of slide
-      is.VIDEOBACK && VIDEOBACK.UpdateAllVideoBy('size', '$videoback');
-
-
-      is.heightFixed && SIZE.HeightFixedForRuby();    // First, get height of ruby -> support image autoFit/autoFill
-      SIZE.EndOfRuby();                   // Size of ruby depends on direction
-      is.res && is.fullscreen && FULLSCREEN.Variable();  // Fullscreen: reupdate variable -> 'padding' & v'a.rate' need height of ruby first
-      is.IMAGE && IMAGE.UpdateAllImageBy('position');   // Update all position of Imageback all slides, after getting height of ruby
-
-
-      if( is.VIDEOBACK ) {
-        VIDEOBACK.UpdateAllVideoBy('position', '$videoback');
-        VIDEOBACK.UpdateAllVideoBy('size', '$videobackPoster');
-
-        // Must update position of Videoback first
-        VIDEOBACK.UpdateAllVideoBy('position', '$videobackPoster');
-      }
-
-
-      is.PARALLAX && PARALLAX.Check(va.$s);         // Update Parallax effect in all slides
-      POSSIZE.CombineAtFirst();
-
-
-
-      /**
-       * SETUP NEED DELAY TIMER
-       */
-      setTimeout(function() {
-
-        // Setup Layer
-        if( is.LAYER ) {
-
-          // Update properties of Layer in all slides
-          // Update position of Layer in current slide
-          LAYER.Update();
-          LAYER.Resume(cs.idCur);
-          LAYER.Resume('home');
-        }
-
-        // Setup Hotspot
-        is.HOTSPOT && HOTSPOT.UpdatePosition(cs.idCur);
-      }, 30);
-
-      SIZE.AnimHeightForRuby(true);             // animHeightForRuby: update make image shake
-      M.RunEvent('resizeEnd');              // Trigger event 'resizeEnd'
-    }
-  },
-
-
-
-
-
-
-
-
-
-
-  /**
-   * NOISREV
-   */
-  NOISREV = {
-    Check : function() {
-
-      // Initialize variable
-      var ver   = o.rev[0],
-        isRun = false;
-
-      // Pre version
-      if   ( ver == 'erp' || ver == 'eerf' ) isRun = true;
-      else if( ver == 'omed') {
-
-        var demoURL = o.rev[1].split('').reverse().join('');
-        if( document.URL.indexOf(demoURL) !== -1 ) isRun = true;
-      }
-      return isRun;
-    },
-
-    // Properties of free version
-    Eerf : function() {
-
-      // Options chung
-      var options = {
-        cssOne    : null,
-        cssTwoIn  : null,
-        cssTwoOut   : null,
-        cssEasing   : null,
-
-        isSlideshow : false,
-        name    : null
-      };
-      o  = $.extend(true, o, options);
-
-      // Layout line
-      if( o.fx === null ) { o.fx = va.fxLayout = 'line' }
-
-      // 'pag' options
-      o.pag.direction = 'hor';
-    }
-  },
-
-
-
-
-
-
-
-
-
-
-  /**
-   * RENDER ELEMENTS
-   */
-  RENDER = {
-
-    /**
-     * RENDER STRUCTURE MARKUP OF THE ELEMENTS
-     */
-    Structure : function() {
-
-      // Setup markup first: Viewport, Canvas
-      RENDER.Anchor();
-      RENDER.Viewport();
-      RENDER.Canvas();
-      RENDER.OverlayGhost($viewport);
-
-
-      // Search + setup home layer
-      is.LAYER && LAYER.LayerHomeMarkup();
-
-
-      // Slides: setup markup
-      // + Create '$s' empty -> add new slide in loop function
-      va.$s = $('');
-      $canvas.children().each(function() { RENDER.Slide($(this)) });
-
-
-      // Setup each elements each slide
-      va.$s.each(function() {
-        var $slCur = $(this);
-
-        // Setup Caption, PagItem
-        RENDER.CapPagHTML($slCur);
-
-        // Setup Videos
-        is.VIDEOIFRAME && VIDEOIFRAME.ConvertTag($slCur);
-      });
-    },
-
-    /**
-     * CREATE MARKUP OF ANCHOR FOR FULLWIDTH - FULLSCREEN LAYOUT
-     */
-    Anchor : function() {
-
-      // Conditional execution
-      if( is.fullwidth || is.fullscreen ) {
-        var classAnchor = va.ns + 'anchor';
-
-        // Create new element 'anchor'
-        va.$anchor = $('<div/>', { 'class': classAnchor });
-
-        // Append $anchor after ruby
-        $ruby.before(va.$anchor);
-
-        // Set position & size for Ruby at fist
-        POSSIZE.Anchor();
-      }
-    },
-
-    /**
-     * CREATE MARKUP OF VIEWPORT
-     */
-    Viewport : function() {
-
-      // Initialize variable
-      var viewClass = va.ns + o.nameViewport,
-        viewport  = $ruby.children('.'+ viewClass);
-
-
-      // Search markup viewport
-      if( viewport.length ) $viewport = viewport;
-      else {
-        $ruby.wrapInner( $(divdiv, { 'class': viewClass }) );
-        $viewport = $ruby.children('.'+ viewClass);
-      }
-
-      // Store 'viewport' in variable
-      va.$viewport = $viewport;
-    },
-
-    /**
-     * CREATE MARKUP OF CANVAS
-     *  + Default tagname is 'div'
-     *  + Can chnages tagName of canvas by 'tagName' option
-     *  + Automatically changes tagName of canvas to 'ul' if tagName of slide is 'li'
-     */
-    Canvas : function() {
-
-      // Initialize variable
-      var canvasClass = va.ns + o.nameCanvas,
-        tagCanvas   = o.tagCanvas,
-        canvas    = $viewport.children('.'+ canvasClass);
-
-
-      /**
-       * CASE: MARKUP CANVAS IS OUTSIDE || EXIST BEFORE
-       */
-      if( canvas.length ) {
-        tagCanvas = canvas[0].tagName.toLowerCase();
-      }
-
-
-      /**
-       * CASE: CREATE NEW MARKUP OF CANVAS
-       */
-      else {
-
-        /**
-         * CASE: SLIDES EXIST
-         */
-        var $slides = $viewport.children();
-        if( $slides.length ) {
-
-          // Automatically changes tagCanvasName if tagName of children is 'li'
-          if( tagCanvas == 'div' && $slides[0].tagName.toLowerCase() == 'li' ) tagCanvas = 'ul';
-
-          var html = (tagCanvas == 'ul') ? '<ul/>' : divdiv;
-          $slides.wrapAll( $(html, {'class': canvasClass}) );
-        }
-
-
-        /**
-         * CASE: THE SLIDES NOT EXIST
-         */
-        else {
-          $viewport.append( $('<div/>', { 'class': canvasClass }) );
-        }
-      }
-
-
-
-      /**
-       * STORE CANVAS INTO GLOBAL VARIABLE
-       */
-      $canvas = va.$canvas = $viewport.children('.'+ canvasClass);
-      M.Data($canvas, { 'tagName': tagCanvas, 'pos' : { 'x' : 0 } });
-    },
-
-    /**
-     * OVERLAY GHOST: SUPPORT SWIPE GESTURE NOT PREVENT BY ANY OTHER ELEMENTS
-     */
-    OverlayGhost : function($parent) {
-
-      var $overlayGhost = $(divdiv, { 'class' : va.ns +'overlay-ghost' });
-      $parent.append($overlayGhost);
-    },
-
-    /**
-     * CREATE MARKUP OF SLIDES
-     *  + Wrap 'div'/'li' for slide without wrapper
-     *  + Add class '{ns}slide' & add icon loader into slide
-     */
-    Slide : function($sl) {
-      var slClass  = va.ns + o.nameSlide,
-        slTagBegin = $sl[0].tagName.toLowerCase();
-
-
-      /**
-       * SETUP OF TAG NAME
-       */
-      // Case: wrapper is 'div|li|article|section'
-      if( /^(div|li|article|section)$/.test(slTagBegin) || $sl.hasClass(slClass) ) {
-        // do nothing
-      }
-
-      // Case: wrapper is 'style|script' -> remove setup
-      else if( /^(style|script)$/.test(slTagBegin) ) {
-        return;
-      }
-
-      // Case: wrapper is '<br>' -> remove current slide
-      else if( /^(br)$/.test(slTagBegin) ) {
-        $sl.remove();
-        return false;
-      }
-
-      // Slide without wrapper, only one element link '<a>', '<img>'
-      else {
-        var canvasTag = M.Data($canvas)['tagName'],
-          slTag   = (canvasTag == 'ul') ? '<li/>' : divdiv,
-          $wrapper  = $(slTag, { 'class': slClass });
-
-        $sl.wrap($wrapper);
-        $sl = $sl.closest('.'+ slClass);
-      }
-
-
-
-
-      /**
-       * GET LINK ON SLIDE
-       */
-      var dataLink   = $sl.data('link'),
-        linkTarget = $sl.data('link-target') || '',
-        link     = null;
-
-      if( dataLink !== undefined && !/^\s*$/.test(dataLink) ) {
-
-        // Store link url
-        link = dataLink;
-
-        // Create new markup of slide link
-        $sl
-          .addClass(M.NS('{ns}link-onslide'))
-          .removeAttr('data-link data-link-target');
-      }
-
-
-
-
-      // Slide: add class -> make sure slide has class nameSlide
-      // Slides assign to variable $s, add class 'sleep' to setup height 100% , hidden all children
-      $sl
-        .addClass( slClass )
-        .addClass( M.NS('{ns}sleep {ns}no-loaded') )
-        .addClass( va.deactived );
-
-      // Slide: initialize properties in data to get info without error
-      var FALSE = false;
-      M.Data($sl, {
-        'link'     : link,
-        'linkTarget' : linkTarget,
-        'isLoading'  : FALSE,
-        'isLoaded'   : FALSE,
-        'isImgback'  : FALSE,
-        'isVideo'  : FALSE,
-        'isAjax'   : FALSE,
-        'isPagEmpty' : FALSE,
-        'loadBy'   : 'normal'
-      });
-
-
-      // Insert icon loader into slide
-      RENDER.LoaderAdd($sl, $sl, '$slLoader');
-
-      // Insert slide to '$s' variable
-      va.$s = va.$s.add($sl);
-
-      // Return slide: supprot for add new slide by api
-      return $sl;
-    },
-
-    /**
-     * SEARCH & CREATE MARKUP CAPTION ITEM & PAGITEM OF CURRENT SLIDE
-     */
-    CapPagHTML : function($slCur) {
-
-      /**
-       * SEARCH CONTENT CAPTION OF CURRENT SLIDE
-       */
-      var ns     = va.ns,
-        capHTML  = '',
-        slData   = M.Data($slCur),
-        $imgback = $slCur.find('.' + ns + o.nameImageBack);
-
-      // First, get content of Imageback
-      $imgback.each(function() {
-        var $i = $(this);
-
-        // Content of caption depends on tagName
-        // + is image: get content in 'alt' attribute
-        // + is link tag: get content inside tag
-        var tag = this.tagName.toLowerCase();
-        if   ( tag === 'img' ) capHTML = $i.attr('alt');
-        else if( tag === 'a' )   capHTML = $i.html();
-      });
-
-
-      // Keep searching content in Caption item element
-      var $capItem = $slCur.children('.' + ns + 'capitem');
-      if( $capItem.length ) {
-        capHTML = $capItem.html();
-        $capItem.remove();
-      }
-
-      // Store captionItem into data slide
-      slData.htmlCap = capHTML;
-
-
-
-      /**
-       * SETUP PAGINATION ITEM
-       */
-      // Pagination item: search '.pagitem' -> store into data slide
-      var $pagItem = M.Find($slCur, M.NS('.{ns}pagitem'));
-
-      // Case: create new node if not exist
-      if( !$pagItem.length ) {
-        $pagItem = $(divdiv, { 'class': ns + 'pagitem' });
-        slData.isPagEmpty = true;
-      }
-
-      // Store object into data slide then remove
-      slData.$pagItem = $pagItem;
-      $pagItem.remove();
-    },
-
-
-
-
-
-
-
-
-
-
-    /**
-     * SERACH THE ELEMENTS OF OUTSIDE RUBY
-     */
-    SearchNode : function(classSearch) {
-      var $dom = $(),
-        NAME = va.name;
-
-
-      /**
-       * CONDITIONAL EXECUTION: MUST BE 'NAME' DEFINED
-       */
-      if( NAME !== null && NAME !== undefined ) {
-        $(classSearch).each(function() {
-
-          var $item    = $(this),
-            markupData = $item.data(rt01VA.rubyName + 'Markup');
-
-          // Get object if value in data link name of ruby
-          if( markupData === NAME ) $dom = $item;
-        });
-
-        // Return object
-        if( $dom.length ) return $dom;
-      }
-
-
-
-      /**
-       * KEEP SEARCHING OBJECT INSIDE RUBY
-       */
-      var $findNext = M.Find($ruby, classSearch);
-
-      // Return object found
-      return $findNext.length ? $findNext : $();
-    },
-
-    /**
-     * INSERT THE MARKUP INTO OBJECT
-     */
-    Into : function(intoParent, $child) {
-      var oMarkup = o.markup, $parent;
-
-      // Search parent object
-      switch( intoParent ) {
-
-        case 'viewport' :
-          $parent = $viewport;
-          break;
-
-        case 'nav' :
-          if( !va.$nav ) {
-            va.$nav = $(divdiv, {'class' : va.ns + o.nameNav});
-            RENDER.Into(oMarkup.navInto, va.$nav);
-          }
-          $parent = va.$nav;
-          break;
-
-        case 'ssControl' :
-          $parent = va.$ssControl;
-          break;
-
-        default :
-          $parent = $ruby;
-          break;
-      }
-
-      // Insert new childrent found into parent
-      $parent.append($child);
-    },
-
-    /**
-     * RENDER ICON LOADER
-     */
-    LoaderAdd : function($save, $parent, name) {
-
-      /**
-       * CONDITIONAL EXECUTION
-       */
-      if( !(o.isLoader) ) return;
-
-
-
-      /**
-       * CREATE LOADER
-       */
-      var markup  = (name === '$loaderThumb') ? M.NS(o.markup.loaderThumb)
-                          : M.NS(o.markup.loader),
-
-        // Create loader by jQuery
-        $loader = $(markup);
-
-      // Store loader into data slide & insert to parent
-      M.Data($save)[name] = $loader;
-      $parent.append($loader);
-    },
-
-    LoaderRemove : function($slide, name) {
-
-      var $loader = M.Data($slide)[name];
-      $loader && $loader.remove();
-    },
-
-
-
-
-
-
-
-
-
-
-    /**
-     * UPDATE IMAGE IN 'OVERLAY' ELEMENT
-     */
-    DivImg : function(name, parent, isAfter) {
-
-      var classes   = va.ns + o[name+'Name'],
-        nameUpper = M.ProperCase(name);   // Capitalize the first letter of 'name', ex: 'overlay' to 'Overlay'
-
-      va[name] = $ruby.find('.'+ classes);
-
-
-      // Case: option actived
-      if( o['is'+ nameUpper] ) {
-        if( !va[name].length ) {
-
-          // Check image inside container
-          var src = $ruby.data('img'+ name),
-            tag = (!!src) ? '<div class="'+ classes +'"><img src="'+ src +'" alt="['+ name +']"></div>'
-                    : '<div class="'+ classes +'"></div>';
-
-          // Select insert after || before compare with parent object
-          isAfter && parent.after($(tag)) || parent.before($(tag));
-        }
-      }
-
-      // Case: option deactived -> remove, support for 'update' api
-      else if( va[name].length ) va[name].remove();
-    },
-
-    /**
-     * RENDER OTHER ELEMENTS
-     */
-    Other : function() {
-
-      // Render overlay element
-      (oo.isOverlay != o.isOverlay) && RENDER.DivImg('overlay', $canvas, true);
-    }
-  },
-
-
-
-
-
-
-
-
-
-
-  /**
-   * LOAD METHODS
-   * Support features:
-   *  + Begin loading slide with ID != 0
-   *  + Load by zigzag left/right if idBegin != 0
-   *  + Preload slide, default is 1
-   *  + Support parallel load : optimal load speed
-   *  + When no loaded, switch to other slide -> priority load current slide
-   */
-  LOAD = {
-
-    /**
-     * STORE ID OF SLIDES INTO ARRAY TO LOADDING SLIDE IN ORDER
-     */
-    Way : function() {
-      var IDToLoad   = [],      // Store ID of slide in array
-        idCur    = cs.idCur,    // ID current
-        oLazySmart = o.lazySmart;
-
-
-      /**
-       * CHECK LOADING STATUS OF SLIDE
-       */
-      function IsSlideLoading(id) {
-        return M.Data(va.$s.eq(id))['isLoading'];
-      }
-
-
-      /**
-       * FUNCTION: LOADING THE SLIDE IN ORDER FORM SMALLEST TO LARGEST
-       * + Load in order : 0,1,2,3,4...
-       */
-      function LoadLinear() {
-        for( var i = 0; i < num; i++ ) {
-          !IsSlideLoading(i) && IDToLoad.push(i);
-        }
-      }
-
-
-      /**
-       * LOADING SLIDES BY ZIGZAG DEPENDS ON 'IDMAP'
-       */
-      function LoadZigzagByIDMap() {
-        var idMap  = va.idMap,
-          idCenter = M.C(num / 2 - 1),
-          idCur  = idCenter,
-          nLeft  = 1,
-          nRight   = 1,
-          isRight  = true;
-
-
-        /**
-         * SETUP EACH SLIDE
-         */
-        for( var i = 0; i < num; i++ ) {
-
-          /**
-           * CASE: THE FIRST SLIDE
-           */
-          if( i == 0 ) {
-            !IsSlideLoading(idMap[idCur]) && IDToLoad.push( idMap[idCur] );
-          }
-
-
-          /**
-           * CASE: SETUP OTHER SLIDE
-           */
-          else {
-            if( isRight ) {
-              idCur = idCenter + nRight;
-              nRight++;
-              isRight = false;
+        rubyAnimateKeyframes: {
+            fadeOut: [ {
+                pos: 100,
+                opacity: 0
+            } ],
+            fadeIn: [ {
+                pos: 0,
+                opacity: 0
+            } ]
+        },
+        rubyAnimateOne: {
+            fade: {
+                next: [ "fadeOut", "fadeIn" ],
+                prev: [ "fadeOut", "fadeIn" ]
             }
-            else {
-              idCur = idCenter - nLeft;
-              nLeft++;
-              isRight = true;
+        },
+        fxMathName: [ "rectMove", "rectRun", "rectSlice", "rubyFade", "rubyMove", "rubyRun", "rubyScale", "zigzagRun", "randomMath" ],
+        coverflow3D: {
+            widthSlide: "80%",
+            perspective: 1200,
+            zDeep: 600,
+            rotate: 30,
+            opacity: 1,
+            isDeepMulti: !0
+        },
+        isNav: !1,
+        nav: {
+            isEventTap: !0,
+            markup: "<div class='{ns}nav'><div class='{ns}nav-prev'>prev</div><div class='{ns}nav-next'>next</div></div>",
+            markupOutside: "<div class='{ns}nav-prev'>prev</div><div class='{ns}nav-next'>next</div>"
+        },
+        isPag: !0,
+        pag: {
+            type: "thumbnail",
+            width: null,
+            height: null,
+            minWidth: null,
+            minHeight: null,
+            maxWidth: null,
+            maxHeight: null,
+            direction: "hor",
+            position: "end",
+            align: "center",
+            cssPosition: "relative",
+            hOffset: null,
+            vOffset: null,
+            speed: 300,
+            easing: "easeOutCubic",
+            sizeAuto: "full",
+            typeSizeItem: "self",
+            isEventTap: !0,
+            isItemCurCenterWhenTap: !0,
+            isJustifyWhenLarge: !1,
+            isArrow: !0,
+            isTapOnArrow: !0,
+            isMark: !0,
+            isMarkTransition: !0,
+            moreClass: null,
+            widthMinToHor: 0,
+            rangeMinToHor: 0,
+            wheel: "auto",
+            markupArrow: "<div class='{ns}pagarrow-item {ns}pagarrow-{dirs}'><div class='{ns}pagarrow-icon'></div></div>",
+            markupMark: "<div class='{ns}pagmark'><div class='{ns}pagmark-item {ns}pagmark-margin'></div><div class='{ns}pagmark-item {ns}pagmark-border'></div><div class='{ns}pagmark-item {ns}pagmark-padding'></div><div class='{ns}pagmark-item {ns}pagmark-self'></div></div>"
+        },
+        image: {
+            isResponsive: !0
+        },
+        imageback: {
+            position: "center",
+            pixelRatio: 1,
+            isResponsive: !0
+        },
+        video: {
+            height: 480,
+            isBtnPause: !1,
+            isPauseThenRemove: !1
+        },
+        videoback: {
+            position: "fill",
+            posterPosition: "fill",
+            opacity: .3,
+            isResponsive: !0
+        },
+        hotspot: {
+            widthItem: null,
+            sizeArea: 10,
+            position: "top",
+            eventToOpen: "tap",
+            animIn: [ {
+                y: "100%",
+                opacity: 0
+            }, {
+                y: 0,
+                opacity: 1,
+                duration: 200
+            } ],
+            animOut: [ {
+                y: 0
+            }, {
+                y: "100%",
+                opacity: 0,
+                duration: 200
+            } ],
+            animTopIn: null,
+            animTopOut: null,
+            animBottomIn: null,
+            animBottomOut: null,
+            animLeftIn: null,
+            animLeftOut: null,
+            animRightIn: null,
+            animRightOut: null,
+            markupPoint: "<div class='{ns}hspoint'></div>",
+            isActivedAtFirst: !1,
+            isResponsive: !1
+        },
+        layer: {
+            width: null,
+            height: null,
+            count: 1,
+            direction: "normal",
+            duration: 400,
+            delay: 0,
+            easing: "easeOutQuad",
+            eventToPlay: null,
+            isPlayWhenSlideActived: !0,
+            isAutoPlay: !0,
+            isResponsive: !0,
+            isRandom: !1,
+            isMask: !1,
+            animateEnd: [ {
+                opacity: 0,
+                duration: 400
+            } ]
+        },
+        layerParallax: {
+            isParallax: !0,
+            radiusLevelValue: [ 0, 5, 10, 15, 20, 25, 30, 35, 40, 45, 50 ],
+            radiusLevel: 3,
+            radius: null,
+            direction: "reverse"
+        },
+        parallax: {
+            scrollDirection: "same",
+            scrollDepth: 80,
+            scrollBgDepth: 80,
+            scrollLayerDepth: 50,
+            isScroll: !1,
+            isScrollLayerFade: !0
+        },
+        parallaxScroll: {
+            direction: "same",
+            bgDepth: 80,
+            layerDepth: 50,
+            isLayerEnable: !0,
+            isLayerFade: !0
+        },
+        isSlideshow: !1,
+        slideshow: {
+            delay: 8e3,
+            timer: "arc",
+            isAutoRun: !0,
+            isPlayPause: !0,
+            isTimer: !0,
+            isLoop: !0,
+            isHoverPause: !1,
+            isRunInto: !1,
+            isRandom: !1
+        },
+        timerArc: {
+            width: null,
+            height: null,
+            fps: 30,
+            rotate: 0,
+            radius: 14,
+            weight: 4,
+            stroke: "hsla(0,0%,0%,.6)",
+            fill: "transparent",
+            radiusOuter: 14,
+            weightOuter: 2,
+            strokeOuter: "hsla(0,0%,0%,.1)",
+            fillOuter: "transparent"
+        },
+        flickr: {
+            urlRequest: "https://api.flickr.com/services/rest/?method=flickr.{method}&api_key={key}{typeID}&format=json&nojsoncallback=1",
+            apiKey: "a85720e2fbb21eccea51fcb75cb22184",
+            photoNum: 10,
+            photoRecentNum: null,
+            photoAlbumNum: null,
+            photoFavesNum: null,
+            photoSize: "Large",
+            photoPosition: "last",
+            getPhotoRecentByUrl: null,
+            getPhotoAlbumByUrl: null,
+            getPhotoFavesByUrl: null,
+            recentID: null,
+            albumID: null,
+            favesID: null,
+            isRandomPhoto: !1,
+            markupSlide: '<div><a class=\'{ns}imgback\' data-flickr=\'{"numID": {numID}, "photoID": "{photoID}"}\'>{photoTitle}</a>{markupInfo}</div>',
+            markupInfo: "<div class='{ns}flickr-info {ns}layeritem' data-animate-start='{infoLayer}'>{markupPhotoTitle}{markupAlbumTitle}{markupSplit}{markupAuthor}</div>",
+            markupSplit: " | ",
+            markupPhotoTitle: "<a class='{ns}flickr-photo-title' href='{photoURL}'>{photoTitle}</a>",
+            markupAlbumTitle: "<a class='{ns}flickr-album-title' href='{albumURL}'>{albumTitle}</a>",
+            markupAuthor: "<a class='{ns}flickr-author' href='{authorURL}'>{author}</a>",
+            infoLayer: [ {
+                x: 20,
+                y: "100%{parent}"
+            }, {
+                y: "100%{parent} - 100% - 20",
+                duration: 400
+            } ],
+            isInfo: !0,
+            isPhotoTitle: !0,
+            isAlbumTitle: !0,
+            isAuthor: !0
+        },
+        markup: {
+            loader: "<div class='{ns}loader'><svg class='{ns}loader-circular'><circle class='{ns}loader-path' cx='50%' cy='50%' r='20' fill='none' stroke-width='4' stroke-miterlimit='15'/></svg></div>",
+            loaderThumb: "<div class='{ns}loader {ns}loader-small'><svg class='{ns}loader-circular'><circle class='{ns}loader-path' cx='50%' cy='50%' r='10' fill='none' stroke-width='3' stroke-miterlimit='15'/></svg></div>",
+            ssControl: "<div class='{ns}ss-control'></div>",
+            navInto: "viewport",
+            pagInto: "ruby",
+            ssControlInto: "ruby",
+            timerInto: "ssControl",
+            playInto: "ssControl"
+        },
+        isKeyboard: !1,
+        keyboard: {
+            nextKey: 39,
+            prevKey: 37,
+            nextAlterKey: null,
+            prevAlterKey: null
+        },
+        isDeeplinking: !1,
+        deeplinking: {
+            prefixDefault: [ "ruby", "slide" ],
+            prefix: null,
+            isIDConvert: !0,
+            isOnlyShowID: !0
+        },
+        isCookie: !1,
+        cookie: {
+            name: "",
+            days: 7
+        },
+        nativeFS: {
+            isButton: !0,
+            markupButton: "<a class='{ns}toggle-nativeFS'></a>"
+        },
+        updateOptsInNativeFS: {},
+        events: {},
+        desktop: {},
+        mobile: {
+            speedHeight: null,
+            direction: "hor"
+        },
+        fallback: {
+            markup: {
+                loader: "<div class='{ns}loader {ns}loader-old'>loading</div>"
             }
-
-            !IsSlideLoading(idMap[idCur]) && IDToLoad.push( idMap[idCur] );
-          }
-        }
-      }
-
-
-      /**
-       * LOADING SLIDES ZIGZAG BY RIGHT/LEFT DIRECTION
-       * + Begin loading at idBegin -> next load right/left -> next load right/left
-       */
-      function LoadZigzagLine() {
-        var right   = 1,    // Default: load right first
-          n     = 1,
-          leftEnd   = 0,    // Shortcut leftEnd
-          rightrEnd = 0;    // Shortcut rightEnd
-
-
-        /**
-         * SETUP EACH SLIDE
-         */
-        for( var i = 0; i < num; i++ ) {
-
-          /**
-           * CASE: THE FIRST SLIDE
-           */
-          if( i == 0 ) {
-            !IsSlideLoading(va.idBegin) && IDToLoad.push(va.idBegin);
-          }
-
-
-          /**
-           * CASE: OTHER SLIDES
-           */
-          else {
-            if( (idCur != num - 1) && (right || leftEnd) ) {
-              !IsSlideLoading(idCur + n) && IDToLoad.push(idCur + n);
-
-              // Left: end
-              if( leftEnd ) n++;
-              else      right = 0;
-
-              // Right: check end
-              if( IDToLoad[i] >= num-1 ) rightrEnd = 1;
+        },
+        rev: [ "erp" ],
+        versionBrand: "1",
+        version: "1.7"
+    }, rt01VA.optsPlus = {
+        tabs: {
+            lazyType: "single",
+            margin: 30,
+            pag: {
+                type: "tabs",
+                position: "begin",
+                align: "begin"
             }
-            else {
-              !IsSlideLoading(idCur - n) && IDToLoad.push(idCur - n);
-              n++;
-
-              // Right: end
-              right = !rightrEnd;
-
-              // Left: check end
-              if( IDToLoad[i] <= 0 ) leftEnd = 1;
+        },
+        slider: {
+            lazyType: "smart",
+            margin: 0,
+            pag: {
+                type: "thumbnail",
+                position: "end",
+                align: "center"
             }
-          }
+        },
+        carousel: {
+            lazyType: "smart",
+            fx: "line",
+            speed: 600,
+            widthSlide: 300,
+            margin: 15,
+            isCenter: !1,
+            isLoop: !1,
+            isPag: !1,
+            isNav: !0
         }
-      }
-
-
-
-
-
-      /**
-       * THE NUMBER OF SLIDE PARALLEL LOADING
-       *  + After complete preload -> 'va.nLoadParallet' allways = -1 -> plus 1 at first to easy setup
-       */
-      va.nLoadParallel = oLazySmart.amountEachLoad + 1;
-
-
-      /**
-       * SETUP PRELOAD
-       *  + Case 'all': load all slides
-       *  + Case == 0: allways preload 1 slide
-       */
-      va.preload = oLazySmart.preload;
-      if( oLazySmart.preload == 'all' || oLazySmart.preload > num ) va.preload = num;
-      if( oLazySmart.preload <= 0 ) va.preload = 1;
-      if( o.lazyType === 'none' )   va.preload = 0;
-      if( o.lazyType === 'single' ) va.preload = 1;
-
-
-
-      /**
-       * SETUP ORDER & POSITION ID OF SLIDES
-       */
-      LOAD.IDMap();
-
-
-
-      /**
-       * SETUP IN ORDER LOAD OF SLIDES
-       */
-      if( cs.num > 0 ) {
-
-        // Case: slide at center position ->  load zigzag-round
-        // Ver 1.7 - Jan 13, 2017: remove condition va.fxLayout == 'line', support for layout 'dot'
-        if( is.centerLoop ) LoadZigzagByIDMap();
-
-        // Case: slide at position linear
-        // If ID = 0: load linear, the rest is load zigzag-line
-        else (idCur == 0) ? LoadLinear() : LoadZigzagLine();
-      }
-
-      // Store value IDToLoad into variable
-      va.IDToLoad = IDToLoad;
-    },
-
-    /**
-     * ORDER APPEARANCE OF ID SLIDE
-     * The steps taken:
-     *  + Search ID-slide begin in array[]
-     *  + The remaining order in array[] by plus 1
-     *  + If order > va.num -> begin by 0
-     */
-    IDMap : function() {
-      var map = [];
-
-      /**
-       * SETUP IDMAP FOR CENTER LAYOUT
-       */
-      // Ver 1.7 - Jan 13, 2017: remove condition va.fxLayout == 'line', support for layout 'dot'
-      if( is.centerLoop ) {
-
-        // Priority slide right appears if sum of slides is even number
-        var idBegin = M.C(num / 2) + cs.idCur;
-        if( !va.center.isOdd ) idBegin++;
-
-        // 'idBegin' begin again by smaller, if larger 'va.num'
-        if( idBegin >= num ) idBegin -= num;
-
-
-        // Function loop: add ID to map
-        for( i = 0; i < num; i++ ) {
-
-          // idBegin return 0, if larger 'va.num'
-          if( idBegin >= num ) idBegin = 0;
-
-          // Map: add value
-          map[i] = idBegin++;
-        }
-      }
-
-
-      /**
-       * SETUP IDMAP FOR LAYOUT WITHOUT CENTER
-       */
-      else {
-        for( i = 0; i < num; i++ ) {
-          map.push(i);
-        }
-      }
-
-      // Store result into variable
-      va.idMap = map;
-    },
-
-
-
-
-
-
-
-
-
-
-    /**
-     * SETUP PARALLET LOADDING MULTIPLE SLIDES AT FIRST
-     */
-    ParallelWhenSlideBegin : function() {
-      var IDToLoad = va.IDToLoad;
-
-      /**
-       * UPDATE VARIABLE TO RECOGNIZE STATUS LOADING
-       */
-      IDToLoad.length && IDToLoad.shift();    // Get ID current slide
-      va.nLoadAtFirst++;              // Increase the number of load
-
-
-
-      /**
-       * SETUP PRELOAD SLIDES AT RUBY APPEARANCE AT FIRST
-       *  + This time 'LOAD.slideBegin()' in 'LOAD.ParalletWhenSlideEnd()' be paused
-       */
-      if( IDToLoad.length ) {
-
-        // Condition and function load next slide
-        var isLoadNext = false;
-        if( /^(none|all)$/.test(o.lazyType) ) isLoadNext = true;
-        if( o.lazyType !== 'none' && va.nLoadAtFirst < va.preload ) isLoadNext = true;
-
-        isLoadNext && LOAD.SlideBegin( va.$s.eq(IDToLoad[0]) );
-      }
-    },
-
-    /**
-     * SETUP PARALLET MULTIPLE SLIDES SAME TIME WHEN FINISH SETUP THE SLIDE
-     */
-    ParallelWhenSlideEnd : function($slide) {
-
-      // Initialize variable
-      var IDToLoad   = va.IDToLoad,
-        oLazySmart = o.lazySmart;
-
-
-      // Check case loaded all slides
-      va.nLoaded++;
-      va.nLoaded === num && LOAD.LoadedAllSlides();
-
-      // Complete the process preload
-      if( !is.preloaded && va.nLoaded == va.preload ) is.preloaded = true;
-
-
-      // Check next load
-      if( !/^(none|single)$/.test(o.lazyType) ) {
-
-        // LoadAmount only performed when complete preload
-        // Reset value of 'va.nLoadParallet' if 'va.nLoadParallet' == 0
-        if( is.preloaded ) {
-
-          va.nLoadParallel--;
-          if( !va.nLoadParallel ) va.nLoadParallel = o.lazySmart.amountEachLoad;
-        }
-
-
-
-        /**
-         * SETUP LOAD NEXT SLIDE
-         *  + Condition: va.IDToLoad[] !== empty & is.preloaded == true
-         *  + If is.preloaded == false -> 'LOAD.SlideBegin()' be paused -> load new slide switch to 'LOAD.ParalletWhenSlideBegin()'
-         *  + Additional condition: 'LOAD.Add()' not work -> avoid runing multiple function same time
-         */
-        if( IDToLoad.length && is.preloaded && va.nLoadParallel >= oLazySmart.amountEachLoad && !M.Data($slide)['isLoadAdd'] ) {
-
-          for( i = va.nLoadParallel; i > 0; i-- ) {
-            LOAD.Next();
-          }
-        }
-      }
-    },
-
-    /**
-     * LOADING ADD NEW SLIDE WHEN TOGGLE TO OTHER SLIDE
-     */
-    Add : function($slide) {
-      var slData = M.Data($slide);
-
-
-      // Check slide is complete loading
-      if( slData && !slData.isLoading ) {
-
-        // Reset 'loadAll' variable
-        is.loadAll = false;
-
-        // Because unknown ID of current slide in va.IDToLoad[] -> use loop
-        // Get index ID in va.IDToLoad[]
-        // Check va.IDToLoad !== null in the case add new slide by api
-        var IDToLoad = va.IDToLoad;
-        if( IDToLoad.length ) {
-
-          for( i = IDToLoad.length - 1; i >= 0; i-- ) {
-            if( IDToLoad[i] === cs.idCur ) {
-
-              // Swap ID in va.IDToLoadp[], if there is no order in next load
-              IDToLoad.splice(0, 0, IDToLoad.splice(i, 1)[0]);
-
-              // Break loop for
-              i = -1;
+    }, rt01VA.M = {
+        Message: function(e, t) {
+            if ("object" == typeof console && void 0 !== e) {
+                var a = "[" + rt01VA.rubyName + ": " + e + "]";
+                t && (a += " -> " + t), console.warn(a);
             }
-          }
-        }
-
-
-        // Check next load slide
-        LOAD.Next($slide);
-      }
-    },
-
-
-
-
-
-
-
-
-
-
-    /**
-     * LOAD NEXT SLIDE
-     */
-    Next : function($slNext) {
-
-      /**
-       * CONDITIONAL EXECUTION
-       */
-      if( !(cs.num && va.IDToLoad.length) ) return;
-
-
-
-      /**
-       * SETUP LOAD NEXT SLIDE
-       */
-      // Get slide in 'va.IDToLoad' if without 'slNext' paramater
-      if( !$slNext ) $slNext = va.$s.eq(va.IDToLoad[0]);
-
-      // Load next slide
-      LOAD.SlideBegin($slNext);
-    },
-
-    /**
-     * SETUP CURRENT SLIDE AT FIRST
-     */
-    SlideBegin : function($slide) {
-      var slData = M.Data($slide);
-
-      // Ver 1.5 - 24/09/2016 : fixed when add new slide by api, $slide = undefined
-      if( !$slide.length ) return;
-
-      // Load: setup begin
-      M.RunEvent('loadBegin', $slide, slData.id);
-
-      // Setup load all slide same time
-      LOAD.ParallelWhenSlideBegin();
-
-      // Remove class 'sleep' -> diplay the childrent of slide
-      $slide.removeClass(va.ns +'sleep');
-
-      // Status loading of current slide
-      slData.isLoading = true;
-
-
-
-
-      /**
-       * CASE: ID SLIDE === IDBEGIN OPTION
-       */
-      if( slData.id === va.idBegin ) {
-
-        // Toggle current slide at first
-        cs.idCur == 0 && M.RunEvent('start');
-        M.ToggleSlide();
-      }
-
-
-
-
-      /**
-       * OTHER SETUP
-       */
-      // Setup all Image & Videoback in slide
-      is.VIDEOBACK && VIDEOBACK.SetupAtLoadSlideBegin($slide);
-      is.IMAGE && IMAGE.SetupAtLoadSlideBegin($slide);
-
-      // Continue setup 'SlideEnd' if without Image & Videoback
-      if( !slData.isVideoback && !slData.imageLen ) {
-        LOAD.SlideEnd($slide);
-      }
-    },
-
-    /**
-     * SETUP CURRENT SLIDE AFTER LOADED ALL IMAGE
-     *  + Only for slide object (not included Canvas)
-     */
-    SlideEnd : function($slide) {
-
-      var hSlide  = M.OuterHeight($slide, true),
-        slData  = M.Data($slide),
-        id    = slData.id,
-        ns    = va.ns;
-
-      // Slide current: setting data
-      slData.height   = hSlide;
-      slData.isLoaded = true;
-
-      // Remove class after complete loaded
-      $slide.removeClass(ns + 'no-loaded');
-
-
-
-
-      /**
-       * DISPLAY RUBY & SETUP THE PROPERTIES AFTER COMPLETE LOADED FIRST SLIDE
-       */
-      if( !is.initLoaded ) {
-
-        // Toggle class 'init' & 'ready' -> Ruby ready
-        $ruby.addClass(ns + 'ready').removeClass(ns + 'init');
-
-        // SETUP HEIGHT OF RUBY AT FIRST SLIDE
-        // -> Must be removed class 'init' when make fn -> fixed lag
-        if( is.heightFixed ) SIZE.HeightFixedForRuby();
-        else         SIZE.HeightAutoForRuby(hSlide);
-
-        // Setup size of ruby depends on direction
-        SIZE.EndOfRuby();
-
-        // Init: load continue
-        INIT.Load();
-      }
-
-
-
-
-      /**
-       * SETUP POSITION OF IMAGEBACK + VIDEOBACK
-       */
-      if( is.IMAGE ) {
-        IMAGE.BackPosition(slData.$imgback);
-      }
-
-      // Case: Videoback
-      if( is.VIDEOBACK ) {
-
-        // Setup position of Videoback
-        VIDEOBACK.Position(slData.$videoback);
-
-        // Setup properties of Video Poster
-        var $videoPoster = slData.$videobackPoster;
-        VIDEOBACK.Properties($videoPoster);
-        VIDEOBACK.SizeResponsive($videoPoster);
-        VIDEOBACK.Position($videoPoster);
-
-        // Play Videoback of current slide
-        id == cs.idCur && VIDEOBACK.Run('play');
-      }
-
-
-      // Update size & position of veritcal direction
-      !is.dirsHor && VERTICAL.SlideLoaded();
-
-      // Display slide after loaded all image
-      $slide.addClass(ns + 'ready');
-
-      // Icon loader: remove
-      RENDER.LoaderRemove($slide, '$slLoader');
-
-
-
-
-      /**
-       * SETUP PAGINATION OF SLIDE
-       */
-      is.pag && PAG.SetupWhenLoadSlideEnd($slide);
-
-
-
-
-      /**
-       * SETUP HOTSPOT AT FIRST
-       */
-      if( is.HOTSPOT ) {
-        HOTSPOT.Init($slide);
-
-        // Use timer for fixed size of Hotspot item incorrect at first
-        setTimeout(function() { HOTSPOT.Reset(id) }, 10);
-      }
-
-
-
-
-      /**
-       * SETUP LAYER AT FIRST
-       *  + Need 'va.hRuby' first
-       */
-      if( is.LAYER ) {
-        LAYER.Init($slide);
-
-        // Play Tween animate of current slide
-        id == cs.idCur && LAYER.Play(id);
-      }
-
-
-
-
-      /**
-       * SETUP PARALLAX LAYER AT FIRST
-       */
-      if( is.LAYERPARALLAX ) {
-        LAYERPARALLAX.Init($slide);
-
-        // Toggle event of parallax effect layer
-        id == cs.idCur && LAYERPARALLAX.ToggleEvent(id);
-      }
-
-
-
-
-      /**
-       * INITIALIZE VIDEO IFRAME
-       */
-      is.VIDEOIFRAME && VIDEOIFRAME.Init($slide);
-
-
-
-
-      /**
-       * CHECK CURRENT SLIDE HAS PARALLAX EFFECT
-       */
-      is.PARALLAX && PARALLAX.Check($slide);
-
-
-
-
-      /**
-       * CONTINUE PLAY SLIDESHOW AFTER LOADED SLIDE
-       */
-      is.slideshow && SLIDESHOW.Go('slideLoaded');
-
-
-
-
-      /**
-       * SETUP EVENTS TRIGGER
-       */
-      // Events trigger: slide loaded
-      M.RunEvent('loadSlide.' + id);
-      M.RunEvent('loadEnd', $slide, id);
-
-
-
-
-      /**
-       * LOAD NEXT SLIDE
-       *  + Located at end
-       */
-      LOAD.ParallelWhenSlideEnd($slide);
-    },
-
-    /**
-     * CASE LOADED ALL SLIDES
-     */
-    LoadedAllSlides : function() {
-
-      // Trigger event 'loadAll'
-      M.RunEvent('loadAll');
-
-      // Add new class to notice on Ruby
-      is.loadAll = true;
-      $ruby
-        .addClass(va.ns + 'loaded')
-        .removeClass(va.ns + 'no-loaded');
-
-      // Remove loader icon
-      RENDER.LoaderRemove($ruby, '$rubyLoader');
-    }
-  },
-
-
-
-
-
-
-
-
-
-
-  /**
-   * POSITION
-   */
-  POSITION = {
-
-    /**
-     * SETUP ANIMATION WITH FIXED POSITION
-     */
-    AnimateX : function($obj, nx, isNoAnim, isPosFixed, speed, easing) {
-
-      /**
-       * VALUE SETUP
-       * Object translate is '$obj' -> if not, select ''$swipeCur'
-       */
-      var $swipe = ($obj === null) ? va.$swipeCur : $obj,
-        p    = $swipe.is($canvas) ? va.can : va.pag,
-
-        // Position to go to
-        x = isPosFixed ? nx : (- nx * p.sTranslate + p.xCanvas);
-
-      // Speed & easing of transition
-      speed  = speed || va.speed[cs.idCur];
-      easing = easing || va.easing;
-
-      // Setup limited position in Carousel effect
-      x = POSITION.LimitInCarouselX(x);
-
-      // Update current position of 'xCanvas'
-      p.xCanvas = x;
-
-
-
-
-      /**
-       * TRANSITION SETUP
-       *  + Case: support transtion css
-       *  + Case: not support transition css
-       */
-      var tf = (p.dirs === 'hor') ? { 'x': x }
-                    : { 'y': x },
-
-        // Get Tween of '$swipe'
-        tween = M.GetTween($swipe);
-
-
-      // Case: have Animation
-      if( !isNoAnim ) {
-        tween
-          .animate($swipe, tf, {
-            isNew  : true,
-            duration : speed,
-            easing   : easing
-          });
-      }
-
-      // Case: without Animation
-      else tween.css($swipe, tf);
-    },
-
-    /**
-     * SETUP POSITION MIN/MAX IN CAROUSEL EFFECT
-     */
-    LimitInCarouselX : function(x) {
-
-      // Conditional execution
-      if( va.fxLayout == 'line' && !is.loop && va.$swipeCur.is(va.$canvas) ) {
-        var p = va.can;
-
-        if   ( x > p.xMin ) x = p.xMin;
-        else if( x < p.xMax ) x = p.xMax;
-      }
-
-      // Return value of limited position
-      return x;
-    },
-
-    /**
-     * SETUP MOVE OBJECT TO FIXED POSITION
-     */
-    TranslateX : function($obj, nx, isPosFixed, xPlus, isHorCustom) {
-
-      // Setup position
-      var x;
-      if( isPosFixed ) x = nx;
-      else       x = nx * va.can.sTranslate;
-
-
-      // Transform: add _xPlus
-      if( $.isNumeric(xPlus) ) x += xPlus;
-
-      // Setup Tween CSS for object
-      var isHor = isHorCustom === undefined ? is.dirsHor : isHorCustom,
-        tf  = isHor ? { 'x' : x }
-                : { 'y' : x };
-
-      M.GetTween($obj).css($obj, tf);
-    },
-
-
-
-
-    /**
-     * BALANCE FOR CENTER LAYOUT
-     * @porpose
-     *  + Move slide to edge position
-     *  + -> Slides allways balance number of 2 side after Canvas move
-     *
-     * @howtodo
-     *  + Determine how many slide need to move -> create loop to move each slide
-     *  + Move each slide: determine ID, position of slide need to move
-     *  + Performed translate by 'xTranslate()'
-     */
-    Balance : function(isContinuity, isOne, speed) {
-      // Conditional execution
-      if( !is.loop ) return;
-
-
-      /**
-       * CHECK MOVE 'NEXT' OR 'PREV'
-       *  + Move 'next'/'prev' have the same way -> different parameter
-       */
-      var isNext = va.nMove > 0,
-
-        // Variable store different between of translate 'next' or 'prev'
-        a = isNext ? { 's' : 1, 'id0': 0, 'idN': num - 1 }
-               : { 's' : -1, 'id0': num - 1, 'idN': 0 },
-
-        // Number of slide translate combine with 'isOne' parameter, default is 'va.nMove'
-        nMove = isOne ? 1 : M.A(va.nMove);
-
-
-      // Speed of translate -> more slide more smaller speed
-      a.speed = (speed === undefined) ? va.speed[cs.idCur] : speed;
-
-      // Insert other options into variable
-      a.isNext = isNext;
-      a.isContinuity = isContinuity;
-
-
-
-
-      /**
-       * SETUP POSITION OF SLIDE FOR BALANCE
-       */
-      for( i = 0; i < nMove; i++ ) {
-
-        /**
-         * VALUE OF EDGE SLIDE -> MOVE THE VARIABLE IN ARRAY
-         *  + id: get ID slide of first value in array
-         *  + xCur: get position of last value in array + wSlide
-         *  + tf: position of transform
-         */
-        var id   = va.idMap[a.id0],
-          $slCur = va.$s.eq(id),
-          xCur   = va.pBegin[a.idN] + (va.can.sTranslate * a.s),
-          tf   = {};
-
-
-
-        /**
-         * VALUE OF TRANSFORM FOR SLIDE IN EACH CASE
-         */
-        // Case: normal
-        if( va.fxView == 'basic' || va.fxView == 'mask' ) {
-          var tl = is.dirsHor ? 'Tlx' : 'Tly';      // Translate by css3
-          tf[cssTf] = M[tl](xCur);
-
-          $slCur.css(tf);
-        }
-
-        // Case: view coverflow3D
-        else if( va.fxView == 'coverflow3D' ) {
-          var cover = o.coverflow3D,
-            z   = cover.isDeepMulti ? cover.zDeep * ((isNext ? va.center.nRight : va.center.nLeft) + 1)
-                          : cover.zDeep;
-
-          va.tweenSlide.css($slCur, {
-            'x'     : xCur,
-            'z'     : -z,
-            'rotateY' : -cover.rotate * a.s
-          });
-        }
-
-
-
-
-        /**
-         * UPDATE VALUE IN VARIABLE
-         */
-        M.Shift(va.idMap, isNext);
-        M.Push(va.idMap, id, isNext);
-
-        M.Shift(va.pBegin, isNext);
-        M.Push(va.pBegin, xCur, isNext);
-
-
-
-
-        /**
-         * UPDATE TRANSFORM ON SLIDES IN OTHER VIEW
-         */
-        var balanceName = 'Balance'+ va.View;
-        !!VIEW[balanceName] && VIEW[balanceName](a);
-      }
-    },
-
-    /**
-     * COPY SLIDES INTO WHEN TOGGLE SLIDE BY PAGINATION
-     * @purpose
-     *  + Toggle slide by pagination -> slide at edge position will automatically translate to all slide balnace
-     *  + Appeare white area by edge slide translate -> copy edge slide but remain in place -> after translate done then remove all copy slide
-     */
-    FillHole : function() {
-      // Conditional execution
-      if( !is.loop) return
-
-      // Check slideClone - remove
-      va.$slClone.length && va.$slClone.remove();
-      va.$slClone = $('');
-
-
-
-
-      // Check clone slide
-      // When toggle slide, slide hidden behind Viewport, not necessary to clone slide
-      var center   = va.center,
-        nMove  = (va.nMove > 0) ? center.nLeft : center.nRight,
-        nMin   = nMove - center.nEdge,
-        nMoveAbs = M.A(va.nMove);
-
-      if( nMoveAbs > nMin ) {
-
-        /**
-         * CREATE CLONE SLIDE + REMOVE ELEMENTS NOT NECESSARY
-         */
-        for( i = nMin; i < nMoveAbs; i++ ) {
-
-          // Copy slide then append into Canvas
-          // Remove class 'cur' if on clone slide
-          var id = (va.nMove > 0) ? va.idMap[i]
-                      : va.idMap[num - 1 - i],
-
-            $slCur   = va.$s.eq(id),
-            $slClone = $slCur
-                  .clone()
-                  .addClass(va.deactived)
-                  .removeClass(va.ns + o.current)
-                  .appendTo($canvas);
-
-          // Store into data of slide
-          M.Data($slClone, { '$slSource': $slCur });
-
-          // Add new clone slide into variable -> remove all clone slide after translate done
-          va.$slClone = va.$slClone.add($slClone);
-        }
-
-
-
-
-        /**
-         * SETUP FOR SPECIAL VIEW
-         */
-        var fnName = 'FillHole' + va.View;
-        !!VIEW[fnName] && VIEW[fnName]();
-
-
-
-
-        /**
-         * REMOVE ALL CLONE SLIDE AFTER ANIMATION END
-         */
-        clearTimeout(ti.fillHole);
-        ti.fillHole = setTimeout(function() {
-
-          va.$slClone.remove();
-        }, va.speed[cs.idCur] + 10);
-      }
-    },
-
-
-
-
-    /**
-     * SETUP TRANSLATE REBOUND WHEN TAP ON NAVIGATION NOT ALLOW TO MOVE
-     */
-    AnimRebound : function(dirs) {
-      if( !o.isAnimRebound ) return;
-
-      // Initialize variable
-      var p    = va.can,
-        layout = va.fxLayout,
-        isNext = dirs == 'next',
-        sign   = isNext ? -1 : 1,
-
-        tSpeed = 150,               // Speed of animation
-        plus   = 30,              // x plus value, unit px
-        xBack  = isNext ? p.xMax : p.xMin,    // Initial position of Canvas
-        xLimit = 130 * sign + xBack;      // Limited position for Canvas back -> +/- 130px
-
-
-
-      /**
-       * GET VALUE OF CURRENT POSITION -> SUPPORT GET POSITION OF CANVAS HAS MOVED
-       */
-      var xCur = $canvas.css(cssTf);
-      if( is.tf ) xCur = (xCur == 'none') ? xBack : M.ValueX(xCur);
-      else    xCur = (xCur == 'auto') ? xBack : M.PInt(xCur);
-
-
-
-      /**
-       * SETUP ANIMATION FOR CANVAS
-       */
-      var xGo = plus * sign + xCur;
-
-      // Function animate Go & Back
-      function Go()   { POSITION.AnimateX(null, xGo, 0, 1, tSpeed) }
-      function Back() { POSITION.AnimateX(null, xBack, 0, 1) }
-
-      // xGo : limited value
-      // + When Canvas translate beyond allow
-      // + Canvas translate to initial position
-      if( xGo/sign > xLimit/sign ) {
-        Back();
-      }
-
-      // Animate run
-      // Canvas will translate a chunk -> setup timer for go back
-      else {
-        Go();
-        clearTimeout(ti.rebound);
-        ti.rebound = setTimeout(Back, tSpeed);
-      }
-    },
-
-    /**
-     * SETUP KEEP MOVING WHEN STOP SWIPE
-     */
-    Flywheel : function() {
-      var isCanvas = $canvas.is(va.$swipeCur),
-        p    = isCanvas ? va.can : va.pag;
-
-
-      // Setup for $paginaton
-      if( !isCanvas ) {
-
-        /**
-         * CONDITIONAL EXECUTION FOR FLYWHEEL MOVING
-         *  + Inside scope of Viewport
-         *  + Duration of swipe < 200ms
-         *  + Moved temporarily must larger 1 'sTranslatel' -> case main slide
-        */
-        var tDrag    = va.tDrag1 - va.tDrag0,
-          isContinue = (va.xBuffer < 0 && va.xBuffer > p.xMax) && (tDrag < 200) && (M.A(va.xOffset) > 10);
-        if( !isContinue ) return;
-
-
-        /**
-         * SETUP CONTINUE
-         */
-        var xOff  = va.pageX1 - va.x0Fix,   // Distance swiped -> get correct value instead 'xOffset'
-          xTarget = va.xBuffer + xOff,
-
-          /**
-           * WIDTH LIMITED
-           *  + Support check flywheel continue -> distance between x[0], x[1] > wLimit
-           *  + Support move pagination to edge if lack of distance
-           */
-          wLimit = 50;
-
-        // Case: position to move to edge about a distance wLimit
-        if   ( xTarget + wLimit > 0 )    xTarget = 0;
-        else if( xTarget - wLimit < p.xMax ) xTarget = p.xMax;
-
-        // Setup translate for pagination
-        PAG.TranslateTo(xTarget);
-      }
-    },
-
-
-
-
-    /**
-     * MOVE CANVAS TO INITIAL POSITION
-     *  + Remove transition after update
-     */
-    CanvasBegin : function() {
-
-      /**
-       * INIT POSITION OF CANVAS
-       * @param int xCanvas
-       *  + After resize -> Canvas & slide must reset position
-       *  + Ruby center -> xCanvas: calculate back position of Canvas
-       */
-      var layout = va.fxLayout,
-        p    = va.can,
-        xBegin = 0;
-
-      // Init position of line layout
-      if( layout == 'line' && is.center ) {
-        var sSlideCur = is.dirsHor ? va.wSlide
-                       : M.OuterHeight(va.$s.eq(cs.idCur), true);
-
-        xBegin = M.R( (va.sRuby - sSlideCur) / 2);
-      }
-
-      // Update init position of Canvas
-      p.xCanvas = xBegin;
-
-
-
-      /**
-       * LIMITED POSITION OF CANVAS -> BUFFER SWIPE REDUCED RATE
-       * @param int xMin
-       * @param int xMax
-       */
-      if( layout == 'dot' )
-        p.xMin = p.xMax = 0;
-
-      else if( layout == 'line' ) {
-        // Minimum position of Canvas
-        p.xMin = xBegin;
-
-        // Size of sum all slide
-        // Same time remove 'margin' left of first item & 'margin' right of last item
-        var sSlideSum = M.Sum(va.sSlideMap) - (va.ma[0] + va.ma[1]);
-
-        // Maximum position of Canvas
-        p.xMax = (va.wRuby < sSlideSum) ? - (sSlideSum - va.wRuby + xBegin)
-                        : xBegin;
-      }
-
-
-
-      /**
-       * MOVE CANVAS TO POSITION OF CURRENT SLIDE
-       */
-      va.$swipeCur = $canvas;
-
-      if( is.loop ) POSITION.AnimateX(null, xBegin, true, true);
-      else      POSITION.AnimateX(null, cs.idCur, true);
-    }
-  },
-
-
-
-
-
-
-
-
-
-
-  /**
-   * SIZES
-   */
-  SIZE = {
-
-    /**
-     * GET VALUE MARGIN
-     * @param array va.ma Value 1 is margin-left, value 2 is margin-right
-     */
-    Margin : function() {
-      var wRuby  = va.wRuby;
-
-      // Get the current margin in ResponsiveLevels
-      va.maGridCur = $.isArray(va.maGrid) ? va.maGrid[va.index] : null;
-
-      // Case: the margin-grid available -> get margin from the option
-      if( va.maGridCur !== null ) {
-        va.ma = [ M.PercentToPixel(va.maGrid[va.index], wRuby), M.PercentToPixel(va.maGrid[va.index], wRuby) ]
-      }
-
-      // Case: margin not available -> get margin from CSS
-      else {
-        if( is.dirsHor && wRuby !== M.InnerWidth($viewport) ) {
-          va.ma[0] = M.PInt($viewport.css('padding-left'));
-          va.ma[1] = M.PInt($viewport.css('padding-right'));
-        }
-
-        if( !is.dirsHor && va.hRuby !== M.InnerHeight($viewport) ) {
-          va.ma[0] = M.PInt($viewport.css('padding-top'));
-          va.ma[1] = M.PInt($viewport.css('padding-bottom'));
-        }
-      }
-    },
-
-    /**
-     * SIZE INCLUDED MARGIN OF SLIDE
-     * @param int va.wSlideFull
-     * @param int va.can.sTranslate
-     */
-    TranslateS : function() {
-
-      // Get value of margin
-      SIZE.Margin();
-
-      // Assign value
-      // Default: wTranslate = wSLideFull -> other 'view' will update value later
-      va.wSlideFull = va.can.sTranslate = va.wSlide + va.ma[0] + va.ma[1];
-    },
-
-
-
-
-    /**
-     * SETUP WIDTH OF RUBY
-     * @param init va.wRuby
-     */
-    WidthForRuby : function() {
-
-      /**
-       * VERTICAL TABS
-       *  + Setup margin for Viewport -> get 'va.wRuby' value correct
-       */
-      if( is.pag && !!va.pagVer ) {
-
-        // If have not margin, calculate size of pag item at first
-        !va.pag.maRight && PAG.GetSizeOfItems();
-        PAG.MarginOnViewport();
-      }
-
-
-
-      // Update position and size for Ruby at first
-      POSSIZE.Anchor();
-
-      // Width of Ruby
-      va.wRuby = M.Width($viewport);
-
-
-
-
-      /**
-       * GET THE CURRENT VALUE IN SIZE GRID
-       */
-      var index = va.index = M.GetIndexInResponsive(o.responsiveLevels);
-      va.wGridCur = $.isArray(va.wGrid) ? va.wGrid[index] : null;
-      va.hGridCur = $.isArray(va.hGrid) ? va.hGrid[index] : null;
-      va.paGridCur = $.isArray(va.paGrid) ? va.paGrid[index] : null;
-
-
-
-      /**
-       * SETUP WIDTH OF SLIDE
-       * @param int va.wSlide
-       */
-      // Setup horizontal direction
-      var wSlide = null;
-      if( is.dirsHor ) {
-        // Get the current width-slide from Grid size
-        wSlide = M.PercentToPixel(va.wSlideGrid[va.index], va.wRuby);
-      }
-
-      // Setup vertical direction
-      else {
-        wSlide = va.wRuby;
-      }
-
-      // Rounded value 'wSlide'
-      va.wSlide = M.PInt(wSlide);
-    },
-
-    /**
-     * SETUP HEIGHT OF VIEWPORT FOR ANIMATE-HEIGHT IN HEIGHT-AUTO
-     */
-    HeightLockForAnim : function() {
-
-      // First, setup current fixed height for Viewport
-      $viewport.css('height', M.Height($viewport));
-
-      // Create timer to remove fixed height for Viewport
-      clearTimeout(ti.heightLock);
-      ti.heightLock = setTimeout(function() {
-
-        $viewport.css('height', '');
-      }, o.speedHeight + 10);
-    },
-
-    /**
-     * SETUP ANIMATE-HEIGHT EFFECT FOR RUBY
-     * @param int va.hRuby
-     */
-    AnimHeightForRuby : function(isUpdateResize) {
-
-      /**
-       * GET HEIGHT OF CURRENT HEIGHT AT FIRST
-       */
-      var timePlus  = 30,
-
-        // Ver 1.4 - 18/09/2016 : get size by 'offsetHeight' not included transformed css
-        hSlideCur = M.OuterHeight(va.$s.eq(cs.idCur), true);
-
-
-
-
-      /**
-       * FUNTION: SUPPORT SMOOTH-HEIGHT FOR $CANVAS
-       */
-      function SmoothHeight(height) {
-
-        // Store height value of ruby in variable
-        // Size of Viewport varies depending on the swipe direction
-        va.hRuby = height;
-        if( !is.dirsHor ) va.sRuby = height;
-
-
-
-        /**
-         * ANIMATION-HEIGHT EFFECT
-         *  + Remove effect if (speedHeight == null) || resize event
-         */
-        if( o.speedHeight === null || isUpdateResize ) {
-          M.Scroll.Check();
-        }
-
-        else {
-          var speedHeight = o.speedHeight - timePlus;
-
-          // Setup animation effect
-          va.tweenView
-            .animate($viewport, { 'height': height }, {
-
-              isNew  : true,
-              duration : speedHeight,
-              complete : function() {
-
-                // Mark sure remove fixed height on Viewport
-                $viewport.css('height', '');
-
-                // Update value of variable ralative scroll browser
-                M.Scroll.Check();
-              }
-            });
-        }
-      }
-
-
-
-      /**
-       * CHECK HEIGHT CHANGES ON VIEWPORT
-       */
-      function CheckHeightChange() {
-
-        // Smooth resize height Ruby when move to near slide
-        // + Add options 'isUpdateResize' to allways run 'SmoothHeight()'
-        // + Avoid case: resize event, (va.hRuby == hSlideCur) -> not execute 'SmoothHeight()'
-        if( !is.heightFixed && ((va.hRuby != hSlideCur && hSlideCur > 0) || isUpdateResize) ) {
-          SmoothHeight(hSlideCur);
-
-
-          /**
-           * UPDATE VALUE OF PAGINATION VERTICAL WHEN CHANGES HEIGHT
-           *  + Smooth height for pagination vertical
-           */
-          if( is.pag && !is.pagList && va.pag.dirs == 'ver' && !is.pagOutside && o.pag.sizeAuto == 'full' ) {
-            PAG.PropAndStyle();
-          }
-        }
-      }
-
-
-
-
-      /**
-       * FUNCTION EXECUTION
-       *  + Create timer for 'AnimHeightForRuby' -> Change height at last
-       *  + Must be >= 30ms -> for Dot layout toggle class 'hNative' required delay for old browser ???
-       */
-      setTimeout(CheckHeightChange, timePlus);
-    },
-
-
-
-
-    /**
-     * SETUP HEIGHT OF HEIGHT-AUTO WHEN LOADED FIRST SLIDE
-     * @param int va.hRuby
-     */
-    HeightAutoForRuby : function(hSlide) {
-
-      // Store & setup height allways be an integer
-      va.hRuby = M.PInt(hSlide);
-    },
-
-    /**
-     * SETUP HEIGHT OF HEIGHT-FIXED FOR RUBY
-     * @param int va.hRuby
-     */
-    HeightFixedForRuby : function() {
-
-      // Function: setup height for Viewport
-      function HeightForViewport(h) {
-        $viewport.css('height', h);
-      }
-
-
-      /**
-       * SETUP IN FULLSCREEN MODE
-       */
-      if( is.fullscreen ) {
-
-        // Get height auto for Viewport
-        var hWin    = $w.height(),
-          offsetTop = va.$anchor.offset().top;
-
-        // Case: offsetTop < height-window
-        if( offsetTop < hWin ) {
-          hWin -= offsetTop;
-        }
-
-
-
-
-        /**
-         * SETUP HEIGHT WHEN IT HAVE 'OFFSET'
-         */
-        if( o.offsetBy !== null ) {
-          var $offset = $(o.offsetBy);
-
-          // Height Ruby will substract by height offsetBy container
-          $offset.each(function() {
-            hWin -=  M.OuterHeight($(this), true);
-          });
-
-          // Reupdate position + size ruby when $offset contain images
-          if( $offset.find('img').length ) {
-            $w.on('load', function() { cs.refresh() });
-          }
-        }
-
-        va.hRuby = hWin;
-        HeightForViewport(va.hRuby);
-      }
-
-
-
-      /**
-       * SETUP NORMAL
-       */
-      // else {
-      //
-      //   // Priority level of height ruby: va.hRes > height css > o.height
-      //   // Assign height Viewport when have height repsonsive
-      //   if( va.hRes ) {
-      //     va.hRuby = M.R(va.hRes * va.rate);
-      //     HeightForViewport(va.hRuby);
-      //   }
-      //   else {
-      //
-      //     // Height value in css
-      //     var h = M.Height($viewport);
-      //
-      //     // Check if height in option !== height css
-      //     if( is.heightFixed && h != o.height ) {
-      //      h = o.height;
-      //      HeightForViewport(h);
-      //     }
-      //
-      //     if( !h ) h = 0;
-      //     va.hRuby = h;
-      //   }
-      // }
-
-      else {
-        va.hRuby = null;
-
-        if( $.isArray(va.hGrid) ) {
-
-          // Case: Height-grid current is available
-          if( $.isNumeric(va.hGridCur) ) {
-            va.hRuby = va.hGridCur;
-          }
-
-          // Case: The value of current Height-grid is 'null'
-          else {
-            if( $.isArray(va.wGrid) ) {
-              va.hRuby = M.R(va.hGrid[0] * va.rate);
-            }
-          }
-        }
-
-        // Set height for Viewport
-        va.hRuby && HeightForViewport(va.hRuby);
-      }
-    },
-
-    /**
-     * SETUP SIZE RUBY AFTER HAVE WIDTH - HEIGHT VALUE
-     */
-    EndOfRuby : function() {
-
-      /**
-       * GET WIDTH OF VIEWPORT IN THE CASE
-       */
-      // Case default
-      var wCur = M.Width($viewport);
-
-      // Case : in layout fullwidth - fullscreen
-      if( is.fullwidth || is.fullscreen ) wCur = $w.width();
-
-
-
-
-      /**
-       * IF WIDTH RUBY CHANGE -> UPDATE WIDTH - HEIGHT VALUE
-       */
-      if( va.wSlide !== wCur ) {
-
-        // Get width of ruby at first
-        SIZE.WidthForRuby();
-        // Responsive: calculation padding & va.rate
-        is.res && RESPONSIVE.UpdateVars();
-        // Get height of ruby at first -> Support for image features autoFit/autoFill
-        is.heightFixed ? SIZE.HeightFixedForRuby()
-                 : SIZE.HeightAutoForRuby( M.OuterHeight(va.$s.eq(cs.idCur), true) );
-      }
-
-
-      /**
-       * SETUP VARIABLE OF DIRECTION
-       */
-      // Varible to display size (width/height) of ruby
-      va.sRuby = is.dirsHor ? va.wRuby : va.hRuby;
-    }
-  },
-
-
-
-
-
-
-
-
-
-
-
-  /**
-   * SETUP POSITION & SIZE
-   */
-  POSSIZE = {
-
-    /**
-     * SYNTHETIC INITIAL POSITION - SIZE OF ELEMENTS
-     */
-    CombineAtFirst : function() {
-
-      /**
-       * CSS WIDTH FOR CANVAS
-       */
-      if( /^(line|dot)$/.test(va.fxLayout) ) {
-
-        // Width of Canvas by swipe direction
-        va.sCanvas = is.dirsHor ? va.wSlide : va.wRuby;
-        $canvas.css('width', va.sCanvas);
-      }
-
-      // TranslateW: get
-      SIZE.TranslateS();
-
-
-
-      /**
-       * SETUP VARIABLES IN LINE LAYOUT
-       */
-      if( va.fxLayout == 'line' ) {
-
-        /**
-         * IDENTIFY NUMBER OF EDGE SLIDE CAN SEE COMPARE WITH CENTER SLIDE
-         * @param int va.center.nEdge
-         */
-        if( is.centerLoop ) {
-
-          var wAll = 0, i = 0;
-          while (wAll < va.wRuby) {
-            wAll = (va.wSlide + va.ma[0] + va.ma[1]) * (i * 2 + 1);     // Number 1: for center slide. Number 2: for edge slide
-            i++;
-          }
-          var nEdge = i-1;
-          if( nEdge * 2 >= num ) nEdge = ~~((num-1)/2);
-
-          // Store result into 'va.center'
-          va.center.nEdge = nEdge;
-        }
-
-
-        /**
-         * OTHER SETUP
-         */
-        // Setup position for each slide
-        var fnName = 'TFSlide'+ va.View;
-        !!VIEW[fnName] && VIEW[fnName]();
-      }
-
-
-
-
-      /**
-       * UPDATE POSITION OF CANVAS AT FIRST
-       */
-      POSITION.CanvasBegin();
-
-
-
-      /**
-       * PAGINATION: UPDATE VALUE OF VARIABLE
-       */
-      if( is.pag && !is.pagList ) {
-        PAG.CSSPosForPag();
-        PAG.PropAndStyle();
-        PAG.PosAndSizeOfItems();
-        PAG.UpdateThumbnail();
-        o.pag.isMark && PAG.SizePosOfMark();
-
-        // Setup center position for center PagItem - without animation
-        PAG.PosCenterForItemCur(true, true);
-
-
-
-        /**
-         * CHECK CONVERT VERTICAL TABS TO HORIZONTAL TABS
-         *  + Create timer > 30ms: must be get height of ruby -> run first 'SIZE.AnimHeightForRuby()'
-         *  + 'PAG.VerToHor' into function() -> fixed IE7
-         */
-        setTimeout(function() { PAG.VerToHor() }, 40);
-      }
-    },
-
-    /**
-     * SETUP POSITION & SIZE EACH SLIDE IN 'BASIC' VIEW
-     */
-    SlideBasic : function() {
-
-      var pBegin  = va.pBegin  = [],
-        sSlideMap = va.sSlideMap = [],
-        nBegin  = is.centerLoop ? va.center.nLeft : 0;
-
-
-
-      /**
-       * FUNCTION: GET HEIGHT INCLUDED MARGIN OF CURRENT SLIDE
-       */
-      function HeightSlideCur(id) {
-        return M.OuterHeight(va.$s.eq(id), true) + va.ma[0] + va.ma[1];
-      }
-
-
-
-
-      /**
-       * STORE POSITION EACH SLIDE
-       * @param array va.pBegin
-       */
-      // Default size of slide for horizontal direction
-      if( is.dirsHor ) {
-        for( i = 0; i < num; i++ ) {
-
-          sSlideMap[i] = va.wSlideFull;
-          pBegin[i] = sSlideMap[i] * (- nBegin + i);
-        }
-      }
-
-      // Size of slide for vertical direction
-      else {
-
-        // Case: Center loop
-        if( is.centerLoop ) {
-          var hTopPlus  = 0,
-            hBottomPlus = 0;
-
-          // Position Above
-          for( i = nBegin; i < num; i++ ) {
-            sSlideMap[i] = HeightSlideCur(va.idMap[i]);
-            pBegin[i] = hTopPlus;
-            hTopPlus += sSlideMap[i];   // Position starting = 0 -> must below location
-          }
-
-          // Position Below
-          for( i = nBegin - 1; i >= 0; i-- ) {
-            sSlideMap[i] = HeightSlideCur(va.idMap[i]);
-            hBottomPlus -= sSlideMap[i];
-            pBegin[i]  = hBottomPlus;
-          }
-        }
-
-        // Case: not Center loop
-        else {
-          for( i = 0; i < num; i++ ) {
-            3[i] = HeightSlideCur(i);
-            pBegin[i] = sSlideMap[i] * i;
-          }
-        }
-      }
-    },
-
-    // POSITION & SIZE FOR ANCHOR IN LAYOUT FULLWIDTH - FULLSCREEN
-    Anchor : function() {
-
-      // Conditional execution
-      if( !(is.fullwidth || is.fullscreen) ) return;
-
-      // Get position and size for Ruby
-      var sizeBody   = $w.width(),
-        sizeAnchor   = va.$anchor.width(),
-        offsetAnchor = va.$anchor.offset().left;
-
-      // Case: remove position & size of ruby if sizeAnchor == sizeBody
-      if( sizeAnchor === sizeBody ) {
-        $ruby.css({ 'width': '', 'left': '' });
-      }
-
-      // Case: set position & size for ruby
-      else {
-        $ruby.css({
-          'width' : ~~ sizeBody,
-          'left'  : - Math.ceil(offsetAnchor)
-        });
-      }
-    }
-  },
-
-
-
-
-
-
-
-
-
-
-
-  /**
-   * VIEW
-   */
-  VIEW = {
-
-    /**
-     * SETUP PROPERTIES WHEN RESIZE IN SIZE()
-     */
-    TFSlideBasic : function() {
-
-      /**
-       * SETUP POSITION & SIZE OF EACH SLIDE
-       */
-      POSSIZE.SlideBasic();
-
-
-
-      /**
-       * TRANSFORM POSITION OF EACH SLIDE BASE ON POSITION STORAGE ABOVE
-       */
-      var p     = va.can,
-        isHor   = p.dirs == 'hor',
-        translate = isHor ? 'Tlx' : 'Tly';
-
-
-      va.tfMap = [];
-      for( i = 0; i < num; i++ ) {
-        var id = is.centerLoop ? va.idMap[i] : i,
-          tf = {};
-
-        tf[p.cssTf] = M[translate](va.pBegin[i]);
-
-        va.tfMap.push(tf);      // add vao namespace transform
-        va.$s.eq(id).css(tf);     // Put slide into predefined position
-      }
-    }
-  },
-
-
-
-
-
-
-
-
-
-
-  /**
-   * UPDATE POSITION & SIZE IN DIRECTION VERTICAL
-   */
-  VERTICAL = {
-
-    /**
-     * UPDATE POSITION & SIZE WHEN SLIDE LOAED
-     */
-    SlideLoaded : function() {
-      // Size of each slide
-      VIEW.TFSlideBasic();
-
-      // Update position of Canvas when update position each slide
-      if( va.fxLayout == 'line' ) POSITION.CanvasBegin();
-    }
-  },
-
-
-
-
-
-
-
-
-
-
-  /**
-   * SWAP TO OTHER SLIDE
-   */
-  TOSLIDE = {
-
-    /**
-     * SETUP WHEN START MOVE TO NEXT SLIDE
-     */
-    Run : function(nSlide, isIDFixed, isContinuity, isPagCenter) {
-      var idCur = cs.idCur;
-
-      // Conditional execution
-      if( !((!isIDFixed && nSlide <= cs.num) || (isIDFixed && idCur !== nSlide)) ) return;
-
-
-
-      /**
-       * TOSLIDE VARIABLE: STORE INITIAL PROPERTIES
-       */
-      va.ts = {
-        'num'      : nSlide,
-        // ID of fixed slide
-        'isIDFixed'  : !!isIDFixed,
-        // Swipe continuously
-        'isContinuity' : !!isContinuity,
-        // Default: is center
-        'isPagCenter'  : (isPagCenter === undefined) ? true : !!isPagCenter
-      };
-
-
-
-
-      /**
-       * SETUP INITIALIZE VARIABLES
-       *  + fxRun : support slideshow + setup vertical tabs when body resize
-       *  + slideNext : move to next or prev
-       */
-      is.fxRun = true;
-      $ruby.addClass(va.ns +'fxRun');
-
-      is.slideNext = isIDFixed ? (nSlide - cs.idCur > 0) : (nSlide > 0);
-      M.RunEvent('fxBegin');
-
-
-
-
-      /**
-       * SETUP OTHER ELEMENTS WHEN SLIDE LOADED
-       */
-      if( M.Data(va.$s.eq(idCur))['isLoaded'] ) {
-
-        is.HOTSPOT && HOTSPOT.Reset(idCur);           // Reset initial status of Hotspot
-        // is.LAYER && LAYER.Reset(idCur);             // Reset Tween current animate
-        is.LAYER && LAYER.PlayEnd(idCur);             // Reset old tween & Play tween of animate-end
-        is.VIDEOIFRAME && VIDEOIFRAME.SlideDeactived(idCur);  // Closed all Video
-        is.LAYERPARALLAX && LAYERPARALLAX.Reset(idCur)      // Reset position of Parallax item
-
-        is.VIDEOBACK && VIDEOBACK.Run('pause');         // Pause Videoback of current slide
-      }
-
-      // Slideshow: stop timer when run effect
-      is.slideshow && SLIDESHOW.Go('slideToBegin');
-
-
-
-
-      /**
-       * MAIN SETUP
-       */
-      // Callback func: start && before
-      isIDFixed ? (nSlide == 0) && M.RunEvent('start')
-            : (idCur + nSlide == 0 || idCur + nSlide - num == 0 ) && M.RunEvent('start');
-      M.RunEvent('before');
-
-      // ID: convert to ts.num
-      if( isIDFixed ) va.ts.num -= idCur;
-
-      // Easing transition of Canvas
-      var es;
-      if   ( va.moveBy == 'swipe' && va.moveLastBy != 'swipe' ) es = o.swipe.easing;
-      else if( va.moveBy == 'tap' && va.moveLastBy != 'tap' )   es = o.fxEasing;
-
-      if( es ) {
-        va.easing = es;
-        va.moveLastBy = va.moveBy;
-      }
-
-      // Continue setup depends layout
-      TOSLIDE[va.fxLayout]();
-    },
-
-
-    /**
-     * SETUP CONTINUE IN 'LINE' LAYOUT
-     */
-    line : function() {
-      var ts = va.ts;
-
-      // Toggle ID current
-      TOSLIDE.ToggleID();
-      !is.heightFixed && SIZE.AnimHeightForRuby();
-
-      // Setup when slide run end effect
-      clearTimeout(ti.lineEnd);
-      ti.lineEnd = setTimeout(TOSLIDE.End, va.speed[cs.idCur]);
-
-
-
-      /**
-       * ANIMATE $CANVAS IN HORIZONTAL DIRECTION
-       */
-      if( is.dirsHor ) {
-
-        /**
-         * CASE: CENTER LOOP
-         */
-        if( is.centerLoop ) {
-
-          // Translate by 'Tap' pagination
-          ts.isIDFixed && POSITION.FillHole();
-
-          // Setup transform of each slide to allways center layout
-          POSITION.Balance(ts.isContinuity);
-          !ts.isContinuity && POSITION.AnimateX($canvas, ts.num);
-        }
-
-
-
-        /**
-         * CASE: NO CENTER LOOP
-         */
-        else {
-
-          // Animate to next object
-          !ts.isContinuity && POSITION.AnimateX($canvas, ts.num);
-
-          // Update transform on each slide
-          if( va.fxType == '3d' ) {
-            var restoreName = 'Restore'+ va.View;
-            !!VIEW[restoreName] && VIEW[restoreName]();
-          }
-        }
-      }
-
-
-
-
-      /**
-       * ANIMATE $CANVAS IN VERTICAL DIRECTION
-       */
-      else {
-
-        /**
-         * CASE: CENTER LOOP
-         */
-        if( is.centerLoop ) {
-
-          if( M.A(ts.num) == 1 ) {
-            var id     = ts.num > 0 ? cs.idLast : cs.idCur,
-              hSlideCur  = M.OuterHeight(va.$s.eq(id), true) + va.ma[0] + va.ma[1],
-              xTranslate = - (hSlideCur * ts.num - va.can.xCanvas);
-
-            // NOT FINISH -> PAUSE AT HERE !!!
-            POSITION.Balance(ts.isContinuity);
-            !ts.isContinuity && POSITION.AnimateX($canvas, xTranslate, false, true);
-          }
-        }
-      }
-    },
-
-
-    /**
-     * SETUP CONTINUE IN 'DOT' LAYOUT
-     */
-    dot : function() {
-      var ts = va.ts;
-
-      // Toggle ID current
-      // Add timer when toggle slide -> fixed flicker at first when performed 'Math' effect
-      if( va.fxType == 'math' ) ts.isDelayWhenToggleID = true;
-      TOSLIDE.ToggleID();
-
-      // Setup animate height for Viewport in Height-Auto
-      !is.heightFixed && SIZE.AnimHeightForRuby();
-
-      // Insert 'mask' class to fixed scroll-x bar appear in FxCSS
-      o.isBodyMaskInFxCSS && (va.fxView === 'css') && va.$body.addClass(va.ns + 'mask-x');
-
-      // Initial setup effect
-      FX.Init();
-    },
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * TOGGLE CURRENT ID WITH LAST ID
-     */
-    ToggleID : function() {
-
-      /**
-       * SETUP VALUE HEIGHT FOR VIEWPORT IN HEIGHT-AUTO TO CREATE ANIMATE-HEIGHT EFFECT
-       *  + Remove effect if 'speedHeight' == null
-       */
-      !is.heightFixed && (o.speedHeight !== null) && SIZE.HeightLockForAnim();
-
-
-
-
-      /**
-       * Change value of current & last ID
-       */
-      var ts  = va.ts,
-        idCur = cs.idCur,
-        // Store number of move slide
-        nMove = va.nMove = ts.num;
-
-      // Store idLast & update idCur
-      cs.idLast = idCur;
-
-
-      // Return value idCur when out range [0, num]
-      idCur += nMove;
-      if( is.loop ) {
-        if(    nMove < 0 && idCur < 0 )  idCur = num + idCur;
-        else if( nMove > 0 && idCur >= num ) idCur -= num;
-      }
-
-      // Past new value to current ID
-      // Combine with 'swapID' event
-      M.RunEvent('beforeSwapIDCur');
-      cs.idCur = idCur;
-      M.RunEvent('afterSwapIDCur');
-
-
-      // Add timer for effect in 'Dot' layout : browser Chrome error -> slide shake
-      // In week CPU, remove timer if click continuously
-      if( !!ts.isDelayWhenToggleID ) setTimeout(M.ToggleSlide, 10);
-      else               M.ToggleSlide();
-
-
-
-
-      /**
-       * SETUP AFTER TOGGLE ID
-       */
-      TOSLIDE.AfterToggleID();
-    },
-
-
-    /**
-     * SETUP AFTER TOGGLE ID
-     *  + Similar with 'TOSLIDE.End()', but faster
-     */
-    AfterToggleID : function() {
-
-      /**
-       * SETUP CURRENT PAGITEM MOVE TO CENTER POSITION
-       * @conditions
-       *  + Only move to center when swipe on body run
-       *  + Tap on PagItem
-       *  + Vertical tabs allways execute that fucntion
-       */
-      if( is.pag && !is.pagList && va.ts.isPagCenter
-      &&  (va.moveBy == 'swipe' || (va.moveBy == 'tap' && o.pag.isItemCurCenterWhenTap) || va.pag.dirs == 'ver') ) {
-
-        // Because 'posCenter' for vertical tabs allways update properties 'PAG.PropAndStyle()' -> isForce = true : not animate to wrong position
-        var isForceTf = (va.pag.dirs == 'ver') ? true : false;
-        PAG.PosCenterForItemCur(isForceTf);
-      }
-
-
-
-
-      /**
-       * RESET & UPDATE TWEEN-ANIMATE FOR LAYER IN THE CURRENT SLIDE
-       */
-      is.LAYER && LAYER.Update(cs.idCur);
-
-
-
-
-      /**
-       * OTHER SETUP
-       */
-      // Play Videoback in current slide
-      is.VIDEOBACK && VIDEOBACK.Run('play');
-    },
-
-
-    /**
-     * SETUP WHEN END EFFECT
-     */
-    End : function() {
-      var idCur = cs.idCur;
-
-      // Remove 'mask-x' class to remove scroll-x bar appear in FxCSS
-      o.isBodyMaskInFxCSS && (va.fxView === 'css') && va.$body.removeClass(va.ns + 'mask-x');
-
-      // Notice of end effect
-      is.fxRun = false;
-      $ruby.removeClass(va.ns + 'fxRun');
-      M.RunEvent('fxEnd');
-
-      // Update & start play Layer of current slide
-      if( is.LAYER ) {
-        LAYER.Play(idCur);
-        LAYER.Resume('home');
-      }
-
-      // Update position of Hotspot item after setup Layer
-      is.HOTSPOT && HOTSPOT.UpdatePosition(idCur);
-
-      // Toggle Parallax effect in layer
-      is.LAYERPARALLAX && LAYERPARALLAX.ToggleEvent(idCur);
-
-      // Other setup
-      M.RunEvent('after');            // Trigger event 'after'
-      idCur == num - 1 && M.RunEvent('end');    // Trigger event 'end'
-
-
-
-
-      /**
-       * RESET SLIDE DISPLAY WHEN 'TAP' NAV - PAG & 'DRAG'
-       */
-      if( is.slideshow ) {
-        is.hoverAction = true;
-
-        // Check pause slideshow when have 'isLoop' == false & idCur at end
-        if( !o.slideshow.isLoop && cs.idLast == num - 1 && idCur == 0 ) {
-          cs.pause();
-        }
-        else {
-          SLIDESHOW.Go('slideToEnd');
-        }
-      }
-    }
-  },
-
-
-
-
-
-
-
-
-
-
-  /**
-   * EVENTS
-   */
-  EVENTS = {
-
-    /**
-     * ARRANGE & SETUP THE EVENTS IN RUBY
-     */
-    Setup : function() {
-
-      // Event Navigation & Pagination
-      is.NAV && NAV.EventTap();
-      is.PAG && PAG.EventTap();
-
-      // Event Slideshow
-      if( is.SLIDESHOW ) {
-        SLIDESHOW.EventHover();
-        SLIDESHOW.EventTap();
-      }
-
-      // Event Keyboard
-      EVENTS.Keyboard();
-
-      // Event Wheel & Mousewheel for Viewport, PagInner
-      EVENTS.Wheel({
-        '$wheel'  : $viewport,
-        'direction' : va.can.dirs,
-        'optsWheel' : o.wheel
-      });
-      is.PAG && EVENTS.Wheel({
-        '$wheel'  : va.$pag,
-        'direction' : va.pag.dirs,
-        'optsWheel' : o.pag.wheel
-      });
-
-      // Event Deeplinking
-      is.DEEPLINKING && DEEPLINKING.Events();
-
-      // Event for the elements in layout fullscreen
-      is.FULLSCREEN && FULLSCREEN.Events();
-
-      // Event resize Window
-      EVENTS.Resize();
-    },
-
-    /**
-     * GET CORRECT EVENT BETWEEN MOUSE - TOUCH - SWIPE
-     */
-    GetEventRight : function(e) {
-      var i = e;
-      if( /^touch/.test(e.type) )    i = e.originalEvent.touches[0];
-      else if( /pointer/i.test(e.type) ) i = e.originalEvent;
-      return i;
-    },
-
-    /**
-     * CHECK MOBILE TAP - PREVENT SCROLL UP, SCROLL DOWN STILL CHANGE SLIDE
-     */
-    CheckMobileTap : function($items) {
-
-      $items.each(function() {
-        var $item = $(this);
-
-        // Register event swipe start
-        $item.on(va.ev.swipe.start, function(e) {
-          var itemData = M.Data($(this)),
-            i    = EVENTS.GetEventRight(e);
-
-          itemData.isMobileTap = true;
-        });
-
-        // Register event swipe move
-        $item.on(va.ev.swipe.move, function(e) {
-          var itemData = M.Data( $(this) ),
-            i    = EVENTS.GetEventRight(e);
-
-          itemData.isMobileTap = false;
-        });
-      });
-    },
-
-    /**
-     * ADD TIMER TO REMOVE 2 EVENT 'CLICK' & 'SWIPEEND' IN SAME TIME
-     */
-    DelayToTapNext : function() {
-      is.tapEnable = false;
-      setTimeout( function() { is.tapEnable = true }, 10);
-    },
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * NAVIGATION EVENTS
-     */
-    PrevCore : function(step) {
-      va.moveBy = 'tap';
-
-      /**
-       * SETUP 'STEP' VARIABLE
-       */
-      step = step || 1;
-
-
-
-      /**
-       * CHECK ALLOW MOVE TO PREV SLIDE
-       */
-      if( (is.loop && cs.num > 1) || (!is.loop && cs.idCur > 0) ) {
-        TOSLIDE.Run(- step);
-      }
-      else {
-        POSITION.AnimRebound('prev');
-      }
-    },
-
-    NextCore : function(step) {
-      va.moveBy = 'tap';
-
-      /**
-       * SETUP 'STEP' VARIABLE
-       */
-      step = step || 1;
-
-
-
-      /**
-       * CHECK ALLOW MOVE TO NEXT SLIDE
-       */
-      if( (is.loop && cs.num > 1) || (!is.loop && cs.idCur < num - 1) ) {
-        TOSLIDE.Run(step);
-      }
-      else {
-        POSITION.AnimRebound('next');
-      }
-    },
-
-    Prev : function() {
-      if( is.tapEnable ) {
-        var step = o.stepNav;
-
-        EVENTS.PrevCore(step);
-        EVENTS.DelayToTapNext();
-      }
-    },
-
-    Next : function(isSlideshow) {
-      if( is.tapEnable ) {
-
-        // How many 'step' each case
-        var step = isSlideshow ? o.stepPlay : o.stepNav;
-
-        EVENTS.NextCore(step);
-        EVENTS.DelayToTapNext();
-      }
-    },
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * EVENT TOGGLE SLIDE BY SHORTCUT KEYBOARD
-     */
-    Keyboard : function() {
-      $doc.off(va.ev.key);
-
-      if( o.isKeyboard ) {
-        $doc.on(va.ev.key, function(e) {
-
-          // Check ruby display on the current screen browser
-          M.Scroll.Check(true);
-          if( is.into ) {
-            var keyCode = e.keyCode,
-              optsKB  = o.keyboard;
-
-            if   ( keyCode === optsKB.prevKey || keyCode === optsKB.prevAlterKey ) EVENTS.PrevCore(1);
-            else if( keyCode === optsKB.nextKey || keyCode === optsKB.nextAlterKey ) EVENTS.NextCore(1);
-          }
-        });
-      }
-    },
-
-    /**
-     * EVENT TOGGLE SLIDE BY WHEEL EVENT
-     *  + Reference value Wheel Delta (http://stackoverflow.com/q/5527601/6397436) :
-
-                | evt.wheelDelta | evt.detail
-      ------------------+----------------+------------
-        Safari v5/Win7  |     120    |    0
-        Safari v5/OS X  |     120    |    0
-        Safari v7/OS X  |    12    |    0
-       Chrome v11/Win7  |     120    |    0
-       Chrome v37/Win7  |     120    |    0
-       Chrome v11/OS X  |     3 (!)  |    0    (possibly wrong)
-       Chrome v37/OS X  |     120    |    0
-          IE9/Win7  |     120    |  undefined
-        Opera v11/OS X  |    40    |   -1
-        Opera v24/OS X  |     120    |    0
-        Opera v11/Win7  |     120    |   -3
-       Firefox v4/Win7  |  undefined   |   -3
-       Firefox v4/OS X  |  undefined   |   -1
-      Firefox v30/OS X  |  undefined   |   -1
-
-     */
-    Wheel : function(opts) {
-      var suffix     = '.' + va.ns + va.rubykey,
-        nameWheel    = 'wheel' + suffix,
-        nameMouseWheel = 'mousewheel' + suffix,
-        $wheel     = opts.$wheel;
-
-
-      /**
-       * CONDITIONAL EXECUTION
-       */
-      if( !opts.$wheel ) return;
-
-
-
-      /**
-       * AT FIRST: SETUP DATA WHEEL & REMOVE WHEEL EVENT ON OBJECT
-       */
-      // Loai bo event Wheel tren doi tuo.ng
-      $wheel.off(nameWheel +' '+ nameMouseWheel);
-
-      // Setup data wheel of object
-      var wheelData = M.Data($wheel);
-      if( !wheelData.wheelValue ) wheelData.wheelValue = { 'type': null, 'delta': 0 };
-
-      var wheelValue = wheelData.wheelValue;
-
-
-
-
-      /**
-       * FUNCTION: MOVE TO NEXT SLIDE
-       */
-      function GotoNextSlide(deltaX, deltaY) {
-
-        var wheelDelta      = wheelValue.delta,
-          valueActive     = 300,
-          isScrollPagePrevent = false;
-
-
-        /**
-         * FIXED VALUE DELTA IN THE SPECIAL BROWSER
-         *  + Fixed for Firefox browser: value too small
-         */
-        if( is.firefox ) {
-          deltaX *= 20;
-          deltaY *= 20;
-        }
-
-
-
-
-        /**
-         * FUNCTION: SETUP INCREASE CURRENT DELTA
-         */
-        function DeltaPlus(deltaCur) {
-          if( deltaCur !== 0 && deltaCur !== undefined ) {
-
-            wheelDelta += (deltaCur > 0) ? deltaCur : -deltaCur;
-            isScrollPagePrevent = true;
-          }
-        }
-
-
-
-
-        /**
-         * SETUP VALUE DELTA DEPENDS ON OPTIONS
-         */
-        switch (opts.optsWheel) {
-
-          /**
-           * TRUONG HOP 'AUTO'
-           */
-          case 'auto' :
-
-            // Case: horizontal direction
-            if( opts.direction == 'hor' ) DeltaPlus(deltaX);
-
-            // Case: vertical direction
-            else DeltaPlus(deltaY);
-            break;
-
-
-          /**
-           * CASE: 'BOTH'
-           */
-          case 'both' :
-            DeltaPlus(deltaX || deltaY);
-            break;
-        }
-
-
-
-
-
-        /**
-         * CHECK MOVE TO NEXT SLIDE
-         *  + Wheel twice will be allowed move to postion next slide
-         */
-        if( wheelDelta <= -valueActive ) {
-
-          // Move to previous slide
-          EVENTS.PrevCore(1);
-
-          // Reset variable
-          wheelDelta = 0;
-          wheelValue.type = null;
-        }
-
-        else if( wheelDelta >= valueActive ) {
-
-          // Move to next slide
-          EVENTS.NextCore(1);
-
-          // Reset variable
-          wheelDelta = 0;
-          wheelValue.type = null;
-        }
-
-        // Store value of wheel event on Data
-        wheelValue.delta = wheelDelta;
-
-        // Return value prevent scroll page
-        return isScrollPagePrevent;
-      }
-
-
-
-
-      /**
-       * STRUCTURE OF WHEEL EVENT BETWEEN NATIVE WHEEL & WHEEL PLUGIN
-       */
-      if( o.wheel !== false ) {
-        $wheel.on(nameMouseWheel +' '+ nameWheel, function(e) {
-          var typeCur = e.type,
-            events  = e.originalEvent;
-
-          // Match name of wheel event -> setup continue
-          if( wheelValue.type === null || wheelValue.type == typeCur ) {
-
-            // Setup type of current wheel if removed
-            if( wheelValue.type === null ) wheelValue.type = typeCur;
-
-            var deltaX = events.wheelDeltaX || events.deltaX || 0,
-              deltaY = events.wheelDeltaY || events.deltaY || 0;
-
-            // Check move to next slide
-            var isScrollPagePrevent = GotoNextSlide(deltaX, deltaY);
-
-            // Prevent to scroll page
-            if( isScrollPagePrevent ) return false;
-          }
-        });
-      }
-    },
-
-
-
-
-
-
-
-
-
-
-    /**
-     * UPDATE RUBY AFTER LOAD ALL IMAGE || WINDOW LOADED
-     */
-    LoadAll : function() {
-
-      /**
-       * FUNCTION: CHECK VALUE OF 'RATE' CHNAGES
-       *  + Update ruby if init 'rate' !== current 'rate'
-       */
-      function CheckRate() {
-        is.res && va.rateInit != va.rate && cs.refresh();
-      }
-
-
-
-      /**
-       * EXECUTE EVENT
-       */
-      cs.ev
-        .off('loadAll')
-        .on('loadAll', function() { CheckRate() });
-
-
-
-      /**
-       * EVENT 'LOAD' WINDOW
-       *  + Update ruby
-       */
-      $w.on('load', function(e) {
-        setTimeout(cs.refresh, 100);
-      });
-    },
-
-    /**
-     * EVENT UPDATE RUBY AFTER BROWSER RESIZE
-     */
-    Resize : function() {
-
-      // Function check
-      function Check() {
-
-        clearTimeout(ti.resize);
-        ti.resize = setTimeout(function() {
-
-          // Fullscreen: find current page at first
-          if( is.fullscreen ) va.hRuby = $w.height();
-          // Update variable relative to scroll page
-          is.slideshow && !is.ssPauseAbsolute && M.Scroll.Check();
-
-          // Ruby: toggle showInRange
-          !!o.showInRange && is.DISPLAY && DISPLAY.Toggle();
-
-          // Reupdate Ruby: when show/hide scroll-bar browser
-          if( is.showInRange && ( M.A(M.Width($viewport) - va.wRuby) > 1 || M.A(M.Height($viewport) - va.hRuby) > 1 ) ) {
-            UPDATE.Resize();
-          }
-        }, 100);
-      }
-
-      // Resize: event
-      $w.off(va.ev.resize);
-      $w.on(va.ev.resize, Check);
-
-
-
-
-      /**
-       * !IMPORTANT
-       *  + Add 'div' resize event
-       *  + Replace for functions need to resize:
-       *    - Ruby nested initialize
-       *    - 'EVENTS.RubyLoaded()' -> reby loaded all image
-       *    - 'EVENTS.PageLoaed()' -> the webpage loaded
-       *    - 'EVENTS.ReCheck()' -> remove 'ReCheck()' in 'resize' event & animate-height effect
-       */
-      clearInterval(ti.resizeLoop);
-      ti.resizeLoop = setInterval(function() {
-        var wCur, hCur;
-
-        // Get size for layout fullwidth - fullscreen
-        if( is.fullwidth || is.fullscreen ) {
-          wCur = $w.width();
-
-          // Get height current of window in layout fullscreen
-          var hWin    = $w.height(),
-            offsetTop = $ruby.offset().top;
-
-          if( is.fullscreen && offsetTop < hWin ) {
-            hCur = hWin - offsetTop;
-          }
-        }
-
-        // Get size for layout 'auto'
-        else {
-          wCur = M.Width($viewport);
-          hCur = M.OuterHeight(va.$s.eq(cs.idCur), true);
-        }
-
-
-        // Ver 1.6 - 23/10/2016: Support the size 'width' - 'height' different at least 2px
-        if( !is.fxRun && !is.swiping && ( M.A(wCur - va.wRuby) > 1 || M.A(hCur - va.hRuby) > 1 ) ) {
-          UPDATE.Resize();
-        }
-      }, o.delayUpdate);
-    }
-  },
-
-
-
-
-
-
-
-
-
-
-  /**
-   * EFFECT FOR 'DOT' LAYOUT
-   */
-  FX = {
-
-    /**
-     * CLASSIFICATION OF EFFECT AT FIRST
-     *  + 'Math' effect
-     *  + 'CSS' effect
-     */
-    Init : function(f) {
-      var fxType = va.fxType,
-        fnName = 'ToSlide' + va.View;
-
-
-      // 'Math' effect
-      if( fxType == 'math' && !!VIEW[fnName] ) VIEW[fnName]();
-
-      // 'CSS' effect
-      else if( /^css/.test(fxType) && !!VIEW[fnName] ) VIEW[fnName]();
-
-      // None effect
-      else FX.none();
-    },
-
-    /**
-     * SETUP VARIABLES AT END
-     */
-    End : function(speedCur) {
-
-      // Case: without timer
-      if( speedCur === null ) {
-        TOSLIDE.End();
-      }
-
-      // Case: hove timer
-      else {
-        if( !$.isNumeric(speedCur) ) speedCur = va.speed[cs.idCur];
-
-        // Create timer
-        clearTimeout(ti.fxEnd);
-        ti.fxEnd = setTimeout(TOSLIDE.End, speedCur);
-      }
-    },
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * NONE EFFECT
-     */
-    none : function() {
-      TOSLIDE.End();
-    }
-  },
-
-
-
-
-
-
-
-
-
-
-  /**
-   * API BASIC
-   */
-  API = {
-
-    /**
-     * THE BASIC API METHOD IN RUBY
-     */
-    // Method navigation
-    prev : function(step) { EVENTS.PrevCore(step) },
-    next : function(step) { EVENTS.NextCore(step) },
-    first: function() { TOSLIDE.Run(0, true) },
-    last : function() { TOSLIDE.Run(num - 1, true) },
-    goto : function(id) {
-
-      /**
-       * FUNCTION: MOVE TO SLIDE
-       */
-      function GotoSlide($sl) {
-
-        // Check valid of selector
-        if( $sl.length && va.$s.is($sl) ) {
-          var slideID = M.Data($sl)['id'];
-
-          // Move to Slide
-          $.isNumeric(slideID) && TOSLIDE.Run(slideID, true);
-        }
-      }
-
-
-
-
-      /**
-       * CONVERT ID TO 'NUMBER' IF IT IS 'STRING NUMBER'
-       */
-      if( $.isNumeric(id) ) id = M.PInt(id);
-
-
-
-      /**
-       * MOVE TO SLIDE IN THE CASE
-       */
-      // Case: ID is number
-      if( id >= 0 && id < num ) TOSLIDE.Run(id, true);
-
-
-      // Case: ID is string - jQuery selector
-      else if( typeof id === 'string' ) {
-        var $slide = $(id);
-
-        // Go to slide by $slide
-        GotoSlide($slide);
-      }
-
-
-      // Case: ID is jQuery object
-      else if( id instanceof jQuery ) GotoSlide(id);
-    },
-
-
-    // API Slideshow
-    play  : function() { is.slideshow && SLIDESHOW.Api('play'); },
-    pause : function() { is.slideshow && SLIDESHOW.Api('pause'); },
-    stop  : function() { is.slideshow && SLIDESHOW.Api('stop'); },
-
-
-    // API Layer
-    playLayer   : function() { is.LAYER && LAYER.Play(cs.idCur); },
-    pauseLayer  : function() { is.LAYER && LAYER.Pause(cs.idCur); },
-    resumeLayer : function() { is.LAYER && LAYER.Resume(cs.idCur); },
-
-    // API for native fullscreen
-    requestNativeFS : function() { is.FULLSCREEN && FULLSCREEN.RequestNativeFS() },
-    exitNativeFS : function() { is.FULLSCREEN && FULLSCREEN.ExitNativeFS() },
-
-
-    // Method update properties
-    update : function(options, isNoRefresh) {
-
-      // Store old options & update new options with deep level
-      one.oo = oo = $.extend(true, {}, o);
-      one.vava = vava = $.extend(true, {}, va);
-      one.isis = isis = $.extend(true, {}, is);
-      o = $.extend(true, o, options);
-      va.optsUpdate = options;
-
-      // Check ruby toggle display
-      !!is.awake && !isNoRefresh && cs.refresh();
-      va.optsUpdate = va.addInfo = null;
-    },
-
-    updateOnSlides : function(options) {
-      if( !$.isPlainObject(options) ) return;
-
-      va.optsSlides = options;
-      cs.refresh();
-      va.optsSlides = null;
-    },
-
-    refresh : function() {
-      // console.log('refresh');
-      PROP.MergeAllModules();
-      UPDATE.RemoveClass();
-
-      // Update value of name ruby
-      va.name = o.name || $ruby.attr('id') || null;
-
-      // Update RubyAnimate keyframes into ruby system
-      is.RUBYANIMATE && RUBYANIMATE.UpdateAllKeyframes();
-      PROP.Ruby();
-
-      is.SLIDESHOW && SLIDESHOW.RenderControl();  // Slideshow: update markup
-      is.TIMER && TIMER.Render();         // Timer: update markup
-      is.NAV && NAV.Render();           // Navigation: update markup
-      is.PAG && PAG.RenderSelf();         // Pagination: update markup
-      is.CAP && CAPTION.Render();         // Caption: update markup
-
-      PROP.Slides();
-      LOAD.IDMap();
-
-      // Toggle slide depends on Deeplinking - Cookie
-      PROP.DeepLinkCookie();
-      M.ToggleSlide();
-
-      UPDATE.Reset();
-      UPDATE.Resize();
-
-
-      // Others
-      RENDER.Other();
-      EVENTS.Setup();
-
-      is.APIREMOTE && APIREMOTE.Init();       // Api remote: update event
-      is.SLIDESHOW && SLIDESHOW.UpdateAll();
-    },
-
-    // Destroy ruby
-    destroy : function(isDelete) {
-
-      // Remove swipe event
-      is.SWIPE && SWIPE.Events(false);
-
-
-      // Remove 'tap' event on navigation & pagination
-      var evClick = va.ev.mouse.end +' '+ va.ev.swipe.end +' '+ va.ev.click;
-      o.isNav && va.$prev.add(va.$next).off(evClick);
-      o.isPag && va.$pagItem.off(evClick);
-
-      // Remove ohter events
-      $doc.off(va.ev.key);
-      $viewport.off(va.ev.wheel);
-
-      // Remove resize-timer & resize event
-      clearInterval(ti.resizeLoop);
-      $w.off(va.ev.resize);
-
-      // Pause slideshow
-      // Remove timer & scroll event
-      if( o.isSlideshow ) {
-        clearInterval(ti.timer);
-        $w.off(va.ev.scroll);
-        this.stop();
-      }
-
-
-
-      // Remove all node of ruby
-      if( !!isDelete ) {
-
-        // Delete data on ruby
-        $ruby.removeData(rt01VA.rubyName);
-
-        // Remove all elements have markup-outside
-        !!va.$nav && va.$nav.remove();
-        !!va.$pag && va.$pag.remove();
-        o.isCap && va.$cap.remove();
-
-        if( o.isSlideshow ) {
-          !!va.$timer && va.$timer.remove();
-          !!va.$playpause && va.$playpause.remove();
-          !!va.$ssControl && va.$ssControl.remove();
-        }
-
-        // Update value in system
-        rt01VA.$ruby = rt01VA.$ruby.not($ruby);
-
-        // Remove Node of ruby
-        $ruby.remove();
-      }
-    },
-
-    // Restore ruby after using 'destroy' api
-    restore : function() { INIT.Load() },
-
-
-
-
-    /**
-     * THE FUNCTION HAVE RETURN VALUE IN RUBY
-     */
-    index    : function() { return cs.idCur },
-    indexLast  : function() { return cs.idLast },
-    width    : function() { return va.wRuby },
-    height     : function() { return va.hRuby },
-    slideLength  : function() { return cs.num },
-    slideCur   : function() { return va.$s.eq(cs.idCur) },
-    slideAll   : function() { return va.$s },
-    opts     : function() { return o },
-    optsCur    : function() { return M.Data(cs.idCur).opts },
-    variable   : function() { return va },
-    browser    : function() { return va.browser },
-    isMobile   : function() { return is.mobile },
-    isTransform  : function() { return is.tf },
-    isTransition : function() { return is.ts },
-
-
-
-
-    /**
-     * TRIGGER EVENTS:
-     *  ['init', 'ready', 'loaded']
-     *  ['loadAll', 'loadSlide.id', 'loadBegin', 'loadEnd']
-     *  ['resize', 'resizeEnd']
-     *  ['start', 'end', 'before', 'after']
-     *  ['selectID', 'deselectID', 'swipeBegin', 'swipeEnd', 'fxBegin', 'fxEnd']
-     *  ['slideshowPlay', 'slideshowPause', 'slideshowStop']
-     *  ['beforeSwapIDCur', 'afterSwapIDCur']
-     *  ['beforeTap']
-     */
-    ev : $(divdiv)
-  },
-
-
-
-
-
-
-
-
-
-
-
-  /**
-   * THE OTHER MODULES OF PLUGIN
-   */
-  SWIPE,
-  RESPONSIVE,
-  NAV,
-  PAG,
-  CAPTION,
-  IMAGE,
-  VIDEOBACK,
-  VIDEOIFRAME,
-  IFRAME,
-  HOTSPOT,
-  LAYER,
-  PARALLAX,
-  LAYERPARALLAX,
-  FXMATH,
-  RUBYANIMATE,
-  SLIDESHOW,
-  TIMER,
-  FLICKR,
-  DISPLAY,
-  DEEPLINKING,
-  COOKIE,
-  FULLSCREEN,
-  NESTED,
-  CLASSADD,
-  OLD,
-  APIREMOTE;
-
-
-
-
-
-
-
-
-
-
-  /**
-   * BEGIN INITIALIZE RUBY
-   */
-  INIT.Check();
-}
-
-
-
-
-
-
-
-
-
-
-/**
- * CREATE NEW RUBY BY JQUERY
- *  + Method: var ruby = $('...').rubytabs();
- */
-$.fn[rt01VA.rubyName] = function() {
-
-  var args   = arguments,         // args[0] : options, args[1]: value
-    rubyName = rt01VA.rubyName,
-    rubyData = null;
-
-
-  /**
-   * SETUP EACH OBJECT
-   */
-  $(this).each(function() {
-    var $self = $(this),
-      ruby  = $self.data(rubyName);
-
-    // Parameter 1 is allways object -> to easy check
-    if( args[0] === undefined ) args[0] = {};
-
-
-    /**
-     * CASE: INITIALIZE OBJECT + UPDATE PROPERTIES
-     */
-    if( $.isPlainObject(args[0]) ) {
-
-      // CREATE NEW RUBY
-      if( !ruby ) new $[rubyName]($self, args[0]);
-
-      // UPDATE PROPERTIES
-      else if( !$.isEmptyObject(args[0]) ) ruby.update(args[0]);
-
-
-      // Store data of ruby
-      rubyData = $self.data(rubyName);
-    }
-
-
-    /**
-     * CASE: CALL API - AFTER INITIATED RUBY
-     */
-    else {
-      try    { ruby[args[0]](args[1]) }
-      catch(e) { !!window.console && console.warn('['+ rubyName +': function not exist!]') }
-    }
-  });
-
-  // Return data ruby
-  return rubyData;
-}
-
-
-
-
-
-
-
-
-
-
-/**
- * AUTOMATICALLY INITIALIZE RUBY
- */
-rt01MODULE.AUTOINIT = function($ruby) {
-
-  $ruby.each(function() {
-    var $self  = $(this),
-      data   = $self.data(rt01VA.rubyData) || {},
-      rubyName = rt01VA.rubyName,
-      isJson   = true;
-
-
-    /**
-     * CHECK RUBY INITIALIZATION
-     *  + Remove automatically initialize for ruby
-     */
-    if( $.isPlainObject(data) && $.isEmptyObject(data) ) return;
-
-
-
-
-    /**
-     * CHECK & SETUP MAIN DATA TO GET VALUE OF 'ISAUTOINIT' OPTION
-     */
-    if( typeof data === 'string' ) {
-
-      // Convert to json
-      var msgError = 'main options on "data-XX" not valid'.replace(/XX/, rt01VA.rubyData);
-      data = rt01VA.M.StringToJson(data, msgError);
-
-      // Check is json
-      if( $.isEmptyObject(data) ) isJson = false;
-    }
-
-
-
-    /**
-     * SETUP VALUE 'ISAUTOINIT'
-     */
-    var isAutoInit = data.isAutoInit;
-    if( isAutoInit === undefined ) {
-
-      isAutoInit = rt01VA['optsDefault']['isAutoInit'];
-    }
-
-
-
-
-    /**
-     * CHECK BEFORE AUTOMATICALLY INITIALIZE
-     *  + Check Data variable is Json + AutoInit
-     *  + Check continue: data have 'isAutoInit' option
-     *  + Check continue: data of ruby exist
-     */
-    // Case valid initialization: create new ruby
-    // case unvalid initialization: hidden object
-    (isJson && isAutoInit && !$self.data(rubyName)) ? $self[rubyName]()
-                            : $self.addClass(rt01VA.namespace + 'none');
-  });
-};
-$(document).ready(function() { rt01MODULE.AUTOINIT( $('.' + rt01VA.namespace) ) });
-
-})(jQuery);
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/**
- * RUBYTWEEN
- * @package     RubyTween
- * @author      HaiBach
- * @link      http://haibach.net
- * @version     1.7
- */
-(function($) {
-
-  /*
-   * jQuery Easing v1.3 - http://gsgd.co.uk/sandbox/jquery/easing/
-   */
-  $.GSGDEasing = $.GSGDEasing || {
-    def: 'easeOutQuad',
-    swing: function (x, t, b, c, d) {
-      return $.GSGDEasing[$.GSGDEasing.def](x, t, b, c, d);
-    },
-    easeInQuad: function (x, t, b, c, d) {
-      return c*(t/=d)*t + b;
-    },
-    easeOutQuad: function (x, t, b, c, d) {
-      return -c *(t/=d)*(t-2) + b;
-    },
-    easeInOutQuad: function (x, t, b, c, d) {
-      if ((t/=d/2) < 1) return c/2*t*t + b;
-      return -c/2 * ((--t)*(t-2) - 1) + b;
-    },
-    easeInCubic: function (x, t, b, c, d) {
-      return c*(t/=d)*t*t + b;
-    },
-    easeOutCubic: function (x, t, b, c, d) {
-      return c*((t=t/d-1)*t*t + 1) + b;
-    },
-    easeInOutCubic: function (x, t, b, c, d) {
-      if ((t/=d/2) < 1) return c/2*t*t*t + b;
-      return c/2*((t-=2)*t*t + 2) + b;
-    },
-    easeInQuart: function (x, t, b, c, d) {
-      return c*(t/=d)*t*t*t + b;
-    },
-    easeOutQuart: function (x, t, b, c, d) {
-      return -c * ((t=t/d-1)*t*t*t - 1) + b;
-    },
-    easeInOutQuart: function (x, t, b, c, d) {
-      if ((t/=d/2) < 1) return c/2*t*t*t*t + b;
-      return -c/2 * ((t-=2)*t*t*t - 2) + b;
-    },
-    easeInQuint: function (x, t, b, c, d) {
-      return c*(t/=d)*t*t*t*t + b;
-    },
-    easeOutQuint: function (x, t, b, c, d) {
-      return c*((t=t/d-1)*t*t*t*t + 1) + b;
-    },
-    easeInOutQuint: function (x, t, b, c, d) {
-      if ((t/=d/2) < 1) return c/2*t*t*t*t*t + b;
-      return c/2*((t-=2)*t*t*t*t + 2) + b;
-    },
-    easeInSine: function (x, t, b, c, d) {
-      return -c * Math.cos(t/d * (Math.PI/2)) + c + b;
-    },
-    easeOutSine: function (x, t, b, c, d) {
-      return c * Math.sin(t/d * (Math.PI/2)) + b;
-    },
-    easeInOutSine: function (x, t, b, c, d) {
-      return -c/2 * (Math.cos(Math.PI*t/d) - 1) + b;
-    },
-    easeInExpo: function (x, t, b, c, d) {
-      return (t==0) ? b : c * Math.pow(2, 10 * (t/d - 1)) + b;
-    },
-    easeOutExpo: function (x, t, b, c, d) {
-      return (t==d) ? b+c : c * (-Math.pow(2, -10 * t/d) + 1) + b;
-    },
-    easeInOutExpo: function (x, t, b, c, d) {
-      if (t==0) return b;
-      if (t==d) return b+c;
-      if ((t/=d/2) < 1) return c/2 * Math.pow(2, 10 * (t - 1)) + b;
-      return c/2 * (-Math.pow(2, -10 * --t) + 2) + b;
-    },
-    easeInCirc: function (x, t, b, c, d) {
-      return -c * (Math.sqrt(1 - (t/=d)*t) - 1) + b;
-    },
-    easeOutCirc: function (x, t, b, c, d) {
-      return c * Math.sqrt(1 - (t=t/d-1)*t) + b;
-    },
-    easeInOutCirc: function (x, t, b, c, d) {
-      if ((t/=d/2) < 1) return -c/2 * (Math.sqrt(1 - t*t) - 1) + b;
-      return c/2 * (Math.sqrt(1 - (t-=2)*t) + 1) + b;
-    },
-    easeInElastic: function (x, t, b, c, d) {
-      var s=1.70158;var p=0;var a=c;
-      if (t==0) return b;  if ((t/=d)==1) return b+c;  if (!p) p=d*.3;
-      if (a < Math.abs(c)) { a=c; var s=p/4; }
-      else var s = p/(2*Math.PI) * Math.asin (c/a);
-      return -(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )) + b;
-    },
-    easeOutElastic: function (x, t, b, c, d) {
-      var s=1.70158;var p=0;var a=c;
-      if (t==0) return b;  if ((t/=d)==1) return b+c;  if (!p) p=d*.3;
-      if (a < Math.abs(c)) { a=c; var s=p/4; }
-      else var s = p/(2*Math.PI) * Math.asin (c/a);
-      return a*Math.pow(2,-10*t) * Math.sin( (t*d-s)*(2*Math.PI)/p ) + c + b;
-    },
-    easeInOutElastic: function (x, t, b, c, d) {
-      var s=1.70158;var p=0;var a=c;
-      if (t==0) return b;  if ((t/=d/2)==2) return b+c;  if (!p) p=d*(.3*1.5);
-      if (a < Math.abs(c)) { a=c; var s=p/4; }
-      else var s = p/(2*Math.PI) * Math.asin (c/a);
-      if (t < 1) return -.5*(a*Math.pow(2,10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )) + b;
-      return a*Math.pow(2,-10*(t-=1)) * Math.sin( (t*d-s)*(2*Math.PI)/p )*.5 + c + b;
-    },
-    easeInBack: function (x, t, b, c, d, s) {
-      if (s == undefined) s = 1.70158;
-      return c*(t/=d)*t*((s+1)*t - s) + b;
-    },
-    easeOutBack: function (x, t, b, c, d, s) {
-      if (s == undefined) s = 1.70158;
-      return c*((t=t/d-1)*t*((s+1)*t + s) + 1) + b;
-    },
-    easeInOutBack: function (x, t, b, c, d, s) {
-      if (s == undefined) s = 1.70158;
-      if ((t/=d/2) < 1) return c/2*(t*t*(((s*=(1.525))+1)*t - s)) + b;
-      return c/2*((t-=2)*t*(((s*=(1.525))+1)*t + s) + 2) + b;
-    },
-    easeInBounce: function (x, t, b, c, d) {
-      return c - $.GSGDEasing.easeOutBounce (x, d-t, 0, c, d) + b;
-    },
-    easeOutBounce: function (x, t, b, c, d) {
-      if ((t/=d) < (1/2.75)) {
-        return c*(7.5625*t*t) + b;
-      } else if (t < (2/2.75)) {
-        return c*(7.5625*(t-=(1.5/2.75))*t + .75) + b;
-      } else if (t < (2.5/2.75)) {
-        return c*(7.5625*(t-=(2.25/2.75))*t + .9375) + b;
-      } else {
-        return c*(7.5625*(t-=(2.625/2.75))*t + .984375) + b;
-      }
-    },
-    easeInOutBounce: function (x, t, b, c, d) {
-      if (t < d/2) return $.GSGDEasing.easeInBounce (x, t*2, 0, c, d) * .5 + b;
-      return $.GSGDEasing.easeOutBounce (x, t*2-d, 0, c, d) * .5 + c*.5 + b;
-    },
-
-    // Bo sung linear
-    linear: function(x, t, b, c, d) {
-      return t/d;
-    }
-  };
-
-}(jQuery));
-
-
-
-
-
-
-
-
-
-
-(function($) {
-'use strict';
-
-  /**
-   * GLOBAL VARIABLES IN JAVASCRIPT
-   */
-  if( !window.rt00VA ) {
-
-    /**
-     * CREATE NEW GLOBAL VARIABLE
-     */
-    window.rt00VA = {
-      fps  : 60,
-      data   : {},
-      nTween : 0,
-
-      nameTf : ['x', 'y', 'z', 'rotate', 'rotateX', 'rotateY', 'rotateZ', 'scale', 'scaleX', 'scaleY', 'scaleZ', 'skew', 'skewX', 'skewY', 'perspectiveDirect'],
-
-      nameTf3D : ['z', 'rotateZ', 'scaleZ', 'perspectiveDirect'],
-
-
-      /**
-       * DEFAULT OPTIONS IN PLUGIN
-       */
-      tfDefault : {
-        'x'    : 0,
-        'y'    : 0,
-        'z'    : 0,
-        'scale'  : 1,
-        'scaleX'   : 1,
-        'scaleY'   : 1,
-        'scaleZ'   : 1,
-        'rotate'   : 0,
-        'rotateX'  : 0,
-        'rotateY'  : 0,
-        'rotateZ'  : 0,
-        'skew'   : 0,
-        'skewX'  : 0,
-        'skewY'  : 0,
-        'perspectiveDirect' : null
-      },
-
-      styleDefault : {
-        'opacity' : 1
-      },
-
-      // Properties may have prefix -> will add later
-      propFixed : ['perspectiveDirect', 'overflow'],
-
-      percentRef : {
-        'x'    : 'OuterWidth',
-        'y'    : 'OuterHeight',
-        'left'   : 'OuterWidth',
-        'right'  : 'OuterWidth',
-        'top'  : 'OuterHeight',
-        'bottom' : 'OuterHeight'
-      },
-
-      optsAnimDefault : {
-        'duration'      : 1000,
-        'delay'         : 0,
-        'easing'        : 'easeOutQuad',
-        'xParentOrigin'     : 0,
-        'yParentOrigin'     : 0,
-        'styleBegin'      : {},
-        'styleEnd'      : {},
-
-        'isFallbackTF'    : true,
-        'isXYAlone'       : false,
-        'isClearStyleDefault' : false,
-        'isClearTFDefault'  : true,
-        'isTFOrderByEnd'    : false,
-
-        'isNew'         : false
-      },
-
-      optsCssDefault : {
-        'type' : 'reset'
-      },
-
-      // Options can inherit value from options befores
-      nameOptsInherit : ['xParentOrigin', 'yParentOrigin']
-    };
-
-
-
-
-
-    /**
-     * FUNCTION: GET DATA PROPERTY OF ITEM
-     */
-    window.rt00VA.GetData = function($item) {
-      var dataRuby = null,
-        vData  = window.rt00VA.data;
-
-      /**
-       * CREATE LOOP TO CHECK ALL ITEM IN DATA
-       */
-      for( var key in vData ) {
-        var $itemCur = vData[key]['$item'];
-
-        if( $itemCur.is($item) ) {
-          dataRuby = vData[key];
-          break;
-        }
-      }
-      return dataRuby;
-    };
-  }
-
-
-  /**
-   * GLOBAL VARIABLES IN PLUGIN
-   */
-  var VA = window.rt00VA,
-    va = {},
-    is = {},
-    vData = VA.data,
-    UNDE  = undefined;
-
-
-
-
-
-
-
-
-
-
-  /**
-   * FUNCITON M - UTILITIES
-   */
-  var M = $.extend({}, rt01VA.M, {
-
-    /**
-     * GET SIZE OF OJBECT
-     */
-    GetSize : function(data) {
-      var size = 0;
-      for( var key in data ) {
-
-        if( data[key] !== UNDE ) size++;
-      }
-      return size;
-    },
-
-    // Convert Radius to PI
-    ToPI : function(deg) { return deg * Math.PI / 180 },
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * CHECK BROWSER SUPPORT CSS PROPERTIES
-     */
-    // Capitalize first letter of string
-    ProperCase : function(str) {
-      return str.charAt(0).toUpperCase() + str.slice(1);
-    },
-
-    // Convert string to CamelCase
-    CamelCase : function(str) {
-      return str.replace(/-([a-z])/gi, function(m, str) {
-        return str.toUpperCase();
-      });
-    },
-
-    CssCheck : function(property, isPrefix) {
-
-      var style  = document.createElement('p').style,
-        vender = 'Webkit Moz ms O'.split(' '),
-        prefix = '-webkit- -moz- -ms- -o-'.split(' ');
-
-      // Check first: style have vender
-      var styleCase = this.CamelCase(property);
-      if( style[styleCase] !== UNDE ) return (isPrefix ? '' : true);
-
-
-
-      // Check continue if it has vender
-      // First, convert string style to Upper -> ex: 'flex-wrap' to 'FlexWrap'
-      var preStyle = M.ProperCase(styleCase);
-      // Check each vender
-      for( var i = 0, len = vender.length; i < len; i++ ) {
-        if( style[vender[i] + preStyle] !== UNDE ) return (isPrefix ? prefix[i] : true);
-      }
-
-      // Reture false if not support
-      return false;
-    },
-
-
-
-
-
-
-
-
-
-
-    /**
-     * SORT ASCENDING VALUE IN ARRAY[]
-     */
-    ArrayMinToMax : function(a) {
-      var aClone = $.extend([], a),
-        aOrder = [],
-        pos,
-        min;
-
-
-      for( var i = 0, len = aClone.length; i < len; i++ ) {
-
-        min = aClone[0];
-        pos = 0;
-        for( var j = 1; j < aClone.length; j++ ) {
-
-          if( min > aClone[j] ) {
-            min = aClone[j];
-            pos = j;
-          }
-        }
-
-        aOrder.push(min);
-        aClone.splice(pos, 1);
-      }
-      return aOrder;
-    },
-
-
-    /**
-     * CONVERT NAME OF PROPERTIES FOR STANDARD CSS
-     */
-    ValidName : function(prop, opts) {
-      var propNew = {};
-
-
-      /**
-       * CREATE LOOP TO CHECK ALL NAME IN 'PROP'
-       */
-      for( var name in prop ) {
-
-        /**
-         * CASE: TRANSFORM ORIGIN
-         */
-        if( name == 'originTF' ) {
-          propNew[VA.prefix + 'transform-origin'] = prop[name];
-        }
-
-
-        /**
-         * CASE NORMAL: COPY INITIAL 'PROP' TO NEW 'PROP'
-         */
-        else {
-          propNew[name] = prop[name];
-        }
-      }
-
-
-
-      /**
-       * REMOVE ALL ELEMENTS TRANSFORM 3D IF NOT SUPPORT
-       */
-      if( !VA.isTf3D ) {
-        for( var name in propNew ) {
-
-          if( $.inArray(name, VA.nameTf3D) !== -1 ) {
-            delete propNew[name];
-          }
-        }
-      }
-
-
-
-      /**
-       * REMOVE & CONVERT PROPERTIES IN TRANSFORM TO STYLE CSS
-       */
-      if( !VA.isTf ) {
-
-        // Convert xyz translate to Absolute(left/top) position
-        if( opts.isFallbackTF ) {
-          var source  = ['x', 'y'],
-            replace = ['left', 'top'];
-
-          for( var i = 0, len = source.length; i < len; i++ ) {
-            if( propNew[ source[i] ] !== UNDE ) {
-
-              propNew[ replace[i] ] = propNew[ source[i] ];
-              delete propNew[ source[i] ];
-            }
-          }
-        }
-
-
-        // Remove all elements Transform
-        for( var name in propNew ) {
-          if( $.inArray(name, VA.nameTf) !== - 1 ) {
-            delete propNew[name];
-          }
-        }
-      }
-
-
-
-
-      /**
-       * MOVE ALL PROPERTIES 'OPTION' IN 'PROP'
-       */
-      // Collect all properties have in default options
-      var aFind = [];
-      for( var name in VA.optsAnimDefault ) {
-        aFind.push(name);
-      }
-
-      // Convert properties have in 'prop' to 'opts'
-      for( var i = 0, len = aFind.length; i < len; i++ ) {
-        var propCur = propNew[ aFind[i] ];
-
-        // Kiem tra thuoc tinh opts ton tai
-        if( propCur !== UNDE ) {
-          opts[ aFind[i] ] = propCur;
-          delete propNew[ aFind[i] ];
-        }
-      }
-
-
-      return propNew;
-    },
-
-
-    /**
-     * ANALYZE + CONVERT VALUE OF CSS STYLE
-     */
-    ParseCssStyle : function(valueCur) {
-
-      /**
-       * CASE: VALUE IS STRING
-       */
-      if( typeof valueCur == 'string' ) {
-
-        /**
-         * CASE: PROPERTY HAVE MULTIPLE VALUE
-         */
-        if( valueCur.split(' ').length >= 2 ) {
-
-          // Split string to array
-          valueCur = valueCur.split(' ');
-
-          // Remove empty string in array
-          valueCur = $.grep(valueCur, function(v) { return v !== '' });
-        }
-
-
-        /**
-         * CASE: PROPERTY HAVE 1 VALUE
-         */
-        else {
-
-          /**
-           * CASE: THE VALUE HAVE 'PX' UNIT
-           */
-          if( /px$/.test(valueCur) ) {
-            valueCur = parseFloat(valueCur);
-          }
-
-
-          /**
-           * CASE: THE VALUE HAVE '%' UNIT
-           */
-          else if( /\%$/.test(valueCur) ) {
-            // Not do anything
-          }
-
-
-          /**
-           * CASE OTHER
-           */
-          else {
-            // Convert value to Number (if possible)
-            var fooNum = parseFloat(valueCur);
-            if( !isNaN(fooNum) ) valueCur = fooNum;
-          }
-        }
-      }
-
-      return valueCur;
-    },
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * MERGE CURRENT OPTIONS WITH DEFAULT OPTIONS
-     */
-    MergeOptions : function(optsCur, itemOpts) {
-
-      /**
-       * SETUP THE OPTIONS INHERIT FROM VALUE OPTONS BEFORE
-       */
-      var nameInherit  = VA['nameOptsInherit'],
-        optsNum    = itemOpts.length,
-        optsInherit  = {},
-        optsLastOnItem = {};
-
-      // Case: options before exist on Item
-      if( optsNum > 0 ) {
-        optsLastOnItem = itemOpts[optsNum - 1];
-
-        // Get all item inherit value
-        for( var i = 0, len = nameInherit.length; i < len; i++ ) {
-          optsInherit[ nameInherit[i] ] = optsLastOnItem[ nameInherit[i] ];
-        }
-      }
-
-
-
-
-      /**
-       * MERGE ALL OPTIONS TOGETHER
-       *  + Prority level: optsCur > optsDefault > optsInherit
-       */
-      var optsNew = $.extend(true, {}, optsLastOnItem, VA.optsAnimDefault, optsCur);
-      return optsNew;
-    }
-  });
-
-
-
-
-
-
-
-
-
-
-  /**
-   * MATRIX
-   */
-  var MATRIX = {
-
-    /**
-     * GET VALUE TRANSFORM MATRIX FROM OBJECT
-     */
-    getFromItem : function($item) {
-      var str = $item.css(VA.prefix + 'transform');
-
-      if( /^matrix(3d)?\(/i.test(str) ) {
-
-        var pBegin = str.indexOf('(') + 1,
-          subLen = str.length - pBegin - 1,
-          matrix = str.substr(pBegin, subLen).split(', ');
-
-
-        // Rounded value in array
-        for( var i = 0, len = matrix.length; i < len; i++ ) {
-          matrix[i] = parseFloat(matrix[i]);
-        }
-        return matrix;
-      }
-      return [1,0,0,1,0,0];
-    },
-
-
-    /**
-     * COMBINE WITH MATRIX PROPERTIES FROM PARTICULAR PROPERTY
-     */
-    getFromProp : function(prop) {
-      var matrixInit = [1,0,0,1,0,0];
-
-
-      /**
-       * CREATE LOOP TO SETUP EACH MATRIX PROPERTIES
-       */
-      for( var name in prop ) {
-        var matrixCur = null;
-
-        switch(name) {
-          case 'x' :
-            matrixCur = [1,0,0,1, prop[name], 0];
-            break;
-
-          case 'y' :
-            matrixCur = [1,0,0,1, 0, prop[name]];
-            break;
-
-          case 'rotate' :
-            var radian = M.ToPI(prop[name]),
-              cos  = parseFloat( Math.cos(radian).toFixed(5) ),
-              sin  = parseFloat( Math.sin(radian).toFixed(5) );
-
-            matrixCur = [cos, sin, -sin, cos, 0, 0];
-            break;
-
-
-          case 'scale' :
-            matrixCur = [prop[name],0,0, prop[name],0,0];
-            break;
-
-          case 'scaleX' :
-            matrixCur = [prop[name],0,0,1,0,0];
-            break;
-
-          case 'scaleY' :
-            matrixCur = [1,0,0, prop[name],0,0];
-            break;
-
-
-          case 'skew'  :
-          case 'skewX' :
-          case 'skewY' :
-            if( (prop[name] - 90) % 180 != 0 ) {
-
-              var radian = M.ToPI(prop[name]),
-                tan  = parseFloat( Math.tan(radian).toFixed(5) );
-
-              if   ( name == 'skew' )  matrixCur = [1,0, tan, 1,0,0];
-              else if( name == 'skewX' ) matrixCur = [1,0, tan, 1,0,0];
-              else if( name == 'skewY' ) matrixCur = [1, tan, 0,1,0,0];
-            }
-            break;
-        }
-
-
-        /**
-         * COMBINE INIT MATRIX WITH CURRENT MATRIX
-         */
-        if( matrixCur !== null ) matrixInit = MATRIX.combine( matrixInit, matrixCur );
-      }
-      return matrixInit;
-    },
-
-
-    /**
-     * SETUP MATRIX INHERITED FROM BEFORE PROPERTIES
-     */
-    propertyInherit : function(m1, m2, prop) {
-
-      /**
-       * CASE: INHERIT 3 PROPERTIES 'ROTATE', 'SCALE', 'SKEW'
-       */
-      if( m2[0] == 1 && m2[1] == 0 && m2[2] == 0 && m2[3] == 1
-      && prop['rotate'] == UNDE
-      && prop['scale'] == UNDE && prop['scaleX'] == UNDE && prop['scaleY'] == UNDE
-      && prop['skew'] == UNDE && prop['skewX'] == UNDE && prop['skewY'] == UNDE ) {
-        m2[0] = m1[0];
-        m2[1] = m1[1];
-        m2[2] = m1[2];
-        m2[3] = m1[3];
-      }
-
-
-
-      /**
-       * CASE: TRANSLATE
-       */
-      if( m2[4] == 0 && prop['x'] == UNDE ) m2[4] = m1[4];
-      if( m2[5] == 0 && prop['y'] == UNDE ) m2[5] = m1[5];
-
-      return m2;
-    },
-
-
-    /**
-     * PARSE TRANSFORM PROPERTIES FROM STRING MATRIX
-     */
-    parse : function(m) {
-      var order = ['xy', 'scale', 'skew', 'rotate'], tf = {};
-
-      /**
-       * PARSE X - Y TRANSLATE
-       */
-      tf.x = m[4];
-      tf.y = m[5];
-
-
-      /**
-       * PARSE 'SCALE' PROPERTY
-       */
-      if( m[1] == 0 && m[2] == 0 ) {
-        tf.scaleX = m[0];
-        tf.scaleY = m[3];
-      }
-
-
-      /**
-       * PARSE 'SKEW' PROPERTY
-       */
-      if( m[0] == 1 && m[3] == 1 ) {
-        if( m[2] != 0 ) tf.skewX = parseFloat(( Math.atan(m[2]) * 180 / Math.PI ).toFixed(1));
-        if( m[1] != 0 ) tf.skewY = parseFloat(( Math.atan(m[1]) * 180 / Math.PI ).toFixed(1));
-      }
-
-
-      /**
-       * PARSE 'ROTATE' PROPERTY
-       */
-      if( m[0] == m[3] && m[1] == -m[2] ) {
-        tf.rotate = parseFloat(( Math.acos(m[0]) * 180 / Math.PI ).toFixed(1));
-      }
-
-      // Return transform
-      return tf;
-    },
-
-
-    /**
-     * COMBINE 2 MATRIX
-     */
-    combine : function(m1, m2) {
-
-      /**
-       * CONVERT MATRIX 6 TO 9 VALUE
-       */
-      m1 = [m1[0], m1[1], 0, m1[2], m1[3], 0, m1[4], m1[5], 1];
-      m2 = [m2[0], m2[1], 0, m2[2], m2[3], 0, m2[4], m2[5], 1];
-
-
-      /**
-       * LOOP CALCULATE VALUE OF MATRIX IN ORDER [0, 8]
-       */
-      var x = [];
-      for( var i = 0, len = m2.length; i < len; i++ ) {
-
-        var surplus = i % 3,
-          integer = ~~(i / 3);
-
-        x[i]  = m1[surplus + 0] * m2[integer * 3 + 0];
-        x[i] += m1[surplus + 3] * m2[integer * 3 + 1];
-        x[i] += m1[surplus + 6] * m2[integer * 3 + 2];
-      }
-      return [x[0], x[1], x[3], x[4], x[6], x[7]];
-    },
-
-
-    /**
-     * CONVERT MATRIX TO CSS STRING
-     */
-    toCss : function(m) {
-      var style = {};
-      style[VA.prefix +'transform'] = 'matrix('+ m.join(', ') +')';
-
-      return style;
-    }
-  };
-
-
-
-
-
-
-
-
-
-
-  /**
-   * TRANSFORM CSS3
-   */
-  var TF = {
-
-    /**
-     * CHECK VALUE OF TRANSFORM DEFAULT
-     *  + Support remove value of transform default
-     */
-    CheckValueDefault: function(tf, optsCur) {
-      var isTfDefault = true;
-
-
-      /**
-       * CASE: HAVE OPTION REMOVE TRANSFORM DEFAULT
-       */
-      if( optsCur.isClearTFDefault ) {
-
-        /**
-         * LOOP METHOD TO CHECK EACH TRANSFORM PROPERTIES
-         */
-        for( var name in tf ) {
-          if( isTfDefault ) {
-
-            // Get default value of transform property
-            var valueDefault = VA['tfDefault'][name],
-              valueCur   = tf[name];
-
-            // Compare default value with current value
-            if( valueCur !== valueDefault) isTfDefault = false;
-          }
-        }
-      }
-
-
-      /**
-       * CASE: WITHOUT REMOVE TRANSFORM DEFAULT
-       */
-      else isTfDefault = false;
-
-
-      // Return value
-      return isTfDefault ? {} : tf;
-    },
-
-
-    /**
-     * INHERIT PROPERTIES OF TFBEGIN BUT KEEP ORDER OF TFEND
-     *  + Different $.extend() jQuery
-     */
-    Extend : function(tfBegin, tfEnd, opts) {
-
-      /**
-       * CASE: PROPERTIES IN ORDER OF 'TFEND'
-       */
-      if( opts.isTFOrderByEnd ) {
-
-        // Loop to copy all properties in tfBegin but tfEnd not have
-        for( var name in tfBegin ) {
-          if( tfEnd[name] === UNDE ) {
-            tfEnd[name] = tfBegin[name];
-          }
-        }
-      }
-
-
-      /**
-       * CASE: PROPERTIES IN ORDER OF 'TFBEGIN'
-       */
-      else {
-        tfEnd = $.extend(true, {}, tfBegin, tfEnd);
-      }
-
-
-
-
-      /**
-       * PRORITY 'PERSPECTIVE' PROPERTY IN THE FIRST PLACE
-       */
-      var perspectiveDirect = tfEnd['perspectiveDirect'];
-      if( perspectiveDirect !== UNDE ) {
-
-        tfEnd = $.extend(true, { perspectiveDirect: perspectiveDirect }, tfEnd);
-      }
-
-
-      // Return result
-      return tfEnd;
-    },
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * MAKE TRANSFORM FROM PARTICULAR PROPERTIES
-     */
-    FromProp : function(prop) {
-      var tf = {};
-
-
-      /**
-       * CREATE LOOP TO SETUP EACH PROPERTIES OF MATRIX
-       */
-      for( var name in prop ) {
-        if( $.inArray(name, VA.nameTf) !== -1 ) {
-
-          /**
-           * REMOVE UNNECESSARY NAME
-           */
-          if( name == 'scale' ) {
-            tf['scaleX'] = tf['scaleY'] = prop[name];
-          }
-          else if( name == 'skew' ) {
-            tf['skewX'] = prop[name];
-          }
-          else {
-             tf[name] = prop[name];
-          }
-        }
-      }
-      return tf;
-    },
-
-
-    /**
-     * CONVERT VALUES HAVE OTHER UNIT TO 'PX'
-     *  + Support convert '%' to 'px' unit
-     */
-    ConvertValueToPX : function($anim, name, valueCur) {
-      var aNamePercent = ['x', 'y', 'left', 'right', 'top', 'bottom'],
-        WIDTH    = 'OuterWidth',
-        HEIGHT     = 'OuterHeight',
-        aFnSizeRef   = [WIDTH, HEIGHT, WIDTH, WIDTH, HEIGHT, HEIGHT];
-
-
-
-
-      /**
-       * CONVERT VALUE '%' DEPENDS ON SIZE ITEM
-       */
-      function ConvertPercentByItem(vString) {
-
-        // Check name of properties have supported
-        var nameIndex = $.inArray(name, aNamePercent);
-        if( nameIndex !== -1 ) {
-
-          // Convert '%' unit depends on size of Item
-          vString = parseFloat(vString);
-          vString = M[ aFnSizeRef[nameIndex] ]($anim) * vString / 100;
-          vString = Math.round(vString);
-        }
-
-        // Return result
-        return vString;
-      }
-
-
-      /**
-       * CONVERT VALUE '%' DEPENDS ON PARENT ITEM
-       */
-      function ConvertPercentByParent(vNum, selectorParent) {
-
-        // Check name of properties have supported
-        var nameIndex = $.inArray(name, aNamePercent);
-        if( nameIndex !== -1 ) {
-
-          var $parent = $anim.parent();
-          if( !!selectorParent ) {
-
-            var $select = $anim.closest(selectorParent);
-            if( $select.length ) $parent = $select;
-          }
-
-          vNum = M[ aFnSizeRef[nameIndex] ]($parent) * vNum / 100;
-          vNum = Math.round(vNum);
-        }
-
-        // Return result
-        return vNum;
-      }
-
-
-
-
-
-      /**
-       * CASE: VALUE IS STRING CONTAIN MATH
-       *  + Only allow contain special character of Math
-       *  + Limited the length of string < 200 characters -> for safe
-       */
-      var reOnlyContainMath = /^[0-9\(\)\+\-\*\/\%\s]|(\{.+\})+$/;
-      if( (typeof valueCur == 'string') && reOnlyContainMath.test(valueCur) && (valueCur.length < 200) ) {
-
-
-        /**
-         * CONVERT VALUE '%PARENT' TO 'PX' DEPENDS ON SIZE OF PARENT ITEM
-         *  + Setup convert '%' depends on size of Item
-         */
-        var reParent  = /\d+\.?\d*\%?\{.+\}/g,
-          matchParent = valueCur.match(reParent);
-
-        if( $.isArray(matchParent) ) {
-          for( var i = 0, len = matchParent.length; i < len; i++ ) {
-
-            // First, get value number in string
-            var vMatch   = matchParent[i],
-              vConvert = parseFloat(vMatch);
-
-
-            /**
-             * CASE: VALUE PERCENT(%)
-             */
-            var rePercent = /\d+\.?\d*\%\{(.+)\}/;
-            if( rePercent.test(vMatch) ) {
-
-              var vParent    = vMatch.match(rePercent),
-                selectorParent = null;
-
-              if( vParent && vParent[1] ) {
-
-                /**
-                 * CHECK VALID VALUE OF SELECTOR
-                 */
+        },
+        StringToJson: function(t, a) {
+            if ("string" == typeof t) {
+                t = t.replace(/\u0027/g, '"');
                 try {
-                  $(vParent[1]);
-                  selectorParent = vParent[1];
+                    t = e.parseJSON(t);
+                } catch (e) {
+                    rt01VA.M.Message(a);
                 }
-                catch(e) {
-                  !!console && console.warn(e);
-                }
-              }
-
-              // Convert value '%' to 'px'
-              vConvert = ConvertPercentByParent(vConvert, selectorParent);
             }
-
-            // Replace value Match with value converted
-            valueCur = valueCur.replace(vMatch, vConvert);
-          }
-        }
-
-
-
-        /**
-         * CONVERT VALUE '%' TO 'PX' DEPENDS ON SIZE OF ITEM
-         */
-        var rePercent  = /\d+\.?\d*\%/g,
-          matchPercent = valueCur.match(rePercent);
-
-        if( $.isArray(matchPercent) ) {
-          for( var i = 0, len = matchPercent.length; i < len; i++ ) {
-
-            // Convert value '%' to 'px'
-            var vPercent = matchPercent[i],
-              vPixel   = ConvertPercentByItem(vPercent);
-
-            // Replace value 'px' into init string
-            valueCur = valueCur.replace(vPercent, vPixel);
-          }
-        }
-
-
-
-        /**
-         * EXECUTION MATH WITH STRING CONVERTED
-         *  + Only execution when string only contain number
-         */
-        var reOnlyNumber = /^[0-9\(\)\+\-\*\/\%\s]+$/;
-        if( reOnlyNumber.test(valueCur) ) valueCur = eval(valueCur);
-      }
-
-
-
-
-      /**
-       * RETURN RESUTL
-       */
-      return valueCur;
-    },
-
-
-    /**
-     * CONVERT EACH PARTICULAR PROPERTIES TO CSS
-     */
-    ToCss : function(tf, opts) {
-
-      /**
-       * CHECK DEFAULT VALUE OF TRANSFORM
-       */
-      tf = TF.CheckValueDefault(tf, opts);
-
-
-
-      /**
-       * CONVERT PARTICULAR PROPERTIES TO GROUP PROPERTIES
-       *  + Support properties arranged by order
-       */
-      var tfRaw = {};
-      for( var name in tf ) {
-
-        /**
-         * ROUNDED VALUE
-         */
-        var nFixed = /^(x|y|z)$/.test(name) ? 100 : 10000,
-          tfCur  = Math.round(tf[name] * nFixed) / nFixed;
-
-
-
-        /**
-         * MOVE PARTICULAR PROPERTIES INTO GROUP
-         */
-        if( /^(x|y|z)$/.test(name) ) {
-
-          /**
-           * CASE: PARTICULAR XYZ POSITION
-           */
-          if( opts.isXYAlone ) {
-            if( name == 'x' && tf.x !== UNDE ) tfRaw['x'] = tfCur;
-            if( name == 'y' && tf.y !== UNDE ) tfRaw['y'] = tfCur;
-            if( name == 'z' && tf.z !== UNDE ) tfRaw['z'] = tfCur;
-          }
-
-
-          /**
-           * CASE: XYZ GO TOGATHER
-           */
-          else {
-            tfRaw.xy = tfRaw.xy || [0, 0, 0];
-
-            if( name == 'x' && tf.x !== UNDE ) tfRaw['xy'][0] = tfCur;
-            if( name == 'y' && tf.y !== UNDE ) tfRaw['xy'][1] = tfCur;
-            if( name == 'z' && tf.z !== UNDE ) tfRaw['xy'][2] = tfCur;
-          }
-
-        }
-
-        else if( /^scale/.test(name) ) {
-          tfRaw.scale = tfRaw.scale || [1, 1];
-
-          if( name == 'scaleX' && tf.scaleX !== UNDE ) tfRaw['scale'][0] = tfCur;
-          if( name == 'scaleY' && tf.scaleY !== UNDE ) tfRaw['scale'][1] = tfCur;
-          if( name == 'scaleZ' && tf.scaleZ !== UNDE ) tfRaw['scale'].push(tfCur);
-        }
-
-        else if( /^skew/.test(name) ) {
-          tfRaw.skew = tfRaw.skew || [0, 0];
-
-          if( name == 'skewX' && tf.skewX !== UNDE ) tfRaw['skew'][0] = tfCur;
-          if( name == 'skewY' && tf.skewY !== UNDE ) tfRaw['skew'][1] = tfCur;
-        }
-
-        else if( /^rotate/.test(name) ) {
-
-          if( name == 'rotate' && tf.rotate  !== UNDE ) tfRaw['rotate'] = tfCur;
-          if( name == 'rotateX' && tf.rotateX !== UNDE ) tfRaw['rotateX'] = tfCur;
-          if( name == 'rotateY' && tf.rotateY !== UNDE ) tfRaw['rotateY'] = tfCur;
-          if( name == 'rotateZ' && tf.rotateZ !== UNDE ) tfRaw['rotateZ'] = tfCur;
-        }
-
-        else if( /^perspectiveDirect$/.test(name) ) {
-          tfRaw.perspectiveDirect = tfCur;
-        }
-      }
-
-
-
-
-      /**
-       * CONVERT TRANSFORM TO CSS
-       */
-      var isTf3D = is.tf3D, cssTf = '';
-      for( var name in tfRaw ) {
-
-        /**
-         * CONVERT 'TRANSLATE'
-         */
-        if( name == 'xy' ) {
-          cssTf += (isTf3D ? 'translate3d(_x_px, _y_px, _z_px) ' : 'translate(_x_px, _y_px) ')
-                .replace(/_x_/, tfRaw['xy'][0])
-                .replace(/_y_/, tfRaw['xy'][1])
-                .replace(/_z_/, tfRaw['xy'][2]);
-        }
-
-        // Case: xyz is pariticular elements
-        else if( name == 'x' ) {
-          cssTf += 'translateX(_x_px) '.replace(/_x_/, tfRaw['x']);
-        }
-        else if( name == 'y' ) {
-          cssTf += 'translateY(_y_px) '.replace(/_y_/, tfRaw['y']);
-        }
-        else if( name == 'z' ) {
-          cssTf += (isTf3D ? 'translateZ(_z_px) ' : '')
-                .replace(/_z_/, tfRaw['z']);
-        }
-
-
-
-        /**
-         * CONVERT 'SCALE'
-         */
-        else if( name == 'scale' ) {
-          var tfScale = tfRaw['scale'],
-            str   = ((isTf3D && tfScale.length == 3) ? 'scale3d(_x_, _y_, _z_) ' : 'scale(_x_, _y_) ')
-                .replace(/_x_/, tfScale[0])
-                .replace(/_y_/, tfScale[1])
-                .replace(/_z_/, tfScale[2]);
-
-          // Case: scaleX === scaleY
-          if( tfScale.length == 2 && tfScale[0] === tfScale[1] ) {
-            str = 'scale(_x_) '.replace(/_x_/, tfScale[0]);
-          }
-          cssTf += str;
-        }
-
-
-        /**
-         * CONVERT 'SKEW'
-         */
-        else if( name == 'skew' ) {
-          var tfSkew = tfRaw['skew'];
-
-          // Case: skewY has default value
-          if( tfSkew[1] === 0 ) {
-            cssTf += 'skew(_x_deg) '.replace(/_x_/, tfSkew[0]);
-          }
-
-          // Case: skewY has other value
-          else {
-            cssTf += 'skew(_x_deg, _y_deg) '
-                  .replace(/_x_/, tfSkew[0])
-                  .replace(/_y_/, tfSkew[1]);
-          }
-        }
-
-
-        /**
-         * CONVERT 'ROTATE'
-         */
-        else if( name == 'rotate' ) {
-          cssTf += 'rotate(_x_deg) '.replace(/_x_/, tfRaw['rotate']);
-        }
-        else if( name == 'rotateX' ) {
-          cssTf += (isTf3D ? 'rotateX(_x_deg) ' : 'rotate(_x_deg) ')
-                .replace(/_x_/, tfRaw['rotateX']);
-        }
-        else if( name == 'rotateY' ) {
-          cssTf += (isTf3D ? 'rotateY(_y_deg) ' : '')
-                .replace(/_y_/, tfRaw['rotateY']);
-        }
-        else if( name == 'rotateZ' ) {
-          cssTf += (isTf3D ? 'rotateZ(_z_deg) ' : '')
-                .replace(/_z_/, tfRaw['rotateZ']);
-        }
-
-
-        /**
-         * CONVERT 'PERSPECTIVE'
-         */
-        else if( name == 'perspectiveDirect' ) {
-          cssTf += (isTf3D ? 'perspective(_x_px) ' : '')
-                .replace(/_x_/, tfRaw['perspectiveDirect']);
-        }
-      }
-
-      // Remove whitespace at last position
-      return cssTf.replace(/\s+$/, '');
-    }
-  };
-
-
-
-
-
-
-
-
-
-
-  /**
-   * DATABASE SYSTEM
-   */
-  var DB = {
-
-    /**
-     * CHECK RUBY ID OF ITEM HAVE EXIST IN SYSTEM
-     */
-    CheckRubyID : function($item) {
-      var dataRuby = null;
-
-      /**
-       * CREATE LOOP TO CHECK ALL ITEM IN DATA
-       */
-      for( var key in vData ) {
-        var $itemCur = vData[key]['$item'];
-
-        if( $itemCur.is($item) ) {
-          dataRuby = key;
-          break;
-        }
-      }
-      return dataRuby;
-    },
-
-    /**
-     * GET DATA RUBY ID OF ITEM IN SYSTEM
-     *  + If it not exist then create new ID Ruby
-     */
-    GetRubyID : function($item) {
-
-      /**
-       * CHECK RUBY ID OF ITEM HAVE EXIST ?
-       */
-      var dataRuby = DB.CheckRubyID($item);
-
-
-
-      /**
-       * CREATE NEW RUBY ID IF NOT EXIST IN SYSTEM
-       */
-      if( dataRuby === null ) {
-
-        for( var i = 0, dataLen = M.GetSize(vData); i <= dataLen; i++ ) {
-          if( vData[i] === UNDE ) {
-
-            /**
-             * CREATE NEW ID IN SYSTEM
-             */
-            vData[i] = {
-              $item   : $item,
-              id    : null,
-              idDB    : i,
-              prop    : [],
-              opts    : [],
-              cssStyle  : null,
-              cssTf   : null,
-              isAnimate : false
-            };
-
-            dataRuby = i;
-            break;
-          }
-        }
-      }
-
-      // Store data
-      return dataRuby;
-    },
-
-
-
-
-
-
-
-
-
-
-    /**
-     * UPDATE DATABASE OF ITEM
-     */
-    Update : function($item, prop, opts) {
-      var rubyID   = DB.GetRubyID($item),
-        itemData = VA.data[rubyID];
-
-      /**
-       * SETUP 'PROP' & 'OPTS' AT FIRST
-       */
-      if( !prop ) prop = {};
-      if( !opts ) opts = {};
-
-
-
-
-      /**
-       * SETUP 'OPTS'/'PROP' + STORE OPTION IN DATA SYSTEM
-       * @param boolean isNew   Create new animate system
-       */
-      if( opts.isNew ) {
-
-        // Merge current options & default options
-        opts = $.extend(true, {}, VA.optsAnimDefault, opts);
-
-        // Reset Data system
-        itemData.prop = [];
-        itemData.opts = [];
-      }
-      else {
-        // Merge current options & default options & inherit options
-        opts = M.MergeOptions(opts, itemData['opts']);
-      }
-
-
-      // Convert name of properties to standard CSS
-      prop = M.ValidName(prop, opts);
-
-      // Store options into Data system
-      itemData.prop.push(prop);
-      itemData.opts.push(opts);
-
-      return itemData;
-    },
-
-    /**
-     * REMOVE DATABASE OF ITEM
-     */
-    Delete : function($item) {
-
-      var rubyID = DB.CheckRubyID($item);
-      if( rubyID !== null ) delete VA.data[rubyID];
-    }
-  };
-
-
-
-
-
-
-
-
-
-
-  /**
-   * SETUP OHTER GLOBAL VARIABLE IN PLUGIN
-   */
-  var __Init__ = function() {
-
-    /**
-     * THE GLOBAL PROPERTIES
-     */
-    VA.timeLoop  = ~~(1000 / VA.fps);
-    VA.prefix  = M.CssCheck('transform', true);
-    VA.isTf    = is.tf = M.CssCheck('transform');
-    VA.isTf3D  = is.tf3D = M.CssCheck('perspective');
-
-    // VA.isTf  = is.tf = true;
-    // VA.isTf3D  = is.tf3D = false;
-    VA.isTs    = is.ts   = M.CssCheck('transition');
-    VA.isOpacity = is.opacity = M.CssCheck('opacity');
-
-
-    /**
-     * CONVERT NAME OF VARIABLE CAN BE PREFIX
-     */
-    var prefix = VA.prefix;
-    VA.percentRef[prefix + 'transform-origin0'] = 'OuterWidth';
-    VA.percentRef[prefix + 'transform-origin1'] = 'OuterHeight';
-  }();
-
-
-
-
-
-
-
-
-
-
-
-  /**
-   * SETUP TIMER SYSTEM IN PLUGIN
-   */
-  function TIMER($item) {
-
-    /**
-     * STORE TIMER IN DATA
-     */
-    var that  = this,
-      vData = window.rt00VA.data;
-
-    that.id   = null;
-    that.rubyID = null;
-
-
-
-
-    /**
-     * STORE ID ON SYSTEM
-     */
-    that.save = function() {
-      vData[that.rubyID].id = that.id;
-    }
-
-    /**
-     * REMOVE TIMER OF OBJECT
-     */
-    that.clear = function() {
-      that.id = vData[that.rubyID].id;
-
-      clearTimeout(that.id);
-      clearInterval(that.id);
-      vData[that.rubyID].id = that.id = null;
-    }
-
-    /**
-     * FUNCTION CONTRUCTOR
-     *  + Remove timer of object at first
-     */
-    var __contruct = function() {
-      that.rubyID = DB.GetRubyID($item);
-      that.clear();
-    }();
-  }
-
-
-
-
-
-
-
-
-
-
-  /**
-   * PLUGINS RUBY ANIMATE JQUERY
-   *  + Incomplete 'start' & 'complete' options
-   */
-  function ANIMATE($anim) {
-
-    var that   = this,
-      an     = {},
-      myData   = {},
-      styleCur = {},
-
-      isOverflowOnNode;
-
-
-
-    /**
-     * FUNCTION CLASS
-     */
-    /**
-     * CHECK & INITIALIZATION ANIMATION
-     */
-    function Init() {
-
-      /**
-       * SETUP VARIABLE AT FIRST
-       */
-      an.rubyID = DB.GetRubyID($anim);
-      myData = that.data = vData[an.rubyID];
-
-      // Setup initialization timer of object
-      if( myData.tsInit == UNDE ) myData.tsInit = VA.tsCur;
-
-      // Properties & options of object
-      var prop = myData.prop,
-        opts = myData.opts;
-
-      an.propEnd = prop[prop.length - 1];
-      an.optsEnd = opts[opts.length - 1];
-
-
-
-      /**
-       * SETUP AFTER START ANIMATION
-       */
-      SetupStyleBegin();
-      Start();
-    }
-
-
-    /**
-     * SETUP VALUE OF STYLE & TRANSFORM AT FIRST
-     */
-    function SetupStyleBegin() {
-
-      // Setup properties of normal Style
-      StyleBegin();
-
-      // Setup properties of transform CSS
-      TransformBegin();
-    }
-
-
-    /**
-     * SETUP VALUE OF STYLE AT FIRST
-     */
-    function StyleBegin() {
-
-      var styleBegin  = an.optsEnd.styleBegin,
-        styleEnd  = an.optsEnd.styleEnd,
-        opts    = myData.opts,
-        isAnimMulti = opts.length > 1;
-
-
-      /**
-       * LOOP TO SETUP VALUE NOT BE TRANSFORM CSS
-       */
-      for( var name in an.propEnd ) {
-        if( $.inArray(name, VA.nameTf) === -1 ) {
-
-          /**
-           * SETUP STYLE END
-           *  + Parse & convert value of StyleEnd
-           */
-          var valueCur = an['propEnd'][name];
-          styleEnd[name] = M.ParseCssStyle(valueCur);
-
-
-
-          /**
-           * SETUP STYLE BEGIN
-           */
-          // Case: name of properties have fixed value -> inherit value of tfEnd
-          if( $.inArray(name, VA.propFixed) !== -1 ) {
-            styleBegin[name] = styleEnd[name];
-          }
-
-          else {
-            // Parse & convert value of StyleBegin
-            valueCur = $anim.css(name);
-            styleBegin[name] = M.ParseCssStyle(valueCur);
-          }
-        }
-      }
-
-
-      // Inherit StyleEnd of animation before
-      if( isAnimMulti ) styleBegin = $.extend(styleBegin, opts[opts.length - 2]['styleEnd']);
-
-      // Inherit properties of CSS Style 'point' have setup before
-      if( myData.cssStyle !== null ) {
-        styleBegin = $.extend(true, styleBegin, myData.cssStyle);
-
-        // Remove properties CSS Style after inherit
-        myData.cssStyle = null;
-      }
-
-
-
-
-
-      /**
-       * SETUP INHERIT PROPERTIES OF STYLE-END FROM STYLE-BEGIN
-       */
-      for( var name in styleBegin ) {
-
-        if( styleEnd[name] === UNDE ) {
-          styleEnd[name] = styleBegin[name];
-        }
-      }
-    }
-
-
-    /**
-     * SETUP VALUE OF TRANSFORM AT FIRST
-     */
-    function TransformBegin() {
-      var opts = myData.opts;
-
-
-      /**
-       * GET TRANSFORM OF OBJECT AT FIRST
-       */
-      // Case: have many continuous animation
-      var tfBegin;
-      if( opts.length > 1 ) {
-
-        // Get Transform-begin from Transform-end before
-        tfBegin = $.extend({}, opts[opts.length - 2]['tfEnd']);
-      }
-
-      // Case: only 1 animation
-      else {
-        tfBegin = myData.tfCur;
-        if( tfBegin == UNDE ) {
-
-          var matrixBegin = MATRIX.getFromItem($anim);
-
-          /**
-           * PARSE MATRIX TO INITIAL PROPERTIES
-           */
-          tfBegin = MATRIX.parse(matrixBegin);
-        }
-      }
-
-
-      // Inherit the properties CSS Transform 'point' have setup before
-      if( myData.cssTf !== null ) {
-        tfBegin = $.extend(true, tfBegin, myData.cssTf);
-
-        // Remove CSS Transform property after inherit
-        myData.cssTf = null;
-      }
-
-
-
-
-
-      /**
-       * GET TRANSFORM-END FROM SETUP PROPERTIES
-       */
-      var tfEnd = TF.FromProp(an.propEnd);
-
-
-
-
-      /**
-       * SETUP TRANSFORM INHERIT FROM PROPERTIES BEFORE
-       */
-      // Inherit 'tfBegin' properties but 'tfEnd' does not have, order of Transform depends on options
-      tfEnd = TF.Extend(tfBegin, tfEnd, an.optsEnd);
-
-      var tfDefault = VA.tfDefault;
-      for( var name in tfEnd ) {
-
-        /**
-         * ADDITIONAL PROPERTIES WITH TRANSFORM-BEGIN
-         */
-        if( tfBegin[name] === UNDE ) {
-
-          // Case: value of properties !== default value
-          if( tfEnd[name] != tfDefault[name] ) {
-
-            // Case: name of property has fixed value -> inherit value from 'tfEnd'
-            if( $.inArray(name, VA.propFixed) !== -1 ) tfBegin[name] = tfEnd[name];
-
-            // Case normal -> default value
-            else tfBegin[name] = tfDefault[name];
-          }
-
-          // Case similar to default value: remove from Transform-end
-          else {
-            delete tfEnd[name];
-          }
-        }
-
-
-
-        /**
-         * REMOVE PROPERTIES ON TRANSFORM BEGIN - END SIMILAR TO DEFAULT PROPERTIES
-         */
-        if( tfBegin[name] == tfDefault[name] && tfEnd[name] == tfDefault[name] ) {
-          delete tfBegin[name];
-          delete tfEnd[name];
-        }
-      }
-
-      an.optsEnd.tfBegin = tfBegin;
-      an.optsEnd.tfEnd   = tfEnd;
-    }
-
-
-    /**
-     * SETUP VALUE WHEN BEGIN ANIMATION
-     */
-    function Start() {
-
-      /**
-       * INSERT STYLE 'OVERFLOW' AT FIRST: FIXED FOR OLD BROWSER
-       */
-      var style = $anim.attr('style');
-      isOverflowOnNode = style && style.indexOf('overflow') !== -1;
-
-      // Unavailable
-      // !isOverflowOnNode && $anim.css('overflow', 'hidden');
-
-
-
-      /**
-       * EXECUTE FUNCTION 'START' AT FIRST
-       */
-      !!an.optsEnd.start && an.optsEnd.start();
-    }
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * SETUP NEXT VALUE OF OBJECT, CALL FUNCTION FROM 'TWEEN'
-     * @param boolean isForceAnim   Allways setup style for object
-     */
-    that.next = function(isForceAnim) {
-
-      /**
-       * SETUP CURRENT TIME
-       * @param Int   an.xCur     Current time, in range [0, 1]
-       * @param Boolean isAnimate   Check setup current animation
-       */
-      var opts     = myData.opts,
-        isAnimate  = false,
-        isComplete = false,
-        tCur     = myData.tCur = VA.tsCur - myData.tsInit;
-
-
-      for( var i = 0, len = opts.length; i < len; i++ ) {
-        var optsCur = opts[i];
-
-        // Case: tCur at the forward position the first Aniamtion
-        if( tCur < optsCur.tPlay && i == 0 ) {
-
-          // Case: allways setup Style of object
-          if( isForceAnim ) {
-            an.optsPos = i;
-            an.xCur = 0;
-          }
-
-          // Case normal
-          else an.xCur = null;
-          break;
-        }
-
-        // Case: 'tCur' at the behide position the last Animation
-        else if( tCur > optsCur.tEnd && i == len - 1 ) {
-          an.optsPos = i;
-          an.xCur = 1;
-          isComplete = true;
-          break;
-        }
-
-        // Case: 'tCur' located inside Animation
-        else if( optsCur.tPlay <= tCur && tCur <= optsCur.tEnd ) {
-          an.optsPos = i;
-          an.xCur = $.GSGDEasing[optsCur.easing](null, tCur - optsCur.tPlay, 0, 1, optsCur.duration);
-          isAnimate = true;
-          break;
-        }
-
-        // Case: 'tCur' located outside Animation
-        else if( !!opts[i + 1] && optsCur.tEnd < tCur && tCur < opts[i + 1].tPlay ) {
-          an.optsPos = i;
-          an.xCur = 1;
-          break;
-        }
-      }
-
-
-
-
-      /**
-       * SETUP VALUE OF CURRENT STYLE ON OBJECT
-       */
-      if( an.xCur !== null && opts.length ) {
-
-        // First, reset size of Item
-        GetSizeItem();
-
-        // Reset variable 'styleCur'
-        styleCur = {};
-
-        // Setup current Style value of the object
-        StyleNormalCur();
-        StyleTransformCur();
-        $anim.css(styleCur);
-      }
-
-
-
-      /**
-       * EXECUTE OPTION 'COMPLETE'
-       */
-      if( isComplete ) {
-        var optsCur = opts[an.optsPos];
-        !!optsCur.complete && optsCur.complete();
-      }
-
-
-      /**
-       * Return value check have Animation
-       */
-      return isAnimate;
-    };
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * CONVERT VALUE HAS OTHER UNIT TO 'PX'
-     *  + Support convert '%' to 'px'
-     */
-    function ConvertValue(name, valueCur) {
-
-      /*
-       * CASE: STRING
-       */
-      if( typeof valueCur == 'string' ) {
-
-        /**
-         * CASE: UNIT IS 'PX'
-         */
-        if( /px$/.test(valueCur) ) {
-          valueCur = parseFloat(valueCur);
-        }
-
-
-        /**
-         * CASE: UNIT IS '%'
-         */
-        else if( /\%$/.test(valueCur) ) {
-
-          // Name of property exist in conversion system
-          var nameSizeFn = VA.percentRef[name];
-          if( nameSizeFn !== UNDE ) {
-
-            var sizeCur = an['size'][nameSizeFn];
-            valueCur = sizeCur * parseFloat(valueCur) / 100;
-          }
-        }
-      }
-
-
-
-      /**
-       * RETURN VALUE AFTER SETUP
-       */
-      return valueCur;
-    }
-
-
-    /**
-     * GET SIZE OF ITEM IN CURRENT TIME
-     */
-    function GetSizeItem() {
-
-      an.size = {
-        'OuterWidth'  : M.OuterWidth($anim),
-        'OuterHeight' : M.OuterHeight($anim)
-      };
-    }
-
-
-    /**
-     * SETUP VALUE PLUS DEPENDS ON PROPERTY NAME
-     */
-    function ValueCurForNumber(name, valueBegin, valueEnd) {
-      var nameToFloat = ['opacity'],
-        plus    = (valueEnd - valueBegin) * an.xCur;
-
-      // Case: rounded number float
-      if( $.inArray(name, nameToFloat) !== -1 ) {
-        plus = Math.round(plus * 1000) / 1000;
-      }
-
-      // Case: rounded to integer
-      else {
-
-        /**
-         * ADDITIONAL 1 FRACTION : ANIMATE SMOOTHER
-         */
-        plus = Math.round(plus * 10) / 10;
-      }
-      return valueBegin + plus;
-    }
-
-
-    /**
-     * SETUP VALUE OF PROPERTY IS ARRAY[]
-     */
-    function ValueCurForArray(name, valueBegin, valueEnd) {
-      var aValue = [];
-
-      /**
-       * SETUP EACH VALUE IN ARRAY[]
-       *  + Remove element >= 2 : Browser not support Transform 3D
-       */
-      for( var i = 0, len = valueEnd.length; i < len && !(i >= 2 && !VA.isTf3D); i++ ) {
-
-        /**
-         * CONVERT VALUE BEGIN - END
-         */
-        var vaEndCur   = ConvertValue(name + i, valueEnd[i]),
-          vaBeginCur = ConvertValue(name + i, valueBegin[i]);
-
-        // Case: value 'begin' not exist
-        if( vaBeginCur === UNDE ) vaBeginCur = vaEndCur;
-
-
-
-        /**
-         * SETUP CURRENT VALUE + STORE IN ARRAY[]
-         */
-        var plus   = (vaEndCur - vaBeginCur) * an.xCur,
-          valueCur = Math.round((vaBeginCur + plus) * 10) / 10;
-
-        aValue.push(valueCur + 'px');
-      }
-
-
-      /**
-       * CONVERT ARRAY TO STRING
-       */
-      return aValue.join(' ');
-    }
-
-
-    /**
-     * SETUP NORMAL PROPERTIES AT THE CURRENT TIME
-     */
-    function StyleNormalCur() {
-      var optsCur = myData['opts'][an.optsPos];
-
-
-      for( var name in optsCur['styleBegin'] ) {
-        var valueBegin = optsCur['styleBegin'][name],
-          valueEnd   = optsCur['styleEnd'][name],
-          valueCur;
-
-
-        /**
-         * CASE: PROPERTY HAS VALUE IS ARRAY[]
-         */
-        if( $.isArray(valueBegin) ) {
-          valueCur = ValueCurForArray(name, valueBegin, valueEnd);
-        }
-
-
-        /**
-         * CASE: PROPERTY HAS OTHER VALUE
-         */
-        else {
-
-          // Convert value String to Number (if posible)
-          valueBegin = ConvertValue(name, valueBegin);
-          valueEnd   = ConvertValue(name, valueEnd);
-
-          // Case: value of property is Number
-          if( $.isNumeric(valueBegin) && $.isNumeric(valueEnd) ) {
-            valueCur = ValueCurForNumber(name, valueBegin, valueEnd);
-          }
-
-          // Other case: keep changes
-          else {
-            valueCur = valueBegin;
-          }
-        }
-
-
-
-
-
-        /**
-         * REMOVE STYLES HAVE DEFAULT VALUE
-         */
-        if( optsCur.isClearStyleDefault && VA['styleDefault'][name] === valueCur ) {
-          valueCur = '';
-        }
-
-
-
-        /**
-         * STORE VALUE OF CURRENT PROPERTY
-         */
-        styleCur[name] = valueCur;
-      }
-    }
-
-
-    /**
-     * SETUP 'TRANSFORM' IN CURRENT TIME
-     */
-    function StyleTransformCur() {
-
-      /**
-       * SETUP CURRENT VALUE EACH TRANSFORM PROPERTIES
-       */
-      var optsCur = myData['opts'][an.optsPos],
-        tfBegin = optsCur.tfBegin,
-        tfEnd   = optsCur.tfEnd,
-        tfCur   = {};
-
-      for( var name in tfEnd ) {
-
-        // Setup value 'plus' of each properties
-        var tfBeginCur = TF.ConvertValueToPX($anim, name, tfBegin[name]),
-          tfEndCur   = TF.ConvertValueToPX($anim, name, tfEnd[name]),
-
-          valuePlus  = (tfEndCur - tfBeginCur) * an.xCur,
-          valueCur   = tfBeginCur + valuePlus;
-
-        // Value of current property
-        tfCur[name] = valueCur;
-      }
-
-
-
-
-      /**
-       * CONVERT PARTICULAR PROPERTY OF TRANSFORM TO CSS
-       */
-      var cssTf = TF.ToCss(tfCur, optsCur);
-
-
-
-
-      /**
-       * STORE CURRENT TRANSFORM CSS
-       */
-      var nameTf = VA.prefix + 'transform';
-      styleCur[nameTf] = cssTf;
-
-      // Store current Transform into system
-      myData.tfCur = tfCur;
-    }
-
-
-
-
-
-
-
-
-
-
-
-    // Initialize Animation
-    Init();
-  }
-
-
-
-
-
-
-
-
-
-
-
-  /**
-   * SETUP MAIN PLUGIN
-   */
-  window.RubyTween = function() {
-    var that = this,
-      tw   = that.tw = {
-        id     : VA.nTween++,
-        $items   : $(),
-        data   : [],
-        animate  : [],
-        tsInit   : +new Date(),
-        tCur   : 0,
-        tMax   : Number.MAX_VALUE,
-        status   : 'pause',       // Value included: 'wait', 'play', 'pause'
-        dirs   : 'forward',       // Tween direction: 'forward', 'reverse'
-        timeline : [],
-        timeData : [],
-        timeRef  : {},
-        timePosCur  : 0,
-        timeTypeCur : null
-      };
-
-
-
-
-    /**
-     * SETUP ID-ITEM IN TWEEN SYSTEM
-     */
-    function SetupItemID(itemData, $item, prop, opts) {
-
-      // Check object exist on Tween
-      if( itemData.tweenID === UNDE ) {
-        itemData.tweenID = tw.id;
-      }
-
-      else {
-
-        /**
-         * UPDATE PROPERTIES OF ITEM WHEN ID-ITEM !== ID-TWEEN
-         */
-        if( itemData.tweenID != tw.id ) {
-
-          // Noties to reset 'prop' & 'opts'
-          opts.isNew = true;
-
-          // Update time of object
-          itemData.tsInit = tw.tsCur;
-          itemData.tCur = 0;
-
-          // Re-register current 'prop' & 'opts'
-          itemData = DB.Update($item, prop, opts);
-          itemData.tweenID = tw.id;
-        }
-      }
-    }
-
-    /**
-     * CHECK ITEM EXIST IN SYSTEM
-     */
-    function CheckItemExist(itemData) {
-
-      for( var i = 0, len = tw.animate.length; i < len; i++ ) {
-        if( tw['animate'][i]['data']['$item'].is(itemData.$item) ) return true;
-      }
-      return false;
-    }
-
-    /**
-     * UPDATE INITIALIZATION TIME OF ALL ITEM
-     */
-    function UpdateTimeInitAllItem() {
-
-      for( var i = 0, len = tw.animate.length; i < len; i++ ) {
-
-        // Update initialization time for each object
-        var dataCur = tw['animate'][i]['data'];
-        dataCur.tsInit = tw.tsInit;
-      }
-    }
-
-
-
-
-
-
-
-
-
-
-    /**
-     * SETUP TIMELINE SYSTEM
-     */
-    function TimelineSetup($item, itemData) {
-
-      /**
-       * TIME 'WAIT' - 'PLAY' - 'END' OF OBJECT
-       */
-      tw.$items = tw.$items.add($item);
-
-
-      var optsLen  = itemData.opts.length,
-        optsEnd  = itemData.opts[optsLen - 1],
-        optsLast = itemData.opts[optsLen - 2];
-
-      optsEnd.tWait = (optsLen == 1) ? 0 : optsLast.tEnd;
-      optsEnd.tPlay = optsEnd.tWait + optsEnd.delay;
-      optsEnd.tEnd  = optsEnd.tPlay + optsEnd.duration;
-
-
-
-      /**
-       * INSERT TIME WAIT - PLAY - END INTO TIMELINE SYSTEM
-       */
-      if( $.inArray(optsEnd.tWait, tw.timeData) === -1 ) {
-        tw.timeData.push(optsEnd.tWait);
-        tw.timeRef[optsEnd.tWait] = 'wait';
-      }
-
-
-      if( $.inArray(optsEnd.tPlay, tw.timeData) === -1 ) {
-        tw.timeData.push(optsEnd.tPlay);
-        tw.timeRef[optsEnd.tPlay] = 'play';
-      }
-      else {
-        tw.timeRef[optsEnd.tPlay] = 'play';
-      }
-
-
-      if( $.inArray(optsEnd.tEnd, tw.timeData) === -1 ) {
-        tw.timeData.push(optsEnd.tEnd);
-        tw.timeRef[optsEnd.tEnd] = 'end';
-      }
-
-
-
-      /**
-       * ARRANGE VALUE IN ARRAY[] INCREASE
-       */
-      tw.timeData = M.ArrayMinToMax(tw.timeData);
-      tw.tMax   = tw.timeData[tw.timeData.length - 1];
-
-
-
-      /**
-       * RESET TIMELINE SYSTEM
-       */
-      tw.timeline = [];
-      var statusLast = 'end';
-      for( var i = 0, len = tw.timeData.length; i < len; i++ ) {
-
-        var timeCur  = tw.timeData[i],
-          timeNext   = tw.timeData[i + 1],
-          statusCur  = tw.timeRef[timeCur],
-          statusNext = tw.timeRef[timeNext];
-
-
-        /**
-         * CASE: TIMEOUT 'END - WAIT'
-         * CASE: TIMEOUT 'END - PLAY'
-         */
-        var isTimeoutWait = statusLast == 'end' && statusCur == 'wait',
-          isTimeoutEnd  = statusCur == 'end' && statusNext == 'play';
-        if( isTimeoutWait || isTimeoutEnd ) {
-
-          /**
-           * FIND NEXT VALUE
-           */
-          var valuePlayNext;
-          if( isTimeoutWait ) {
-            for( var j = i; j < len; j++ ) {
-
-              if( tw.timeRef[ tw.timeData[j] ] == 'play' ) {
-                valuePlayNext = tw.timeData[j];
-                break;
-              }
+            return e.isPlainObject(t) ? e.extend(!0, {}, t) : e.isArray(t) ? e.extend(!0, [], t) : {};
+        },
+        JsonToString: function(e, t) {
+            if ("object" == typeof e) try {
+                e = JSON.stringify(e);
+            } catch (e) {
+                rt01VA.M.Message(t);
             }
-          }
-
-          if ( isTimeoutEnd ) valuePlayNext = timeNext;
-
-
-
-          /**
-           * SETUP 'TIMEOUT' VALUE
-           */
-          tw.timeline.push({
-            'type'  : 'timeout',
-            'time'  : timeCur,
-            'delay' : valuePlayNext - timeCur
-          });
-        }
-
-
-
-        /**
-         * CASE: INTERVAL 'WAIT - PLAY'
-         * CASE: INTERVAL 'END - PLAY'
-         */
-        if( /^(wait|end)$/.test(statusLast) && statusCur == 'play' ) {
-          tw.timeline.push({
-            'type' : 'interval',
-            'time' : timeCur
-          });
-        }
-
-
-        /**
-         * SETUP END EACH LOOP
-         */
-        statusLast = statusCur;
-      }
-
-
-
-
-      /**
-       * REMOVE 'TIMEOUT' INSIDE 'INTERVAL'
-       */
-      var timeline = $.extend([], tw.timeline);
-      for( var i = 0; i < timeline.length; i++ ) {
-
-        if( timeline[i].type == 'timeout' ) {
-
-          /**
-           * CREATE LOOP TO CHECK EACH OBJECT HAS 'INTERVAL' CONTAIN CURRENT 'TIMEOUT'
-           */
-          for( var j = 0, lenJ = tw.animate.length; j < lenJ; j++ ) {
-            var dataCur = tw['animate'][j]['data'];
-            if( dataCur.tPlay < timeline[i].time && timeline[i].time < dataCur.tEnd ) {
-
-              // Remove next 'Timeout' & 'Interval' in Timeline array[]
-              timeline.splice(i, 2);
-              i--;
-              break;
-            }
-          }
-        }
-      }
-
-      tw.timeline = timeline;
-    }
-
-
-    /**
-     * UDPATE CURRENT POSITION IN TIMELINE
-     */
-    function TimelinePosCur() {
-
-      var pos = null;
-      for( var i = 0, len = tw.timeline.length; i < len; i++ ) {
-
-        if( tw.timeline[i].time > tw.tCur ) {
-          pos = i - 1;
-          break;
-        }
-      }
-
-
-      // Case: no any value when get value-end in Timeline array[]
-      if( pos === null ) pos = tw.timeline.length - 1;
-
-      // Store position of Animation
-      tw.timePosCur = pos;
-    }
-
-
-    /**
-     * SETUP PLAY ANIMATION
-     */
-    function Play() {
-      var dirs = tw.dirs;
-
-
-      /**
-       * GET CURRENT TIME DEPENDS ON 'FORWARD' - 'REVERSE' DIRECTION
-       *  + Case 'reverse': first reduce time 'tsInit'
-       */
-      var tsLast = tw.tsCur;
-      tw.tsCur = VA.tsCur = +new Date();
-
-
-      // Case: 'forward' direction
-      if( dirs == 'forward' ) {
-        tw.tCur = tw.tsCur - tw.tsInit;
-      }
-
-      // Case: 'reverse' direction
-      else if( dirs == 'reverse' ) {
-        tw.tCur -= tw.tsCur - tsLast;
-
-        // Update time 'Init' for Tween & Items
-        tw.tsInit = tw.tsCur - tw.tCur;
-        UpdateTimeInitAllItem();
-      }
-
-
-
-
-
-      /**
-       * UPDATE CURRENT POSITION IN TIMELINE
-       */
-      TimelinePosCur();
-
-      // Case: 'reverse' position with Animate < 0
-      if( dirs == 'reverse' && tw.timePosCur < 0 ) {
-
-        // Mark sure setup Transform at first
-        Next();
-
-        // Not continue setup
-        return;
-      }
-
-
-
-
-      /**
-       * SETUP DURATION OF TIMER IF TYPE CURRENT TIMELINE IS 'TIMEOUT'
-       */
-      var tlCur  = tw.timeline[tw.timePosCur],
-        tTimeout = 0;
-
-      if( tlCur.type == 'timeout' ) {
-
-        if( dirs == 'forward' ) tTimeout = tlCur.delay - (tw.tCur - tlCur.time);
-        if( dirs == 'reverse' ) tTimeout = tw.tCur - tlCur.time;
-      }
-
-
-
-
-      /**
-       * RESET CURRENT $ANIMATION
-       */
-      tw.animateCur = $.extend([], tw.animate);
-
-
-
-
-      /**
-       * CASE: CURRENT STATUS IS 'WAIT'
-       */
-      if( tw.status == 'wait' ) {
-
-        // First remove 'timer' before
-        clearTimeout(tw.timer);
-
-
-        if( tlCur.type == 'timeout' ) {
-          tw.timer = setTimeout(Play, tTimeout);
-        }
-
-        else if( tlCur.type == 'interval' ) {
-          tw.timer = setInterval(Next, VA.timeLoop);
-        }
-      }
-
-
-
-      /**
-       * CASE: CURRENT STATUS IS 'STOP' - 'PAUSE'
-       */
-      else if( tw.status == 'pause' ) {
-
-        /**
-         * CASE: 'TIMEOUT'
-         */
-        if( tlCur.type == 'timeout' ) {
-          tw.status = 'wait';
-          tw.timer = setTimeout(Play, tTimeout);
-        }
-
-
-        /**
-         * CASE: 'INTERVAL'
-         */
-        else if( tlCur.type == 'interval' ) {
-          tw.status = 'play';
-          tw.timer = setInterval(Next, VA.timeLoop);
-        }
-      }
-    }
-
-
-    /**
-     * SETUP NEXT VALUE OF ALL OBJECTS
-     *  + Function only execute from 'Play()'
-     */
-    function Next() {
-      var dirs = tw.dirs;
-
-
-      /**
-       * CONDITIONAL EXECUTION
-       */
-      var numAnim = tw.animateCur.length;
-      if( !numAnim ) {
-
-        clearInterval(tw.timer);
-        return;
-      }
-
-
-
-
-      /**
-       * GET CURRENT TIME DEPENDS ON 'FORWARD' - 'REVERSE' DIRECTION
-       *  + Case 'reverse': first reduce time 'tsInit'
-       */
-      var tsLast = tw.tsCur;
-      tw.tsCur = VA.tsCur = +new Date();
-
-      // Case: 'forward'
-      if( dirs == 'forward' ) {
-        tw.tCur = tw.tsCur - tw.tsInit;
-      }
-
-      // Case: 'reverse'
-      else if( dirs == 'reverse' ) {
-        tw.tCur -= tw.tsCur - tsLast;
-
-        // Update time 'init' for Tween & Items
-        tw.tsInit = tw.tsCur - tw.tCur;
-        UpdateTimeInitAllItem();
-      }
-
-      // Execute function 'step' (if have) when next animation
-      !!tw.evStep && tw.evStep();
-
-
-
-
-
-      /**
-       * SETUP CURRENT VALUE STYLE OF OBJECTS
-       */
-      for( var i = 0, len = tw.animateCur.length; i < len; i++ ) {
-        var isNext = tw.animateCur[i].next();
-
-
-        /**
-         * REMOVE ANIMATE OF CURRENT OBJECT NEU NOT HAVE NEXT VALUE
-         */
-        if( !isNext ) numAnim--;
-
-        if( !numAnim ) {
-          clearInterval(tw.timer);
-
-
-          /**
-           * CASE: 'WAIT' FOR NEXT ANIMATION
-           */
-          if( tw.tCur < tw.tMax ) {
-
-            // Case: 'forward'
-            if( dirs == 'forward' ) {
-              tw.status = 'wait';
-              Play();
-            }
-
-            // Case: 'reverse'
-            else if( dirs == 'reverse' ) {
-
-              /**
-               * CASE: TIME 'WAIT' BETWEEN ANIAMTIONS
-               */
-              if( tw.tCur > 0 ) {
-                tw.status = 'wait';
-                Play();
-              }
-
-
-              /**
-               * CASE: TIME GO TO BEGIN POSITION
-               */
-              else {
-                // Reset direction of Tween
-                tw.dirs = 'forward';
-
-                // Mark sure setup Transform at first
-                // Included setup status
-                that.go(0);
-
-                // Execute function 'complete' (if have) when complete animation
-                !!tw.evComplete && tw.evComplete();
-              }
-            }
-          }
-
-
-
-          /**
-           * CASE: EXECUTE ALL IN TIMELINE
-           */
-          else if( tw.tCur >= tw.tMax ) {
-            tw.status = 'pause';
-
-            // Execute fuction 'complete' (if have) when complete animation
-            !!tw.evComplete && tw.evComplete();
-          }
-        }
-      }
-    }
-
-
-
-
-
-
-
-
-
-
-    /**
-     * SETUP ANIMATE-TRANSFORM FOR OBJECT
-     */
-    that.animate = function($item, prop, opts, isAutoPlay) {
-
-      // Conditional execution
-      if( !($item && $item.length) ) return that;
-
-
-      /**
-       * GET CURRENT TIME
-       *  + Support for setup below
-       */
-      tw.tsCur = VA.tsCur = +new Date();
-      tw.tCur  = tw.tsCur - tw.tsInit;
-
-
-
-
-      /**
-       * SETUP & STORE 'PROP' - 'OPTS' OF ITEM INTO SYSTEM
-       */
-      var itemData = DB.Update($item, prop, opts);
-
-      // Get value of 'opts' have stored if 'opts' not have value at first
-      if( !opts ) opts = itemData.opts[itemData.opts.length - 1];
-
-      // Case: create new animation
-      if( opts.isNew ) {
-        // Reset ID-Tween if setup new Animation
-        itemData.tweenID = null;
-      }
-
-      // Variable to show Item have animate
-      itemData.isAnimate = true;
-
-      // Setup Item ID
-      SetupItemID(itemData, $item, prop, opts);
-
-
-
-
-      /**
-       * INSERT TIME ANIMATION OF OBJECT INTO TIMELINE SYSTEM
-       *  + Must have Item datavase before
-       */
-      TimelineSetup($item, itemData);
-
-
-
-      /**
-       * SETUP FOR EACH OBJECT
-       */
-      var animateCur = new ANIMATE($item);
-      !CheckItemExist(itemData) && tw.animate.push(animateCur);
-
-
-
-      /**
-       * AUTOMATIC SETUP 'PLAY' ANIMATE
-       *  + Not is parameter, default is 'true'
-       */
-      isAutoPlay = (isAutoPlay === UNDE) ? true : isAutoPlay;
-      isAutoPlay && Play();
-
-      // Return RubyTween
-      return that;
-    }
-
-
-    /**
-     * SETUP CSS TRANSFORM FOR OBJECT
-     */
-    that.css = function($item, prop, opts) {
-
-      // Conditional execution
-      if( !($item && $item.length) ) return that;
-
-      // Update CSS options with default options
-      opts = $.extend(true, {}, VA.optsCssDefault, opts);
-
-
-
-      /**
-       * CASE: RESET TWEEN-ANIMATE BY CSS
-       */
-      var optsType = opts.type;
-      if( optsType === 'reset' ) {
-
-        /**
-         * SETUP THUOC TINH MAC DINH
-         *  + Support remove properties relate to CSS Transform
-         */
-        prop = $.extend({
-          'originTF'  : '',
-          'perspective' : ''
-        }, prop);
-
-
-
-
-        /**
-         * RESET 'PROP' & 'OPTS' OF ITEM IN SYSTEM
-         */
-        // Pause Tween first
-        that.pause();
-
-        // Reset 'prop' & 'opts' of Item on Database
-        opts.isNew = true;
-
-        // Get data of ITem by 'DB.Update()'
-        var itemData = DB.Update($item, prop, opts);
-
-        // Remove Item from Tween system
-        itemData.tweenID = null;
-
-
-
-
-        /**
-         * SETUP PROPERTY CSS ON ITEM
-         */
-        var styleCur = {};
-        prop = itemData.prop[0];
-        opts = itemData.opts[0];
-
-
-        // Get property !== CSS Transfrom
-        for( var name in prop ) {
-          if( $.inArray(name, VA.nameTf) === -1 ) {
-            styleCur[name] = prop[name];
-          }
-        }
-
-
-        // Get property of CSS Transform
-        var propTf = TF.FromProp(prop);
-
-        // Store Transform property into main variable: when not convert value
-        itemData.tfCur = $.extend({}, propTf);
-
-        // Convert special value of CSS Transform
-        for( var name in propTf ) {
-          propTf[name] = TF.ConvertValueToPX($item, name, propTf[name]);
-        }
-
-        // Convert all properties of CSS Tranform to String
-        var cssTf = TF.ToCss(propTf, opts);
-
-        // Insert CSS Transform into main Style
-        styleCur[VA.prefix + 'transform'] = cssTf;
-
-        // Setup all properties of CSS on Item
-        $item.css(styleCur);
-
-
-
-
-        /**
-         * OTHER SETUP
-         */
-        // Store $Item into system
-        tw.$items = tw.$items.add($item);
-      }
-
-
-
-      /**
-       * CASE: SETUP NEW CSS BEFORE SETUP ANIMATION
-       */
-      else if( /^(point|inherit)$/.test(optsType) ) {
-
-        var rubyID   = DB.GetRubyID($item),
-          itemData = VA.data[rubyID],
-          cssStyle = {},
-          cssTf  = {};
-
-
-        /**
-         * DISTINGUISH PROPERTIES OF TRANSFORM AND WITHOUT TRANSFORM
-         */
-        // Convert name of property for standard
-        prop = M.ValidName(prop, opts);
-
-        for( var name in prop ) {
-          var valueCur = prop[name];
-
-          // Case: property not Transfrom
-          if( $.inArray(name, VA.nameTf) === -1 ) {
-
-            // Parse & convert value of CSS Style
-            cssStyle[name] = M.ParseCssStyle(valueCur);
-          }
-
-          // Case: property of Transform
-          else {
-            cssTf[name] = valueCur;
-          }
-        }
-
-
-
-        /**
-         * INHERIT ALL DEFAULT PROPERTIES TRANSFORM IF TYPE 'POINT'
-         */
-        if( optsType == 'point' ) {
-          cssTf = TF.Extend(VA.tfDefault, cssTf, { 'isTFOrderByEnd': true });
-        }
-
-
-
-        /**
-         * STORE CSS-STYLE & CSS-TRANSFORM FOR NEXT ANIMATION
-         */
-        itemData.cssStyle = cssStyle;
-        itemData.cssTf  = cssTf;
-      }
-
-      return that;
-    }
-
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * GO TO POSITION ON TIMELINE
-     */
-    that.go = function(pos, unit) {
-
-      // Pause animate of objects
-      that.pause();
-
-
-
-      /**
-       * SETUP CURRENT TIME DEPENDS ON UNIT
-       */
-      // Case: default unit is '%'
-      var tCur = pos * tw.tMax / 100;
-
-      // Case: unit is 'ms' (milisecond)
-      if( unit == 'ms' ) tCur = pos;
-
-
-
-
-      /**
-       * CASE: NOT ANIMATE IN SYSTEM & START POSITION
-       *  + Setup CSS at first by 'that.css()'
-       */
-      var animNum = tw.animate.length;
-      if( tCur == 0 && !animNum ) {
-
-        /**
-         * LOOP TO SETUP EACH OBJECT
-         */
-        for( var i = 0, len = tw.$items.length; i < len; i++ ) {
-
-          var $itemCur = tw.$items.eq(i),
-            itemData = VA['data'][ DB.GetRubyID($itemCur) ];
-
-          // Condition setup CSS for object
-          if( !itemData['isAnimate'] && itemData['prop'].length == 1 ) {
-            that.css($itemCur, itemData['prop'][0], itemData['opts'][0]);
-          }
-        }
-      }
-
-
-
-
-
-      /**
-       * CASE: TWEEN HAVE ANIMATE
-       */
-      else {
-
-        /**
-         * UPDATE CURRENT TIME
-         */
-        tw.tCur   = tCur;
-        tw.tsCur  = VA.tsCur = +new Date();
-        tw.tsInit = tw.tsCur - tw.tCur;
-
-        for( var i = 0, len = tw.animate.length; i < len; i++ ) {
-
-          // Update time 'init' for each object
-          tw['animate'][i]['data']['tsInit'] = tw.tsInit;
-
-          // Setup value current Style of objects
-          tw.animate[i].next(true);
-        }
-      }
-
-
-      // Return RubyTween
-      return that;
-    }
-
-
-    /**
-     * EXECUTE 'PAUSE' TWEEN
-     */
-    that.pause = function() {
-
-      /**
-       * REMOVE TIMER OF TIMELINE
-       */
-      if( that.isPlay() ) {
-        clearTimeout(tw.timer);
-        clearInterval(tw.timer);
-        tw.status = 'pause';
-      }
-
-      // Return RubyTween
-      return that;
-    }
-
-
-    /**
-     * EXECUTE 'PLAY' TWEEN
-     */
-    that.play = function() {
-
-      /**
-       * CONDITIONAL EXECUTION
-       */
-      if( that.isPause() && tw.animate.length ) {
-
-        /**
-         * UPDATE INTIALIZATION TIME
-         */
-        tw.tsCur = VA.tsCur = +new Date();
-        tw.tsInit = tw.tsCur - tw.tCur;
-
-        // Update time 'init' for all Item
-        UpdateTimeInitAllItem();
-
-
-
-        /**
-         * PLAY CONTINUE ANIMATION
-         */
-        Play();
-      }
-
-      return that;
-    }
-
-
-    /**
-     * TOGGLE BETWEEN 'PLAY' & 'PAUSE' & 'RESTART'
-     */
-    that.toggle = function() {
-
-      // Case: position is end
-      if( tw.tCur >= tw.tMax ) that.restart();
-
-      // Case: toggle between 'play' and 'pause'
-      else that.isPause() ? that.play() : that.pause();
-      return that;
-    }
-
-
-    /**
-     * EXECUTE CONTINUE TWEEN WHEN PAUSE
-     */
-    that.resume = function() {
-
-      // Update current position & continue to play Tween
-      that.go(tw.tCur, 'ms').play();
-      return that;
-    }
-
-
-    /**
-     * RESTART TWEEN ANIMATE
-     */
-    that.restart = function() {
-      that.go(0).play();
-      return that;
-    }
-
-
-    /**
-     * REVERSE TWEEN ANIMATE
-     */
-    that.reverse = function() {
-
-      // Variable to show Tween direction
-      tw.dirs = 'reverse';
-
-      // Update position Tween at current time
-      that.go(tw.tCur, 'ms');
-
-      // Update position Tween if at first place
-      if( tw.tCur <= 0 ) that.go(100);
-
-      // Continue play
-      that.play();
-      return that;
-    }
-
-
-    /**
-     * RESET CURRENT TWEEN SYSTEM
-     *  + Remove properties of Item out DB
-     */
-    that.reset = function(isDeleteItemDB) {
-
-      /**
-       * DELETE ALL ITEM IN DATABASE SYSTEM
-       */
-      if( isDeleteItemDB ) {
-        for( var i = 0, len = tw.animate.length; i < len; i++ ) {
-
-          var idDBCur = tw['animate'][i]['data']['idDB'];
-          delete vData[idDBCur];
-        }
-      }
-
-
-
-      /**
-       * RESET OTHER PROPERTIES
-       */
-      tw.dirs = 'forward';
-      tw.tCur = 0;
-      tw.tMax = 0;
-      tw.timeData = [];
-      tw.animate = [];
-      tw.$items = $();
-      tw.evComplete = null;
-      tw.evStep = null;
-      return that;
-    }
-
-
-    /**
-     * REMOVE DATABASE OF OBJECT IN SYSTEM
-     */
-    that.clearDB = function($item) {
-      // console.log('clear');
-    }
-
-
-
-
-
-
-
-
-
-
-    // Get the current value position - unit is '%'
-    that.positionCur = function() {
-      // The current position of Tween, value is unit '%'
-      // Round 4 number after dot
-      var posCur = Math.round(tw.tCur / tw.tMax * 1000000) / 10000;
-      if( posCur > 100 ) posCur = 100;
-
-      // Return value
-      return posCur;
-    }
-
-    // Check Tween playing
-    that.isPlay = function() {
-      return /^(wait|play)$/.test(tw.status);
-    }
-
-    // Check Tween pause
-    that.isPause = function() {
-      return /^(stop|pause)$/.test(tw.status);
-    }
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * EVENT 'COMPLETE' CONTAIN METHODS - FUNCTION
-     */
-    that.eventComplete = function(fn) {
-      tw.evComplete = fn;
-      return that;
-    }
-
-    /**
-     * EXECUTE EVENT 'COMPLETE'
-     */
-    that.complete = function() {
-
-      // Go to position-end
-      that.go(100);
-
-      // Execute function 'complete' (if have) when aniamte complete
-      !!tw.evComplete && tw.evComplete();
-      return that;
-    }
-
-    /**
-     * EVENT 'STEP' FOR TWEEN
-     */
-    that.eventStep = function(fn) {
-      tw.evStep = fn;
-      return that;
-    }
-  }
-}(jQuery));
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/**
- * MODULE SWIPE
- */
-(function($) {
-
-  // Check variable module
-  window.rt01MODULE = window.rt01MODULE || {};
-
-  // Global variables
-  var that, o, cs, va, is, ti, M, VIEW, POSITION, PAG;
-
-  /**
-   * UPDATE GLOBAL VARIABLES
-   */
-  function VariableModule(self) {
-    that = self;
-    o  = self.o;
-    cs   = self.cs;
-    va   = self.va;
-    is   = self.is;
-    ti   = self.ti;
-
-    // Get Module embbed in Ruby
-    M    = self.M;
-    VIEW   = self.VIEW;
-    POSITION = self.POSITION;
-    // Module outside Ruby
-    PAG    = M.Module('PAG');
-  }
-
-
-  /**
-   * MODULE SWIPE
-   */
-  rt01MODULE.SWIPE = {
-
-    /**
-     * TOOGLE SWIPE EVENT WHEN SWAP SLIDE
-     */
-    ToggleEvent : function() {
-      VariableModule(this);
-
-      // Update property & variable of Swipe event on current Slide
-      that.Properties( M.Data(cs.idCur)['opts'] );
-
-
-      /**
-       * TOGGLE EVENT SWIPE GESTURES
-       */
-      // Event Swipe total Ruby
-      if( is.swipeCur != is.swipeLast ) {
-        that.Events( is.swipeCur ? true : false );
-      }
-
-      // Event Swipe on Viewport
-      if( is.swipeOnBodyLast !== undefined && is.swipeOnBodyCur !== is.swipeOnBodyLast ) {
-        that.Events( is.swipeOnBodyCur ? 'onBody' : 'offBody' );
-      }
-
-      // Store status 'SwipeCur' on 'SwipeLast'
-      is.swipeLast = is.swipeCur;
-      is.swipeOnBodyLast = is.swipeOnBodyCur;
-    },
-
-    /**
-     * UPDATE PROPERTY & VARIABLE 'SWIPE' OF CURRENT SWIPE
-     */
-    Properties : function(optsCur) {
-      VariableModule(this);
-
-
-      /**
-       * SETUP 'SWIPECUR' VARIABLE
-       */
-      is.swipeCur = optsCur.isSwipe;
-
-      //  Case: only 1 slide
-      // Ver 1.5 - 24/09/2016: not placed in 'PROP.Slides()' -> error when add new by 'api.addSlide()' when ruby have 1 slide
-      if( cs.num == 1 ) {
-        is.swipeCur = o.oneSlide.isSwipe ? optsCur.isSwipe : false;
-      }
-
-      // Variable swipe on body at first
-      is.swipeOnBodyCur = optsCur.swipe.isBody;
-
-
-
-
-      /**
-       * ACTION 'SWIPE' DEPENDS ON THE CASE
-       *  + Separate to 'swipeBody' & 'swipePag'
-       */
-      // Truong hop slide hien tai co swipe gestures
-      if( is.swipeCur ) {
-        var swipe = optsCur.swipe;
-
-        // Swipe on pagination
-        is.swipeOnPag = true;
-      }
-
-      // Case: current slide without swipe gestures
-      else {
-        is.swipeOnBodyCur = is.swipeOnPag = false;
-      }
-    },
-
-    /**
-     * SETUP SWIPE EVENTS IN THE CASES
-     */
-    Events : function(status) {
-      var that = this;
-      VariableModule(that);
-
-      var slData = M.Data(cs.idCur),
-
-        // Re-register event on objects
-        isSwipeSupport = is.swipeSupport,
-        evMouse = va.ev.mouse,
-        evSwipe = va.ev.swipe;
-
-
-      /**
-       * FUNCTION CLASSES
-       */
-      var fn = {
-
-        // Remove event swipe 'Start' on object
-        offStart : function($swipe) {
-
-          // Remove class 'swipe-on' -> support recognize swipe gestures & fixed swipe in IE mobile
-          // Remove event 'Drag' on Images when swipe
-          $swipe
-            .removeClass(va.ns +'swipe-on').addClass(va.ns +'swipe-off')
-            .off(va.ev.mouse.start +' '+ va.ev.swipe.start)
-            .off(va.ev.drag);
+            return "string" == typeof e ? e : "";
         },
-
-        // Remove event swipe 'Move' & 'End' on Document
-        offMoveEnd : function() {
-          var ev = va.ev;
-          va.$doc
-            .off(ev.mouse.move +' '+ ev.mouse.end +' '+ ev.swipe.move +' '+ ev.swipe.end);
-        },
-
-
-        /**
-         * REMOVE EVENT SWIPE ON OBJECT
-         */
-        offBody : function() {
-
-          // Remove class 'grab' out Viewport
-          M.ToggleClass('grab', -1);
-
-          // Return position of slide before remove evetns
-          // Ver 1.5 - 24/09/2016 : 'api.addSlide()' error when add -> remove -> re-add on Ruby have 1 slide
-          // that.LastSetup({}, va.swipeTypeCur, false);
-
-          // Remove event 'Start' on Viewport
-          fn.offStart(va.$viewport);
-        },
-        offPag : function() {
-
-          // Remove class 'grab' out Pagination
-          is.swipePagCur = false;
-          M.ToggleClass('grab', -1, va.$pag);
-          is.pag && fn.offStart(va.$pag);
-        },
-
-        /**
-         * REGISTER EVENT SWIPE ON OBJECT
-         */
-        onBody : function() {
-          if( is.swipeOnBodyCur ) {
-
-            //  Remove & re-register swipe event on Document
-            fn.offMoveEnd();
-            fn.offBody();
-
-            // Register swipe event for $viewport
-            M.ToggleClass('grab', 0);
-            that.EventStart(va.$viewport, va.$canvas, evMouse);
-            isSwipeSupport && that.EventStart(va.$viewport, va.$canvas, evSwipe);
-          }
-        },
-        onPag : function() {
-          if( is.swipeOnPag && is.pag ) {
-
-            // Remove & re-register swipe event on Document
-            fn.offMoveEnd();
-            fn.offPag();
-
-            // Register swipe event for $pagination
-            is.swipePagCur = true;
-            M.ToggleClass('grab', 0, va.$pag);
-            that.EventStart(va.$pag, va.$pagInner, evMouse);
-            isSwipeSupport && that.EventStart(va.$pag, va.$pagInner, evSwipe);
-          }
-        },
-
-
-        /**
-         * TOGGLE EVENT CLICK ON SLIDE
-         */
-        offClickOnSlide : function() {
-          slData.$self.off(va.ev.click);
-        },
-        onClickOnSlide : function() {
-          fn.offClickOnSlide();
-
-          // Register event click on slide
-          if( slData.link ) {
-            slData.$self.on(va.ev.click, function() {
-              window.open(slData.link, slData.linkTarget);
+        CamelCase: function(e) {
+            return e.replace(/-([a-z])/gi, function(e, t) {
+                return t.toUpperCase();
             });
-          }
-        }
-      };
-
-
-
-      /**
-       * CLASSIFY STATUS
-       *  + To execute correct function
-       *  + Support remove/register particular object
-       */
-      if( status === true ) {
-        fn.onBody();
-
-        // Disable event click on slide
-        fn.offClickOnSlide();
-
-        // Setup swipe on pagination at first
-        if( o.swipe.isAutoOnPag )
-          !va.pag.isViewLarge && fn.onPag();
-        else
-          fn.onPag();
-      }
-      else if( status === false ) {
-
-        // Enable event click on slide
-        fn.onClickOnSlide();
-
-        // Disable event swipe on Body & Pagination
-        fn.offBody();
-        fn.offPag();
-      }
-      else fn[status]();
-    },
-
-
-
-
-
-    /**
-     * SETUP EVENT & PROPERTI FOR $SWIPE : '$VIEWPORT', $PAGINATION
-     */
-    EventStart : function($swipe, $swipeCanvas, evName) {
-      VariableModule(this);
-      var that = this, ns = va.ns;
-
-
-      /**
-       * ADD CLASS 'SWIPE-ON'
-       *  + Recognize object have swipe gestures
-       *  + Fixed swipe in IE mobile
-       */
-      $swipe.addClass(ns + 'swipe-on').removeClass(ns + 'swipe-off');
-
-
-      /**
-       * REMOVE ACTION 'DRAG' ITEM IN RUBY
-       */
-      $swipe
-        .off(va.ev.drag)
-        .on(va.ev.drag, function(e) { return false });
-
-
-
-
-      /**
-       * EVENT START 'SWIPE' - 'DRAG'
-       *  + 'swipeType': support swipe gestures in same time, 'swipe' & 'mouse'
-       *  + Touchmouse distinguish 'swipe' of Ruby or 'scroll' page
-       */
-      $swipe.on(evName.start, { 'swipeType': evName.type }, function(e) {
-        VariableModule(that);
-
-        /**
-         * INITIAL SETUP
-         */
-        // Direction & type of Swipe gesture
-        va.swipeDirs = null;
-        var evSwipeType = e.data.swipeType;
-        if( va.swipeTypeCur === null ) va.swipeTypeCur = evSwipeType;
-
-
-
-        /**
-         * CHECK $TARGET WHEN SWIPE 'START' ALLOW BEGIN
-         */
-        var tagSpecial  = ['input', 'textarea', 'label', 'a'],
-          eTarget     = e.target,
-          targetTag   = eTarget.tagName.toLowerCase(),
-          isTargetAllow = $.inArray(targetTag, tagSpecial) === -1;
-
-        // Remove swipe 'start' when $target is swipe-prevent
-        if( isTargetAllow ) {
-
-          // Class prevent: 'swipe-prevent', 'nav-prev', 'nav-next'
-          var classPrevent =  '.' + ns + 'swipe-prevent' +
-                    ', .' + ns + o.namePrev +
-                    ', .' + ns + o.nameNext,
-
-            $swipePrevent = $(eTarget).closest(classPrevent);
-
-          if( $swipePrevent.length ) {
-            isTargetAllow = false;
-
-            // Toggle event 'drag' on $swipe to select text
-            that.EventDragToggle($swipe, va.ev[evSwipeType]);
-          }
-        }
-
-        // Remove event swipe 'start' when $target contain <a> node && nested
-        if( isTargetAllow ) {
-          var $target   = $(eTarget),
-            $linkParent = $target.closest('a');
-
-          // If parent exist is '<a>' tag -> check place inside $viewport
-          if( $linkParent.length ) {
-            var $viewportCheck = $linkParent.closest('.'+ ns + o.nameViewport);
-            if( $viewportCheck.length && $viewportCheck.is(va.$viewport) ) {
-              isTargetAllow = false;
+        },
+        PFloat: function(e) {
+            if (/^\-?\d*\.?\d+/g.test(e)) {
+                var t = parseFloat(e);
+                if (t < 9007199254740992) return t;
+            } else {
+                if (/^(true|on)$/g.test(e)) return !0;
+                if (/^(false|off)$/g.test(e)) return !1;
             }
-          }
-
-          // Check 'target' is object of Nested Ruby
-          if( isTargetAllow ) {
-            var $ruby    = $target.closest('.'+ rt01VA.namespace),
-              $rubyParent  = $ruby.parent().closest('.'+ rt01VA.namespace);
-
-            if( cs.$ruby.is($rubyParent) ) isTargetAllow = false;
-          }
+            return 0;
+        },
+        PInt: function(e) {
+            return /^\-?\d+/g.test(e) ? parseInt(e, 10) : 0;
+        },
+        SizeNoTransform: function(e, t, a) {
+            if (!e || !e[0]) return 0;
+            var i = this, n = e[0], r = document.defaultView ? getComputedStyle(n) : n.currentStyle, s = /Width/i.test(t), o = n[s ? "offsetWidth" : "offsetHeight"], l = s ? i.PFloat(r.paddingLeft) + i.PFloat(r.paddingRight) : i.PFloat(r.paddingTop) + i.PFloat(r.paddingBottom), u = s ? i.PFloat(r.borderLeftWidth) + i.PFloat(r.borderRightWidth) : i.PFloat(r.borderTopWidth) + i.PFloat(r.borderBottomWidth), d = s ? i.PFloat(r.marginLeft) + i.PFloat(r.marginRight) : i.PFloat(r.marginTop) + i.PFloat(r.marginBottom);
+            return /^Outer\w+/.test(t) ? a && (o += d) : /^Inner\w+/.test(t) ? o -= u : /^(Width|Height)$/.test(t) && (o -= u + l), 
+            o;
+        },
+        Width: function(e) {
+            return this.SizeNoTransform(e, "Width");
+        },
+        Height: function(e) {
+            return this.SizeNoTransform(e, "Height");
+        },
+        InnerWidth: function(e) {
+            return this.SizeNoTransform(e, "InnerWidth");
+        },
+        InnerHeight: function(e) {
+            return this.SizeNoTransform(e, "InnerHeight");
+        },
+        OuterWidth: function(e, t) {
+            return this.SizeNoTransform(e, "OuterWidth", t);
+        },
+        OuterHeight: function(e, t) {
+            return this.SizeNoTransform(e, "OuterHeight", t);
         }
-
-
-
-
-
-
-
-
-
-
-
-        /**
-         * CONDITION CONTINUE EVENT
-         *
-         */
-        if( !(isTargetAllow && !is.lockSwipe && va.swipeTypeCur == evSwipeType && cs.num > 0) ) return;
-
-
-        /**
-         * REGISTER SWIPE EVENT ON DOCUMENT WHEN START SWIPE
-         */
-        that.EventMove(va.ev[evSwipeType]);
-
-
-        /**
-         * SWIPE END
-         *  + Remove 'mouseLeave' -> unnecessary & make ruby simplifies
-         */
-        va.$doc.one(evName.end, { 'swipeType': evName.type }, function(e) {
-
-          // Add timer to fixed iOS touchEnd slow
-          if( that.is.iOS ) {
-            setTimeout(function() {
-              that.LastSetup(e, e.data.swipeType, false);
-            }, 0);
-          }
-
-          // Setup normal on other device
-          else {
-            that.LastSetup(e, e.data.swipeType, false);
-          }
-        });
-
-
-
-
-
-
-
-
-
-
-
-        /**
-         * SETUP VARIABLE AT FIRST
-         *  + Get time at start 'drag'
-         */
-        var isCanvas = $swipeCanvas.is(va.$canvas);
-        va.tDrag0 = va.tDrag1 = +new Date();
-
-        // Store property of object swiping -> only allow 1 object active
-        va.$swipeCur = $swipeCanvas;
-
-        // Remove animate, go to position-end Transform
-        M.GetTween(va.$swipeCur).go(100);
-
-        // Get value of variable 'va.can' || 'va.pag'
-        var p = M.SwapVaOnSwipe();
-
-        // Remove Tween of slide, go to position-end Transform
-        (va.fxType == '3d') && va.tweenSlide.go(100);
-
-
-
-        /**
-         * SETUP POSITION SWIPE 'START'
-         *  + x0: original position -> swipe position = current-position - original position
-         *  + x0Fix: original position, not change when toggle slide
-         *  + pageX1: support for 'tap' swipe start
-         */
-        var i = that.EVENTS.GetEventRight(e);
-        va.x0 = va.x0Fix = va.pageX1 = M.R( i[p.pageXY] );
-
-        // Y0 value: recognize swipe ruby or swipe page
-        va.y0 = va.pageY1 = i.pageY;
-
-        // xOffset, xBuffer : reset value
-        va.xOffset = va.xBuffer = 0;
-
-        // 'xBuffet' start by 'xCanvas' : when move only +/- current value
-        va.xBuffer = p.xCanvas;
-
-        // Bien reset lai dragBegin --> bien voi muc dich thuc hien 1 lan ban dau trong luc 'mouseMove'
-        is.swipeBegin = true;
-
-        // Reset value number of event swipe has executed -> support for trigger event 'swipeBegin'
-        va.nMoveEvent = 0;
-
-        // Insert 'mask' class to fixed scroll-x bar appear in FxCSS
-        o.isBodyMaskInFxCSS && (va.fxView === 'css') && va.$body.addClass(va.ns + 'mask-x');
-
-        // Enable click on slide
-        is.clickOnSlide = true;
-
-        // Canvas grabbing cursor
-        isCanvas && M.ToggleClass('grab', 1);
-
-        // Update value of other view when start swipe
-        var fnName = 'SwipeBegin'+ va.View;
-        isCanvas && !!VIEW[fnName] && VIEW[fnName]();
-
-
-
-        // + Fixed current cursor is 'default' after 'click'
-        // + Not work in mobile -> not 'scroll' page
-        evSwipeType == 'mouse' && e.preventDefault();
-      });
-    },
-
-    EventMove : function(evName) {
-      var that = this;
-
-      /**
-       * EVENT SWIPE MOVE
-       */
-      $(document).on(evName.move, { 'swipeType': evName.type }, function(e) {
-        VariableModule(that);
-        var evSwipeType = e.data.swipeType,
-          isCanvas  = va.$swipeCur.is(va.$canvas);
-
-
-        /**
-         * CONDITION CONTINUE EVENT - MOVED TEMPORARILY
-         */
-        if( !(!is.lockSwipe && va.swipeTypeCur == evSwipeType) ) return;
-
-
-
-
-        /**
-         * SETUP START SWIPE 'BEGIN'
-         */
-        if( !va.nMoveEvent ) {
-
-          // Recognize $canvas is swiping
-          if( isCanvas ) is.swiping = true;
-
-          // Trigger event 'swipeBegin'
-          M.RunEvent('swipeBegin');
-        }
-
-        // Variable to recognize initial swipe
-        va.nMoveEvent++;
-
-
-
-
-        /**
-         * GET VALUE WHEN SWIPING
-         */
-        // Get correct $event
-        var i = that.EVENTS.GetEventRight(e);
-
-        // Store old pageX & get new pageX -> recognize swipe 'left' or 'right'
-        var p = M.SwapVaOnSwipe();
-        va.pageX0 = va.pageX1;
-        va.pageX1 = M.R( i[p.pageXY] );
-
-
-
-
-        /**
-         * SETUP CONTINUE WHEN 'PAGEX0' !== 'PAGEX1' -> SAVING CPU
-         */
-        if( va.pageX0 != va.pageX1 ) {
-
-           // Value 'offset' of moved temporarily
-          va.xOffset = va.pageX1 - va.x0;
-
-          // Recognize swipe 'left' or 'right' -> use for swipe limit
-          is.swipeNav = (va.pageX1 > va.pageX0) ? 'right' : 'left';
-
-
-          /**
-           * MOVED TEMPORARILY ON MOBILE DEVICE
-           *  + Recognize scroll page or swipe ruby
-           *  + Sroll page: not have 'e.preventDefault()' in 'touchstart' & 'touchmove'
-           *  + Only execute 'touchmove' once & not 'touchend'
-           */
-          if( evSwipeType == 'swipe' ) {
-
-            va.y = M.A(va.y0 - i.pageY);
-            if( va.swipeDirs === null && M.A(va.xOffset) >= va.y ) va.swipeDirs = 'chieuX';
-            if( va.swipeDirs === null && va.y > 5 )        va.swipeDirs = 'chieuY';
-
-
-            // Case: swipe follow horizontal direction X
-            if( va.swipeDirs === null || va.swipeDirs == 'chieuX' ) {
-
-              // Prevent move 'scroll' page follow direction Y for Android
-              // Test on Chrome mobile simulate lagging (sometimes successfull, sometimes unsuccessfull)
-              e.preventDefault();
-
-              // Moved temporarily
-              that.XBuffer(va.pageX1);
+    }), e[rt01VA.rubyName] = function(t, a) {
+        var i, n, r, s, o, l, u, d, p, c, f, v, g, h, m, y, w, C, A, x, I, E, S, b, D, T, M, R, L, P, $ = {
+            $ruby: t
+        }, O = {
+            $w: e(window),
+            $doc: e(document),
+            $body: e("body"),
+            rubykey: Math.ceil(1e9 * Math.random()),
+            ns: rt01VA.namespace,
+            data: {},
+            numNSID: 0
+        }, k = {}, N = {}, V = {}, F = {}, B = {}, U = {}, z = {
+            cs: $,
+            o: V,
+            oo: F,
+            va: O,
+            is: k,
+            ti: N
+        }, G = e(window), H = e(document), W = {
+            Check: function() {
+                X.Browser(), X.CssName(), X.FirstSetup(), X.RunEvent("init"), j.Check() ? k.DISPLAY ? S.SetupInit() : (k.showInRange = k.wake = !0, 
+                W.Ready()) : t.remove();
+            },
+            Ready: function() {
+                X.RunEvent("ready"), t.removeClass(O.ns + "none"), k.RUBYANIMATE && A.UpdateAllKeyframes(), 
+                K.Structure(), _.Ruby(), k.SLIDESHOW && x.RenderControl(), k.TIMER && I.Render(), 
+                k.FULLSCREEN && T.Render(), k.NAV && d.Render(), k.PAG && p.RenderSelf(), k.CAP && c.Render(), 
+                "all" === V.lazyType && K.LoaderAdd(t, t, "$rubyLoader"), _.Slides(), K.Other(), 
+                k.APIREMOTE && P.Init(), _.DeepLinkCookie(), k.FLICKR && E.Init(), q.Way(), k.pag && !k.pagList && p.TypeSizeItem(), 
+                t.addClass(X.NS("{ns}init {ns}no-loaded")), Z.WidthForRuby(), k.res && u.UpdateVars(), 
+                O.rateInit = O.rate, k.pag && p.VerToHor(), J.CombineAtFirst(), k.LAYER ? y.LoadHomeBegin() : q.Next();
+            },
+            Load: function() {
+                k.initLoaded = !0, X.RunEvent("loaded"), k.pag && !k.pagList && p.TypeSizeItem(), 
+                k.res && k.fullscreen && T.Variable(), J.CombineAtFirst(), ie.Setup(), ie.LoadAll(), 
+                X.LastSetup(), k.initEnd = !0, k.LAYER && (y.Init(n), y.Play("home")), setTimeout(function() {
+                    k.slideshow && x.Init();
+                }, 400);
             }
-
-            // Case: swipe direction Y
-            // Remove event swipe 'Move' - 'End' of Document
-            else {
-              that.Events('offMoveEnd');
+        }, X = e.extend(!0, {}, rt01VA.M, {
+            FirstSetup: function() {
+                _.MergeAllModules(), _.MergeAllOpts(), $.one = z, $ = e.extend(!0, $, re), e.data(t[0], rt01VA.rubyName, $), 
+                rt01VA.$ruby = rt01VA.$ruby.add(t), rt01VA.numID++, O.rubyID = rt01VA.numID, O.ns = rt01VA.namespace, 
+                O.name = V.name || t.attr("id") || null, O.nVideoOpen = 0, k.tapEnable = !0, O.fxLast = O.fxCur = "none", 
+                O.classAdd = [], O.actived = O.ns + V.actived, O.deactived = O.ns + V.deactived, 
+                O.addInfo = null, "fullwidth" === V.layout && (k.fullwidth = !0), "fullscreen" === V.layout && rt01MODULE.FULLSCREEN && (k.fullscreen = !0);
+            },
+            LastSetup: function() {
+                !k.tf && setTimeout(Y.Resize, 50);
+            },
+            Browser: function() {
+                var e = navigator.userAgent;
+                a = e || navigator.vender || window, k.ie = document.documentMode, k.edge = !k.ie && !!window.StyleMedia, 
+                k.safari = /Constructor/i.test(Object.prototype.toString.call(window.HTMLElement)), 
+                k.opera = !!window.opera || /\sOPR\//i.test(e), k.chrome = !!window.chrome && !!window.chrome.webstore, 
+                k.firefox = void 0 !== window.InstallTrigger, k.ie11 = !(!k.ie || new Function("/*@cc_on return @_jscript_version; @*/")()), 
+                k.ie7 = !(!k.ie || !/MSIE\s7\./i.test(e));
+                var t = [ "ie", "edge", "safari", "opera", "chrome", "firefox" ];
+                for (o = t.length; o >= 0; o--) if (k[t[o]]) {
+                    O.browser = t[o];
+                    break;
+                }
+                k.evPointer = !!window.PointerEvent, k.evMSPointer = !!window.MSPointerEvent, k.evPointerAll = k.evPointer || k.evMSPointer, 
+                k.evSwipe = !!("ontouchstart" in window || window.DocumentTouch && document instanceof DocumentTouch), 
+                k.swipeSupport = k.evSwipe || k.evPointer || k.evMSPointer;
+                var a = e || navigator.vender || window.opera;
+                k.mobile = k.swipeSupport && (/(android|bb\d+|meego).+mobile|avantgo|bada\/|blackberry|blazer|compal|elaine|fennec|hiptop|iemobile|ip(hone|od)|iris|kindle|lge |maemo|midp|mmp|mobile.+firefox|netfront|opera m(ob|in)i|palm( os)?|phone|p(ixi|re)\/|plucker|pocket|psp|series(4|6)0|symbian|treo|up\.(browser|link)|vodafone|wap|windows ce|xda|xiino/i.test(a) || /1207|6310|6590|3gso|4thp|50[1-6]i|770s|802s|a wa|abac|ac(er|oo|s\-)|ai(ko|rn)|al(av|ca|co)|amoi|an(ex|ny|yw)|aptu|ar(ch|go)|as(te|us)|attw|au(di|\-m|r |s )|avan|be(ck|ll|nq)|bi(lb|rd)|bl(ac|az)|br(e|v)w|bumb|bw\-(n|u)|c55\/|capi|ccwa|cdm\-|cell|chtm|cldc|cmd\-|co(mp|nd)|craw|da(it|ll|ng)|dbte|dc\-s|devi|dica|dmob|do(c|p)o|ds(12|\-d)|el(49|ai)|em(l2|ul)|er(ic|k0)|esl8|ez([4-7]0|os|wa|ze)|fetc|fly(\-|_)|g1 u|g560|gene|gf\-5|g\-mo|go(\.w|od)|gr(ad|un)|haie|hcit|hd\-(m|p|t)|hei\-|hi(pt|ta)|hp( i|ip)|hs\-c|ht(c(\-| |_|a|g|p|s|t)|tp)|hu(aw|tc)|i\-(20|go|ma)|i230|iac( |\-|\/)|ibro|idea|ig01|ikom|im1k|inno|ipaq|iris|ja(t|v)a|jbro|jemu|jigs|kddi|keji|kgt( |\/)|klon|kpt |kwc\-|kyo(c|k)|le(no|xi)|lg( g|\/(k|l|u)|50|54|\-[a-w])|libw|lynx|m1\-w|m3ga|m50\/|ma(te|ui|xo)|mc(01|21|ca)|m\-cr|me(rc|ri)|mi(o8|oa|ts)|mmef|mo(01|02|bi|de|do|t(\-| |o|v)|zz)|mt(50|p1|v )|mwbp|mywa|n10[0-2]|n20[2-3]|n30(0|2)|n50(0|2|5)|n7(0(0|1)|10)|ne((c|m)\-|on|tf|wf|wg|wt)|nok(6|i)|nzph|o2im|op(ti|wv)|oran|owg1|p800|pan(a|d|t)|pdxg|pg(13|\-([1-8]|c))|phil|pire|pl(ay|uc)|pn\-2|po(ck|rt|se)|prox|psio|pt\-g|qa\-a|qc(07|12|21|32|60|\-[2-7]|i\-)|qtek|r380|r600|raks|rim9|ro(ve|zo)|s55\/|sa(ge|ma|mm|ms|ny|va)|sc(01|h\-|oo|p\-)|sdk\/|se(c(\-|0|1)|47|mc|nd|ri)|sgh\-|shar|sie(\-|m)|sk\-0|sl(45|id)|sm(al|ar|b3|it|t5)|so(ft|ny)|sp(01|h\-|v\-|v )|sy(01|mb)|t2(18|50)|t6(00|10|18)|ta(gt|lk)|tcl\-|tdg\-|tel(i|m)|tim\-|t\-mo|to(pl|sh)|ts(70|m\-|m3|m5)|tx\-9|up(\.b|g1|si)|utst|v400|v750|veri|vi(rg|te)|vk(40|5[0-3]|\-v)|vm40|voda|vulc|vx(52|53|60|61|70|80|81|83|85|98)|w3c(\-| )|webc|whit|wi(g |nc|nw)|wmlb|wonu|x700|yas\-|your|zeto|zte\-/i.test(a.substr(0, 4))), 
+                k.androidNative = k.mobile && /Mozilla\/5\.0/i.test(e) && /Android/i.test(e) && /AppleWebKit/i.test(e) && !/Chrome/i.test(e) && !/Android\s+4\.4/i.test(e), 
+                k.iOS = /iPad|iPhone|iPod/.test(navigator.userAgent) && !window.MSStream;
+                var i = "." + O.ns + O.rubykey, n = [ "", "", "" ];
+                k.evSwipe ? n = [ "touchstart", "touchmove", "touchend" ] : k.evPointer ? n = [ "pointerdown", "pointermove", "pointerup" ] : k.evMSPointer && (n = [ "MSPointerDown", "MSPointerMove", "MSPointerUp" ]), 
+                O.ev = {
+                    click: "click" + i,
+                    drag: "dragstart" + i + " selectstart" + i,
+                    resize: "resize" + i,
+                    scroll: "scroll" + i,
+                    key: "keyup" + i,
+                    hash: "hashchange" + i,
+                    swipe: {
+                        start: n[0] + i,
+                        move: n[1] + i,
+                        end: n[2] + i,
+                        type: "swipe"
+                    },
+                    mouse: {
+                        start: "mousedown" + i,
+                        move: "mousemove" + i,
+                        end: "mouseup" + i,
+                        type: "mouse"
+                    },
+                    mouseenter: "mouseenter" + i,
+                    mouseleave: "mouseleave" + i
+                }, "" == n[0] && (O.ev.swipe = {
+                    start: "",
+                    move: "",
+                    end: "",
+                    type: "swipe"
+                }), k.wheelNative = !!("onwheel" in document.createElement("div")), k.console = "object" == typeof console, 
+                k.canvas2d = function() {
+                    var e = document.createElement("canvas");
+                    return !(!e.getContext || !e.getContext("2d"));
+                }(), k.online = /https?/g.test(window.location.protocol);
+            },
+            CssName: function() {
+                var e = {
+                    CamelCase: function(e) {
+                        return e.replace(/-([a-z])/gi, function(e, t) {
+                            return t.toUpperCase();
+                        });
+                    },
+                    CSS: function(e, t) {
+                        var a = document.createElement("p").style, i = "Webkit Moz ms O".split(" "), n = "-webkit- -moz- -ms- -o-".split(" "), r = this.CamelCase(e);
+                        if (void 0 !== a[r]) return !t || "";
+                        for (var s = X.ProperCase(r), o = 0, l = i.length; o < l; o++) if (void 0 !== a[i[o] + s]) return !t || n[o];
+                        return !1;
+                    },
+                    Prefix: function(e) {
+                        return this.CSS(e, !0);
+                    }
+                }, t = "transform";
+                k.tf = e.CSS(t), k.tf3D = e.CSS("perspective"), k.ts = e.CSS("transition"), k.opacity = e.CSS("opacity");
+                var a = O.prefix = e.Prefix(t);
+                O.cssTf = s = a + t;
+                var i = "translate3d(", n = k.tf3D;
+                O.tl0 = n ? i : "translate(", O.tl1 = n ? ",0)" : ")", O.tlx0 = n ? i : "translateX(", 
+                O.tlx1 = n ? ",0,0)" : ")", O.tly0 = n ? i + "0," : "translateY(", O.tly1 = n ? ",0)" : ")";
+            },
+            ToggleSlide: function() {
+                if ($.num >= 1) {
+                    var e = $.idCur, t = $.idLast, a = O.$s.eq(e), i = O.$s.eq(t), n = O.ns + V.current, r = O.deactived;
+                    if (O.$s.not(a).removeClass(n).addClass(r), a.addClass(n).removeClass(r), void 0 !== t && X.RunEvent("deselectID", t), 
+                    X.RunEvent("selectID", e), !k.centerLoop && _.CenterNoLoop(), k.pag) {
+                        var s = O.$pagItem.eq(e);
+                        O.$pagItem.not(s).removeClass(n), s.addClass(n), V.pag.isMark && p.SizePosOfMark();
+                    }
+                    k.nav && d.Toggle(), k.cap && c.Toggle(a, i), q.Add(a), k.CLASSADD && R.Toggle(), 
+                    Y.CanvasMask(), void 0 !== t && (V.isDeeplinking && k.DEEPLINKING && b.Write(), 
+                    V.isCookie && k.COOKIE && D.Write()), k.IFRAME && h.ToggleSource(a), k.NESTED && M.RefreshInSlide(a), 
+                    k.SWIPE && l.ToggleEvent();
+                }
+            },
+            ToggleClass: function(e, t, a) {
+                var i = V.className[e], r = O.ns + i[0], s = O.ns + i[1], o = t ? s : r, l = t ? r : s;
+                void 0 === a && (a = n), -1 == t ? a.removeClass(r + " " + s) : a.addClass(o).removeClass(l);
+            },
+            ValueX: function(e) {
+                var t = e.substr(7, e.length - 8).split(", ");
+                return X.PInt(t[4]);
+            },
+            Scroll: {
+                Setup: function() {
+                    if (k.ssRunInto) {
+                        k.into = !1, X.Scroll.Check();
+                        G.off(O.ev.scroll), G.on(O.ev.scroll, function() {
+                            clearTimeout(N.scroll), N.scroll = setTimeout(function() {
+                                !k.ssPauseAbsolute && X.Scroll.Check();
+                            }, 200);
+                        });
+                    } else k.into = !0;
+                },
+                Check: function(e) {
+                    X.Scroll.Position();
+                    var t = !(O.topW > O.botRuby || O.botW < O.topRuby), a = !e && k.slideshow && k.ssRunInto;
+                    t ? k.into || (k.into = !0, a && x.Go("scrollInto")) : k.into && (k.into = !1, a && x.Go("scrollOut"));
+                },
+                Position: function() {
+                    O.hWin = G.height(), O.topW = G.scrollTop(), O.botW = O.hWin + O.topW, O.topRuby = t.offset().top, 
+                    O.botRuby = O.topRuby + X.OuterHeight(t);
+                }
+            },
+            A: function(e) {
+                return Math.abs(e);
+            },
+            R: function(e) {
+                return Math.round(e);
+            },
+            C: function(e) {
+                return Math.ceil(e);
+            },
+            Ra: function() {
+                return Math.random();
+            },
+            Rm: function(e, t) {
+                return X.Ra() * (t - e) + e;
+            },
+            Sum: function(e, t) {
+                var a = 0;
+                if (t < 0) return a;
+                void 0 === t && (t = e.length);
+                for (var i = 0; i < t; i++) a += e[i];
+                return a;
+            },
+            PPercent: function(e, t) {
+                return e > 0 && e < 1 && (e *= t), X.R(e);
+            },
+            PercentToPixel: function(t, a) {
+                var i = null;
+                return /^\-?\d*\.?\d+\%$/.test(t) ? i = X.R(X.PFloat(t) * a / 100) : e.isNumeric(t) && (i = t), 
+                i;
+            },
+            PStyleToJson: function(e) {
+                var t, a = e.attr("style"), i = /\s*([\w-]+)\s*:\s*([^;]*)/g, n = {};
+                for (void 0 !== e.attr("width") && (n.width = e.attr("width")), void 0 !== e.attr("height") && (n.height = e.attr("height")); t = i.exec(a); ) n[t[1]] = t[2];
+                var r = /^-?\d*.?\d+px$/;
+                return r.test(n.width) && (n.width = parseFloat(n.width)), r.test(n.height) && (n.height = parseFloat(n.height)), 
+                n;
+            },
+            ElesIsNumber: function(t, a) {
+                var i = t.length, n = e.isArray(t) && i === a;
+                if (n) for (var r = 0; r < i; r++) n = n && e.isNumeric(t[r]);
+                return n;
+            },
+            Tl: function(e, t, a) {
+                var a = a || "px";
+                return O.tl0 + e + a + ", " + t + a + O.tl1;
+            },
+            Tlx: function(e, t) {
+                var t = t || "px";
+                return k.tf ? O.tlx0 + e + t + O.tlx1 : e + t;
+            },
+            Tly: function(e, t) {
+                var t = t || "px";
+                return k.tf ? O.tly0 + e + t + O.tly1 : e + t;
+            },
+            TfRemove: function(e) {
+                var t = {};
+                t[s] = "", e.css(t);
+            },
+            Shift: function(e, t) {
+                return t ? e.shift() : e.pop();
+            },
+            Push: function(e, t, a) {
+                return a ? e.push(t) : e.unshift(t);
+            },
+            RandomInArray: function(t, a) {
+                if (e.isArray(t)) {
+                    if (1 === t.length) return t[0];
+                    var i = e.extend(!0, [], t), n = e.inArray(a, i);
+                    return -1 === n && (n = i.length + 1), i.splice(n, 1), i[X.R(X.Rm(0, i.length - 1))];
+                }
+                return t;
+            },
+            RandomInArray2: function(t, a, i) {
+                if (e.isArray(t)) {
+                    if ((!a.length || 1 == a.length && a[0] == i) && (a = e.extend(!0, a, t)), void 0 !== i) {
+                        var n = e.inArray(i, a);
+                        -1 !== n && a.splice(n, 1);
+                    }
+                    var r = X.R(X.Rm(0, a.length - 1)), s = a[r];
+                    return a.splice(r, 1), s;
+                }
+                return t;
+            },
+            SwapVaOnSwipe: function() {
+                return O.$swipeCur.is(i) ? O.can : O.pag;
+            },
+            XClass: function(e, t, a) {
+                e[(t ? "add" : "remove") + "Class"](a);
+            },
+            ProperCase: function(e) {
+                return e.charAt(0).toUpperCase() + e.slice(1);
+            },
+            NS: function(e) {
+                return "string" == typeof e ? e.replace(/\{ns\}/g, O.ns) : "";
+            },
+            MatchMedia: function(e, a, i) {
+                if (i) {
+                    var n = X.OuterWidth(t);
+                    if (e <= n && n <= a) return !0;
+                } else if (window.matchMedia) {
+                    var r = "(min-width: WMINpx) and (max-width: WMAXpx)".replace("WMIN", e).replace("WMAX", a);
+                    if (window.matchMedia(r).matches) return !0;
+                } else {
+                    var s = G.width();
+                    if (e <= s && s <= a) return !0;
+                }
+                return !1;
+            },
+            GetValueInRange: function(e, t) {
+                var a = t || "value", i = 1e5, n = -1;
+                for (o = e.num - 1; o >= 0; o--) X.MatchMedia(e[o].from, e[o].to) && i >= e[o].to && (i = e[o].to, 
+                n = o);
+                return n > -1 ? e[n][a] : null;
+            },
+            GetIndexInResponsive: function(e) {
+                for (var t = null, a = 0, i = e.length; a < i; a++) {
+                    var n = e[a], r = 0 === a ? 1e4 : e[a - 1];
+                    if (X.MatchMedia(n, r)) {
+                        t = a;
+                        break;
+                    }
+                }
+                return null === t && (t = e.length - 1), t;
+            },
+            ParseGrid: function(t, a) {
+                var i = V.responsiveLevels.length, n = null;
+                if (e.isNumeric(t) || "string" == typeof t) {
+                    n = [];
+                    for (s = 0; s < i; s++) n[s] = a ? t : 0 == s ? t : null;
+                } else if (e.isArray(t)) if (t.length < i) {
+                    var r = t.length;
+                    valueLast = t[r - 1], n = t.slice();
+                    for (var s = r; s < i; s++) n[s] = a ? valueLast : null;
+                } else n = t.slice();
+                return n;
+            },
+            Find: function(e, t) {
+                var a = e.find(t), i = e.find("." + O.ns).find(t);
+                return a = a.not(i);
+            },
+            Data: function(t, a) {
+                var i = O.data;
+                if (e.isNumeric(t) && 0 <= t && t < $.num ? t = O.$s.eq(t) : "home" === t && (t = n), 
+                !(t instanceof jQuery)) return !1;
+                e.isPlainObject(a) ? (delete (a = e.extend(!0, {}, a)).$self, delete a.nsid) : a = {};
+                var r;
+                for (r in i) if (t.is(i[r].$self)) return e.extend(!0, i[r], a);
+                return r = O.numNSID, O.numNSID++, i[r] = {
+                    $self: t,
+                    nsid: r
+                }, e.extend(!0, i[r], a);
+            },
+            GetTween: function(e) {
+                var t = X.Data(e);
+                return t.tweenSelf = t.tweenSelf || new RubyTween(), t.tweenSelf;
+            },
+            Module: function(t) {
+                return e.extend({}, rt01MODULE[t], z);
+            },
+            RunEvent: function(t, a, i) {
+                e.isFunction(V.events[t]) && V.events[t]($), $.ev.trigger(t, [ a, i ]);
             }
-          }
-
-          // Case: default is browser on desktop
-          else that.XBuffer(va.pageX1);
-        }
-
-        // Pagination Grabbing Cursor: toggle class
-        !isCanvas && M.ToggleClass('grab', 1, va.$pag);
-
-        // Lock swipe 'tap', check 'offset' to support 'click' if swipe it
-        if( M.A(va.xOffset) > 10 && is.tapEnable ) is.tapEnable = false;   // Tap event more slowly
-
-        // Disable click on slide if have tap move
-        if( M.A(i.pageX - va.x0) > 10 || M.A(i.pageY - va.y0) > 10 ) {
-          is.clickOnSlide = false;
-        }
-      });
-    },
-
-    /**
-     * SETUP ELEMENTS WHEN COMPLETE SWIPE
-     */
-    LastSetup : function(e, evSwipeType, isScrollPage) {
-      VariableModule(this);
-      var isCanvas = va.$swipeCur.is(va.$canvas);
-
-
-      /**
-       * CONDITIONAL EXECUTE
-       */
-      if( !is.lockSwipe && va.swipeTypeCur == evSwipeType ) {
-
-        // Prevent event 'mouseup' on device support 'touch' event
-        // If is 'scroll' page in AndroidNative not support prevent -> not 'scroll' page
-        if( evSwipeType == 'swipe' && !isScrollPage ) {
-          e.preventDefault();
-        }
-
-
-        // Variable to recognize swipe-end on Cavas
-        if( isCanvas ) is.swiping = false;
-        // Callback event end swipe
-        !is.swipeBegin && M.RunEvent('swipeEnd');
-
-        // Get time at swipe-out : calculate fast or slow
-        va.tDrag1 = +new Date();
-
-        // Calculate position moved after swipe
-        that.XNear();
-
-
-        /**
-         * TOGGLE CLASS CURSOR
-         *  + Canvas: recover cursor-swipe
-         *  + Pagination: remove class cursor
-         */
-        isCanvas
-        ? M.ToggleClass('grab', (is.swipeOnBodyCur) ? 0 : -1)
-        : M.ToggleClass('grab', -1, va.$pag);
-
-        // Remove class 'grab-stop' when leave swipe
-        o.isViewGrabStop && M.ToggleClass('stop', -1);
-
-
-
-        /**
-         * CLICK ON SLIDE ACTIVED
-         */
-        var slData = M.Data(cs.idCur);
-        if( is.clickOnSlide && slData.link ) {
-          window.open(slData.link, slData.linkTarget);
-        }
-      }
-
-
-      /**
-       * OTHER SETUP
-       */
-      // Reset value of 'swipeTypeCur' at end of event
-      // Must compare -> because have 2 event 'mouse' & 'touch' in mobile
-      if( va.swipeTypeCur == evSwipeType ) va.swipeTypeCur = null;
-
-      // Remove 'tap' event in swipe gestures
-      if( is.mobile ) is.tapEnable = true;
-      else      setTimeout(function() { is.tapEnable = true }, 10);
-
-      // Remove event swipe 'Move' - 'End' on Document when complete swipe
-      that.Events('offMoveEnd');
-    },
-
-    /**
-     * SETUP REMOVE EVENT 'DRAG' OF $SWIPE-CURRENT -> SUPPROT SELECT TEXT
-     */
-    EventDragToggle : function($swipe, evName) {
-      var that = this;
-      VariableModule(that);
-
-      // Remove event 'drag' on Swipe
-      $swipe.off(va.ev.drag);
-
-      // Recovery event 'drag' removed when 'tap' complete
-      var evNameEndCur = evName.end +'stopDrag';
-      va.$doc.on(evNameEndCur, function(e) {
-        VariableModule(that);
-
-        $swipe.on(va.ev.drag, function() { return false });
-        va.$doc.off(evNameEndCur);
-      });
-    },
-
-    // Event click on slide
-    EventClickOnSlide : function() {
-      VariableModule(this);
-
-
-    },
-
-
-
-
-    /**
-     * SETUP MOVED TEMPARORYLY WHEN SWIPE CONTINUOUS
-     */
-    XBuffer : function(xCur) {
-      VariableModule(this);
-
-      // Initialize variables
-      var layout   = va.fxLayout,
-        view     = va.fxView,
-        idCur    = cs.idCur,
-        isRight  = is.swipeNav == 'right',
-        isLeft   = is.swipeNav == 'left',
-
-        isCanvas   = va.$swipeCur.is(va.$canvas),
-        p      = isCanvas ? va.can : va.pag,
-        sTranslate = p.sTranslate,
-
-        // Thuoc tinh luu tru su khac nhau khi di chuyen 'next' hay 'prev'
-        // Property store diference when move 'next' or 'prev'
-        sign = va.xOffset < 0 ? 1 : -1,
-
-        // Distance moved when swipe
-        pageX = va.pageX1 - va.pageX0;
-
-
-
-
-      /**
-       * SETUP VARIABLE TO ALLOW MOVED TEMPORARILY DEPENDS ON EFFECT
-       */
-      var isBufferReduce = true,
-        isBufferMove   = true;
-
-      if( isCanvas ) {
-
-        /**
-         * CASE SPECIAL: WHEN SWIPE BUFFER
-         */
-        if( va.fxType == 'math' || va.fxView == 'css' ) isBufferMove = false;
-
-
-
-        /**
-         * SETUP IN OPTION 'SWIPE'
-         */
-        if( !o.swipe.isLiveEffect ) {
-          isBufferReduce = isBufferMove = false;
-        }
-      }
-
-
-
-
-
-
-      /**
-       * REDUCE VALUE OF THE MOVE -> WHEN SWIPE OUT VIEWPORT
-       * CASE FOR LINE LAYOUT:
-       *  + Only applies to Canvas have: isLoop == false & pagination
-       */
-      function TranslateReduce1() {
-
-        /**
-         * CONDITIONAL EXECUTION
-         *  + Swipe limit only applies when swipe 'left' & 'right' out Viewport
-         */
-        if( (isRight && va.xBuffer > p.xMin)
-        ||  (isLeft  && va.xBuffer < p.xMax) ) {
-
-          // Reduce to 8 times for desktop, on mobile is smaller
-          var nRate1 = is.mobile ? 4 : 8;
-          pageX /= nRate1;
-        }
-      }
-
-      function TranslateReduce2() {
-
-        // Reduce for default move on 'dot' layout
-        var nRate2 = is.mobile ? 3 : 6;
-        pageX /= nRate2;
-
-        // Continue reduce if 'isLoop' false
-        if( !is.loop
-        &&  (  (idCur <= 0 && isRight)
-          || (idCur >= cs.num - 1 && isLeft) ) ) {
-
-          pageX /= 4;
-        }
-      }
-
-
-      // Not work for 'buffer' on Canvas have 'bufferReduce' false
-      if( isBufferMove && isBufferReduce ) {
-
-        // Case: 'swipeCur' is body Canvas
-        if( isCanvas ) {
-          if( layout == 'line' && !is.loop ) TranslateReduce1();
-          if( layout == 'dot' )        TranslateReduce2();
-
-          /**
-           * GRAB STOP VIEW
-           */
-          if( !is.loop && o.isViewGrabStop ) {
-
-            if   ( isRight && va.xBuffer > 0 )    M.ToggleClass('stop', 0);
-            else if( isLeft  && va.xBuffer < p.xMax ) M.ToggleClass('stop', 1);
-          }
-        }
-
-        // Case: 'swipeCur' is PagInner
-        else {
-          if( is.pag ) {
-            TranslateReduce1();
-
-            /**
-             * SETUP OTHER
-             */
-            // Pag Arrow: check toggle actived
-            // Moved temporarily for Pag Mark
-            o.pag.isArrow && PAG.ArrowActived(va.xBuffer);
-            o.pag.isMark  && PAG.XBufferOnMark(pageX);
-          }
-        }
-      }
-
-
-
-      /**
-       * MOVE BUFFER FOR CANVAS
-       */
-      va.xBuffer += pageX;
-
-      // Move $swipe temprorary
-      // Move x/y depend on swipe directdion
-      if( isBufferMove ) {
-
-        // Setup transform for current $swipe
-        var tf = (p.dirs === 'hor') ? { 'x': M.R(va.xBuffer) }
-                      : { 'y': M.R(va.xBuffer) };
-
-        M.GetTween(va.$swipeCur).css(va.$swipeCur, tf);
-      }
-
-      // Update transform for center layout & CSS effect
-      // Parameter a: recognize swipe 'next' or 'prev'
-      if( o.swipe.isLiveEffect ) {
-        var fnName = 'Buffer'+ va.View;
-        isCanvas && !!VIEW[fnName] && VIEW[fnName](sign);
-      }
-
-
-
-
-      /**
-       * SETUP SWAP SLIDE WHEN SWIPE CONTINUOUS IN 'LINE' LAYOUT
-       *  + Next/prev same function but differ in varaible 'a.s'
-       *  + 'next' use '>', 'prev' use '<' : so '* -1' for 2 case to recognize '>' or '<'
-       * @param int p.xCanvas
-       */
-      if( isCanvas && layout == 'line' ) {
-        var posNext = p.xCanvas - (sTranslate * sign);
-
-        // Swipe next slide (negative) -> swipe 'prev' is similar to 'next'
-        if( va.xBuffer * sign < posNext * sign ) {
-
-          // Reset action only execute once in 'drag' continuous
-          is.swipeBegin = true;
-
-          // Update va.x0 -> use for event 'dragmove' -> when 'dragout', Canvas only move maximum a little distance
-          va.x0 = va.pageX1;
-
-          // Update xCanvas
-          p.xCanvas -= sTranslate * sign;
-
-          /**
-           * UPDATE OTHER ELEMENTS WHEN TOGGLE NEXT 1 SLIDE
-           *  + Add option 'isContinuity' -> prevent setup some options, including 'POSITION.AnimateX()'
-           *  + Because 'xCanvas' updated above
-           */
-          that.TOSLIDE.Run(sign, false, true);
-        }
-      }
-
-
-
-
-
-      /**
-       * OTHER SETUP
-       *  + 'is.swipeBegin' : allow function execute once when drag 'move'
-       */
-      if( is.swipeBegin ) {
-        is.swipeBegin = false;
-
-        (view == 'mask') && VIEW.CloneImgbackInMask();
-      }
-    },
-
-    /**
-     * SETUP MOVE TO NEAR SLIDE WHEN COMPLETE SWIPE
-     */
-    XNear : function() {
-      VariableModule(this);
-
-      // Position & size of $swiping
-      var isCanvas = va.$swipeCur.is(va.$canvas),
-        layout   = va.fxLayout,
-        num    = cs.num,
-        p    = isCanvas ? va.can : va.pag,
-        xOffset  = va.xOffset;  // How many moved 'px'
-
-      // Setup Easing when swipe complete
-      va.moveBy = 'swipe';
-
-
-
-
-      /**
-       * SETUP ON BODY CANVAS
-       */
-      if( isCanvas ) {
-        var wSlide = !!va.pa.left ? va.wSlideFull - (va.pa.left * 2) : va.wSlideFull,
-          tFast  = is.mobile ? 600 : 400,
-          isFast = va.tDrag1 - va.tDrag0 < tFast;
-
-
-        // Width drag: select
-        // Identify move fast or slow of slide
-        var w3  = M.R(wSlide / 3),
-          w20 = M.R(wSlide / 20),
-          wLimit = isFast ? w20 : w3,
-
-          // Time to 'dot' layout recovery old position when move to new slide
-          tGo = 100,
-          // Time to slide recovery old position
-          tRestore = 400;
-
-
-
-        /**
-         * SETUP MOVE TO NEXT / PREV / RESET
-         */
-        // Move to next slide
-        if( xOffset < -wLimit && (is.loop || (!is.loop && cs.idCur < num - 1)) && !!(num - 1) ) {
-
-          (layout == 'dot') && POSITION.AnimateX(null, 0, false, false, tGo);
-          that.TOSLIDE.Run(1);
-        }
-
-        // Move to prev slide
-        else if( xOffset > wLimit && (is.loop || (!is.loop && cs.idCur > 0)) && !!(num - 1) ) {
-
-          (layout == 'dot') && POSITION.AnimateX(null, 0, false, false, tGo);
-          that.TOSLIDE.Run(-1);
-        }
-
-        // Recovery position
-        else if( !!xOffset ) {
-
-          // Ver 1.5 - 24/09/2016 : remove variable 'is.swipeOnSlideCur'
-          POSITION.AnimateX(null, 0, false, false, tRestore);
-
-          // Recovery position & transform after moved temporarily
-          var fnName = 'Restore' + va.View;
-          !!VIEW[fnName] && VIEW[fnName]();
-        }
-
-
-        // Slideshow: setup variable -> reset timer when move next/prev to other slide
-        if( (xOffset < -wLimit || xOffset > wLimit) && o.isSlideshow ) is.hoverAction = true;
-      }
-
-
-
-      /**
-       * SETUP ON PAGINATION INNER
-       */
-      else {
-        if( is.pag && xOffset != 0 ) {
-
-          // Update value 'xCanvas'
-          p.xCanvas = va.xBuffer;
-
-          // Recovery position center for PagInner
-          var sp = o.pag.speed;
-          if( p.align == 'center' || p.align == 'end' ) {
-            p.xCanvas != p.xMin && POSITION.AnimateX(null, p.xMin, false, true, sp);
-          }
-
-          // Recovery position begin/end if $canvas outside Viewport
-          else {
-            if( p.xCanvas > 0 )       { POSITION.AnimateX(null, 0, false, true, sp) }
-            else if( p.xCanvas < p.xMax ) { POSITION.AnimateX(null, p.xMax, false, true, sp) }
-          }
-
-
-          // Check actived on Pag Arrow
-          o.pag.isArrow && PAG.ArrowActived(p.xCanvas);
-
-          // Remove transition-duration on Pag Mark
-          // Update position of Pag Mark
-          if( o.pag.isMark ) {
-            PAG.SizePosOfMark();
-          }
-        }
-      }
-
-
-
-      /**
-       * OHTER SETUP
-       *  + Flywheel: move continue
-       */
-      POSITION.Flywheel();
-    }
-  };
-})(jQuery);
-
-
-
-
-
-
-
-
-
-
-/**
- * MODULE RESPONSIVE
- */
-(function($) {
-
-  // Check variable module
-  window.rt01MODULE = window.rt01MODULE || {};
-
-  /**
-   * MODULE RESPONSIVE
-   */
-  rt01MODULE.RESPONSIVE = {
-
-    /**
-     * UPDATE CAC GIA TRI CUA RESPONSIVE
-     * @param object va.pa
-     * @param int va.rate
-     */
-    UpdateVars : function() {
-      var that = this,
-        o  = that.o,
-        va   = that.va,
-        M  = that.M;
-
-
-      /**
-       * GET PADDING IN THE CASES
-       */
-      // Case: Padding-grid available
-      if( va.paGridCur !== null ) {
-        va.pa.left = va.paGridCur;
-      }
-      // Case: Padding value depend on Width-grid
-      else {
-
-        // CaLculate the padding-left from width-grid
-        if( va.wSlide > va.wGridCur ) {
-          va.pa.left = (va.wSlide - va.wGridCur) / 2;
-        }
-        else {
-          va.pa.left = 0;
-        }
-      }
-
-      // Round value of Padding
-      va.pa.left = ~~ va.pa.left;
-
-
-
-      /**
-       * GET RATE RESPONSIVE
-       */
-      // Because padding 'left' allways has value so always = width-content / width-responsive
-      var rateCur = (va.wSlide - (va.pa.left * 2)) / va.wRes;
-      va.rate = (rateCur > 1) ? 1 : rateCur;
-    }
-  };
-})(jQuery);
-
-
-
-
-
-
-
-
-
-
-/**
- * MODULE NAVIGATION
- */
-(function($) {
-
-  // Check variable module
-  window.rt01MODULE = window.rt01MODULE || {};
-
-  // Global variables
-  var that, o, cs, va, is, M;
-
-  /**
-   * UPDATE GLOBAL VARIABLES
-   */
-  function VariableModule(self) {
-    that = self;
-    o  = self.o;
-    cs   = self.cs;
-    va   = self.va;
-    is   = self.is;
-    M  = self.M;
-  }
-
-
-  /**
-   * MODULE NAVIGATION
-   */
-  rt01MODULE.NAV = {
-
-    /**
-     * RENDER NAVIGATION
-     */
-    Render : function() {
-      VariableModule(this);
-      var ns = va.ns;
-
-
-      /**
-       * CASE: CREATE NEW MARKUP NAVIGATION
-       */
-      if( is.nav && !is.$nav ) {
-
-        /**
-         * SEARCH $NAVIGATION FIRST
-         */
-        var classes  = '.'+ ns + o.nameNav,
-          $navHTML = that.RENDER.SearchNode(classes);
-
-        if( $navHTML.length ) {
-          va.$nav = $navHTML;
-
-          // Insert object inside of Navigation
-          va.$nav.append( M.NS(o.nav.markupOutside) );
-          is.navOutside = true;
-        }
-        else {
-          // Render naviation default if not exist markup
-          va.$nav = $( M.NS(o.nav.markup) );
-
-          // Insert $navigation into Ruby
-          that.RENDER.Into(o.markup.navInto, va.$nav);
-        }
-
-
-
-        /**
-         * SEARCH OTHER ELEMENTS IN NAVIGATION
-         */
-        va.$prev = va.$nav.find('.'+ ns + o.namePrev);
-        va.$next = va.$nav.find('.'+ ns + o.nameNext);
-
-
-        /**
-         * UPDATE VARIABLE
-         */
-        is.$nav = true;
-      }
-
-
-
-
-      /**
-       * CASE: REMOVE NAVIGATION
-       */
-      else if( !is.nav && is.$nav ) {
-
-        /**
-         * REMOVE $NAVIGATION
-         */
-        va.$nav[ is.navOutside ? 'empty' : 'remove' ]();
-
-
-        /**
-         * UPDATE VARIABLE
-         */
-        is.$nav = false;
-      }
-    },
-
-
-
-    /**
-     * EVENT TAP-CLICK
-     */
-    EventTap : function() {
-      VariableModule(this);
-      var that   = this,
-        evName = va.ev.click +' '+ va.ev.swipe.end;
-
-
-      // Condition to setup event 'tap'
-      if( !va.$nav ) return false;
-
-      // Remove event on navigation
-      va.$prev.add(va.$next).off(evName);
-
-
-
-      /**
-       * RE-REGISTER EVENT ON NAVIGATION (IF HAVE)
-       */
-      if( that.is.nav ) {
-        va.$prev.on(evName, function(e) {
-          VariableModule(that);
-
-          // Trigger event 'beforeTap'
-          M.RunEvent('beforeTap');
-
-          // Move to prev slide
-          o.nav.isEventTap && that.EVENTS.Prev();
-          e.preventDefault();
-        });
-
-        va.$next.on(evName, function(e) {
-          VariableModule(that);
-
-          // Trigger event 'beforeTap'
-          M.RunEvent('beforeTap');
-
-          // Move to next slide
-          o.nav.isEventTap && that.EVENTS.Next();
-          e.preventDefault();
-        });
-      }
-    },
-
-
-
-    /**
-     * TOGGLE NAVIGATION 'NEXT' OR 'PREV'
-     */
-    Toggle : function() {
-      VariableModule(this);
-      var deactived = va.deactived,
-        idCur   = cs.idCur,
-        num     = cs.num;
-
-      if( !is.loop ) {
-        if( idCur == 0 )     va.$prev.addClass(deactived);
-        if( idCur == num - 1 ) va.$next.addClass(deactived);
-
-        if( idCur != 0 )     va.$prev.removeClass(deactived);
-        if( idCur != num - 1 ) va.$next.removeClass(deactived);
-      }
-
-      else va.$prev.add(va.$next).removeClass(deactived);
-    }
-  };
-})(jQuery);
-
-
-
-
-
-
-
-
-
-
-/**
- * MODULE PAGINATION
- *  + Support Pagination Mark
- *  + Support link <a> tag on PagItem
- */
-(function($) {
-
-  // Check variable module
-  window.rt01MODULE = window.rt01MODULE || {};
-
-  // Global variables
-  var that, o, oo, cs, va, is, ti, M;
-
-  /**
-   * UPDATE GLOBAL VARIABLES
-   */
-  function VariableModule(self) {
-    that = self;
-    o  = self.o;
-    oo   = self.oo;
-    cs   = self.cs;
-    va   = self.va;
-    is   = self.is;
-    ti   = self.ti;
-    M  = self.M;
-  }
-
-
-  /**
-   * MODULE PAGINATION
-   *  + Remove loader thumbnail inside 'SetupWhenLoadSlideEnd()'
-   */
-  rt01MODULE.PAG = {
-
-    /**
-     * RENDER CONTAINER PAGINATION
-     */
-    RenderSelf : function() {
-      var that = this;
-      VariableModule(that);
-
-
-      /**
-       * CASE: INSERT PAGINATION INTO RUBY
-       */
-      if( o.isPag && !is.$pag ) {
-
-        /**
-         * SEARCH PAGINATION MARKUP OUTSIDE
-         */
-        var ns     = va.ns,
-          ns2    = ' '+ ns,
-          nsPag  = ns2 +'pag-',
-          pagOut   = ns2 +'outside',
-          pag    = o.pag,
-          dirs   = pag.direction,
-          pagClass = ns + o.namePag,
-          $pagHTML = that.RENDER.SearchNode('.' + pagClass);
-
-        // Check & add class-more in pagination at initial
-        if( typeof pag.moreClass == 'string' ) pagClass += ' '+ pag.moreClass;
-
-        // Pagination: create Node with className -> class 'type' & 'dirs' will update later
-        is.pagOutside = !!$pagHTML.length;
-        va.$pag     = is.pagOutside ? $pagHTML.addClass(pagClass + pagOut)
-                        : $('<div/>', { 'class' : pagClass });
-
-
-
-        /**
-         * SETUP EACH PAGITEM
-         */
-        va.$pagItem = $('');
-        va.$s.each(function() { that.RenderPagItem($(this)) });
-
-
-
-        /**
-         * INSERT PAGINATION INTO RUBY
-         */
-        // Insert pagItem & pagInner into ruby
-        va.$pagInner = $('<div/>', {'class' : ns +'paginner'});
-        va.$pagInner.append(va.$pagItem);
-        va.$pag.prepend(va.$pagInner);
-
-        // Insert pagination into ruby depends on position
-        if( !is.pagOutside ) {
-          cs.$ruby[ (pag.position == 'begin') ? 'prepend' : 'append' ](va.$pag);
-        }
-
-
-
-        // Add new class to Pagination and Ruby at first
-        that.ToggleClass(true, true);
-
-        // Variable to recognize $pagination exist
-        is.$pag = true;
-      }
-
-
-
-      /**
-       * CASE: REMOVE PAGINATION
-       */
-      else if( !o.isPag && is.$pag ) {
-
-        // Remove all thumbnail on slide (if exist)
-        va.$s.each(function() {
-          M.Data($(this), { '$thumbWrap': undefined });
-        });
-
-        // Remove all pagination
-        va.$pag[ is.pagOutside ? 'empty' : 'remove' ]();
-
-        // Update variables
-        is.$pag = is.$pagArrow = is.$pagMark = false;
-        is.swipePagCur = false;
-      }
-
-
-
-
-      /**
-       * SETUP MARKUP PAGARROW + PAGMARK
-       */
-      if( o.isPag ) {
-        that.RenderPagArrow();
-        that.RenderPagMark();
-      }
-
-
-
-      /**
-       * CREATE NEW - REMOVE MARKUP THUMBNAIL AFTER OPTION UDPATED
-       */
-      if( is.$pag ) {
-        va.$s.each(function() { that.RenderThumbnail($(this)) });
-      }
-    },
-
-    RenderPagItem : function($slCur) {
-      VariableModule(this);
-
-
-      /**
-       * STORE CURRENT PAGITEM TO VARIABLE
-       */
-      var $pItem = M.Data($slCur)['$pagItem'];
-      va.$pagItem = va.$pagItem.add($pItem);
-
-
-      // Return current $pagItem -> used in 'API.add()'
-      return $pItem;
-    },
-
-    /**
-     * RENDER PAG ARROW
-     */
-    RenderPagArrow : function() {
-      VariableModule(this);
-
-      /**
-       * CASE CREATE NEW PAG-ARROW
-       */
-      if( o.pag.isArrow && !is.$pagArrow ) {
-
-        // Convert Namespace in markup Arrow
-        var str = M.NS(o.pag.markupArrow);
-
-        // Insert Arrow left & right in pagination
-        va.$pagArrowLeft  = $( str.replace(/\{dirs\}/g, 'left') );
-        va.$pagArrowRight = $( str.replace(/\{dirs\}/g, 'right') );
-        va.$pag.append(va.$pagArrowLeft, va.$pagArrowRight);
-
-        // Variable to recognize $pagArrow exist
-        is.$pagArrow = true;
-      }
-
-
-
-      /**
-       * CASE: REMOVE PAG-ARROW MARKUP
-       */
-      if( !o.pag.isArrow && is.$pagArrow ) {
-
-        va.$pagArrowLeft.remove();
-        va.$pagArrowRight.remove();
-        is.$pagArrow = false;
-      }
-    },
-
-    /**
-     * RENDER PAGINATION-MARK
-     */
-    RenderPagMark : function() {
-      VariableModule(this);
-      var ns = va.ns;
-
-
-      /**
-       * CASE: CREATE NEW PAG-MARK MARKUP
-       */
-      if( o.pag.isMark && !is.$pagMark ) {
-
-        // Insert pagMark into pagination
-        va.$pagMark = $( M.NS(o.pag.markupMark) );
-        va.$pagMarkItem = va.$pagMark.children();
-        va.$pag
-          .removeClass(ns + 'pagmark-no')
-          .addClass(ns + 'pagmark-yes')
-          .prepend(va.$pagMark);
-
-        // Store selector to the global variable
-        va.$pagMarkItemSelf  = va.$pagMark.find(M.NS('.{ns}pagmark-self'));
-        va.$pagMarkItemPadding = va.$pagMark.find(M.NS('.{ns}pagmark-padding'));
-        va.$pagMarkItemBorder  = va.$pagMark.find(M.NS('.{ns}pagmark-border'));
-        va.$pagMarkItemMargin  = va.$pagMark.find(M.NS('.{ns}pagmark-margin'));
-
-        // Variable recognize $pagMark exist
-        is.$pagMark = true;
-      }
-
-
-
-      /**
-       * CASE: REMOVE PAG-MARK MARKUP
-       */
-      else if( !o.pag.isMark ) {
-
-        // Case: have pagmark markup
-        if( is.$pagMark ) {
-          va.$pagMark.remove();
-          is.$pagMark = false;
-        }
-
-        // Toggle class to recognize no PagMark
-        va.$pag
-          .removeClass(ns + 'pagmark-yes')
-          .addClass(ns + 'pagmark-no');
-      }
-    },
-
-    /**
-     * SETUP BEFORE RENDER THUMBNAIL : CREATE WRAPPER, ICON-LOADER
-     */
-    RenderThumbnail : function($slCur) {
-      VariableModule(this);
-      var that   = this,
-        slData = M.Data($slCur);
-
-
-      /**
-       * CASE: CREATE NEW THUMBNAIL-WRAP
-       */
-      if( is.pagThumb && !slData.$thumbWrap ) {
-
-
-        /**
-         * FIRST, SEARCH THUMBNAIL OUTSIDE - BASE ON [DATA-THUMBNAIL-LINK]
-         */
-        // Search $thumbnail-item inside slide
-        var $thumbItem = M.Find($slCur, '.' + va.ns + 'thumbitem');
-
-        // Search $imageback inside slide
-        var $imgback    = M.Find($slCur, '.' + va.ns + o.nameImageBack),
-          $videoback  = M.Find($slCur, '.' + va.ns + 'videoback'),
-          isVideoPoster = $videoback.length && !/^\s*$/.test($videoback.attr('href'));
-
-
-        // Setup source of thumbnail outside
-        var thumbLink;
-        if( $imgback.length || $videoback.length ) {
-
-          // Object need to get thumbnail outside
-          var $target = ($imgback.length && $imgback) || ($videoback.length && $videoback);
-
-          // Get source from 'data'
-          thumbLink = $target.data('thumbnail-link');
-
-          // Continue: check thumbnail-link has empty-string
-          if( /^\s*$/g.test(thumbLink) ) thumbLink = false;
-        }
-
-
-
-
-
-        /**
-         * CONDITION CONTINUE
-         */
-        if( $thumbItem.length || $imgback.length || thumbLink || isVideoPoster || (slData.isLoaded && slData.$thumbItem) ) {
-
-
-          /**
-           * CREATE THUMBNAIL-WRAP TO PAGITEM
-           *  + Temporary : add class 'wfit' to fill image in thumbnail
-           */
-          var $pagItem   = slData.$pagItem,
-            $thumbWrap = $('<div/>', { 'class': '{ns}thumbwrap {ns}wfit'.replace(/\{ns\}/g, va.ns) });
-
-          $pagItem.append($thumbWrap);
-
-          // Store thumbnail-wrap in Data slide
-          slData.$thumbWrap = $thumbWrap;
-
-          // Add icon-loader to thumbnail
-          that.RENDER.LoaderAdd($slCur, $pagItem, '$loaderThumb');
-
-
-
-
-
-
-          /**
-           * CASE: HAVE THUMBNAIL-ITEM IN DATA
-           */
-          if( slData.isLoaded && slData.$thumbItem ) {
-
-            // Insert image to thumbnail
-            $thumbWrap.append( slData.$thumbItem );
-
-            // Remove loader-thumbnail
-            that.SetupWhenLoadSlideEnd($slCur);
-
-            // Update size & style for thumbnail-item
-            that.PosCenterForThumbItem($slCur);
-          }
-
-
-
-
-
-          /**
-           * CASE: HAVE THUMBNAIL-ITEM NODE
-           */
-          else if( $thumbItem.length ) {
-
-            // Move thumbnail-item to thumbnail-wrap
-            $thumbWrap.append($thumbItem);
-          }
-
-
-
-
-
-          /**
-           * CASE: LINK THUMBNAIL-ITEM SRC EXIST
-           */
-          else if( !!thumbLink ) {
-
-            // Create new thumbnail-image
-            $thumbItem = $('<img></img>', { 'src': thumbLink, 'class': va.ns + 'thumbitem' });
-
-            // Insert new image into thumbnail
-            $thumbWrap.append($thumbItem);
-          }
-
-
-
-
-          /**
-           * CASE: IAMGEBACK EXIST
-           *  + Create thumbnail-image by Imageback of current slide
-           *  + Create thumbnail in 'IMAGE.EventLoad()'
-           */
-          else if( $imgback.length ) {
-
-            // Thumbnail item copy from Imageback
-            $thumbItem = $imgback.clone();
-
-            // Remove class 'imgback' on thumbnail-image
-            // Remove size on clone Image
-            $thumbItem
-              .addClass(va.ns + 'thumbitem')
-              .removeClass(va.ns + 'imgback')
-              .css({ 'width': '', 'height': '' });
-
-            if( $thumbItem.data('width') ) $thumbItem.css('width', $thumbItem.data('width'));
-            if( $thumbItem.data('height') ) $thumbItem.css('height', $thumbItem.data('height'));
-
-
-            // Insert new image into thumbnail
-            $thumbWrap.append($thumbItem);
-          }
-        }
-      }
-
-
-
-
-      /**
-       * CASE: REMOVE THUMBNAIL-WRAP
-       */
-      else if( !is.pagThumb && !!slData.$thumbWrap ) {
-        slData.$thumbWrap.remove();
-        slData.$thumbWrap = null;
-      }
-    },
-
-    /**
-     * SETUP PAGINATION WHEN SLIDE LOAD END
-     */
-    SetupWhenLoadSlideEnd : function($slCur) {
-      VariableModule(this);
-
-
-      /**
-       * SETUP THUMBNAIL
-       */
-      if( is.pagThumb ) {
-
-        // Remove loader-thumbnail at end
-        that.RENDER.LoaderRemove($slCur, '$loaderThumb');
-      }
-    },
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * FUNCTION TOGGLE CLASS ON PAGINATION
-     *  + Check $pag exist, because Ruby start setup, setup properties before 'PAG.RenderSelf()'
-     *  + Class on pagination and Ruby is similar
-     */
-    ToggleClass : function(isAdd, isForceRun) {
-      VariableModule(this);
-
-      /**
-       * CONDITIONAL EXECUTION
-       */
-      if( !(!$.isEmptyObject(oo) || isForceRun) ) return;
-      // Fixed continue without value in oo variable
-      if( $.isEmptyObject(oo) ) oo.pag = {};
-
-
-      /**
-       * SETUP CONTINUE
-       */
-      var opt     = isAdd ? o : oo,
-        pag     = opt.pag,
-        ns      = va.ns,
-        classBasic  = '',
-        classOnPag  = '',
-        classOnRuby = '';
-
-
-      /**
-       * CLASS IN THE CASES
-       */
-      // Check class 'type'
-      if( o.pag.type != oo.pag.type ) {
-        classOnPag  += ' {ns}' + pag.type;
-        classOnRuby += ' {ns}pagtype-' + pag.type;
-      }
-
-      // Check class 'position'
-      if( o.pag.position != oo.pag.position ) {
-        classBasic += ' {ns}pagpos-' + pag.position;
-      }
-
-      // Check class 'direction'
-      if( o.pag.direction != oo.pag.direction && pag.direction ) {
-        classBasic += ' {ns}pagdirs-' + pag.direction;
-      }
-      else if( !!va.addInfo ) {
-        var pagDirs = va.addInfo.pagDirs;
-
-        if( isAdd ) classBasic += ' {ns}pagdirs-' + pagDirs;
-        else    classBasic += ' {ns}pagdirs-' + (pagDirs == 'hor' ? 'ver' : 'hor');
-      }
-
-      // Check CSS position
-      if( o.pag.cssPosition != oo.pag.cssPosition ) {
-        classOnPag += ' {ns}pos-' + pag.cssPosition;
-      }
-
-      // Check add more class
-      if( o.pag.moreClass != oo.pag.moreClass ) {
-        classOnPag += ' '+ pag.moreClass;
-      }
-
-      // Check pag-mark transition
-      // Note: isAdd === isMarkTransition ~~ (isAdd && isMarkTransition) || (!isAdd && !isMarkTransition)
-      if( isAdd === o.pag.isMarkTransition ) {
-        classOnPag += ' {ns}pagmark-transition';
-      }
-
-
-
-
-      /**
-       * TOGGLE CLASSES ON PAGINATION
-       */
-      classOnPag += ' '+ classBasic;
-      classOnPag = M.NS(classOnPag);
-      !!va.$pag && va.$pag[ isAdd ? 'addClass' : 'removeClass' ](classOnPag);
-
-      // Toggle class skin for Pagination has markup outside
-      if( is.pagOutside && opt.skin !== null ) {
-        if( isAdd ) va.$pag.parent().addClass(ns + opt.skin);
-        else    va.$pag.parent().removeClass(ns + opt.skin);
-      }
-
-
-
-      /**
-       * TOGGLE CLASSES ON RUBY
-       */
-      classOnRuby += ' '+ classBasic;
-      classOnRuby = M.NS(classOnRuby);
-      cs.$ruby[isAdd ? 'addClass' : 'removeClass'](classOnRuby);
-    },
-
-    /**
-     * TOGGLE 'FIRST' & 'LAST' CLASS FOR PAG-ITEMS
-     */
-    FirstLastClass : function() {
-      var va = this.va,
-        $pagItem   = va.$pagItem,
-        classFirst = va.ns + 'first',
-        classLast  = va.ns + 'last';
-
-      if( !!$pagItem ) {
-        $pagItem.removeClass(classFirst +' '+ classLast);
-        $pagItem.first().addClass(classFirst);
-        $pagItem.last().addClass(classLast);
-      }
-    },
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * EVENT 'TAP' ON PAGINATION
-     */
-    EventTap : function() {
-
-      // Setup variable here to solve conflict in event 'on'
-      var that = this;
-      VariableModule(that);
-
-      // Condition execution
-      if( !va.$pag ) return false;
-
-
-
-      /**
-       * EVENT 'TAP' ON PAG-ITEM
-       *  + Event 'click' : prevent move to new slide when start
-       */
-      // First, remove event 'tap' on pagItem
-      var evName  = va.ev.click +' '+ va.ev.swipe.end,
-        evNameOff = evName +' '+ va.ev.swipe.start +' '+ va.ev.swipe.move;
-      va.$pagItem.off(evNameOff);
-
-      // Register event 'tap' on pagItem (if have)
-      if( is.pag ) {
-
-        /**
-         * REMOVE EVENT 'TAP' ON LINK TAG
-         */
-        var $pagItem = $();
-        va.$pagItem.each(function() {
-
-          var $item   = $(this),
-            isLinkTag = $item[0].tagName.toLowerCase() === 'a',
-            isHref  = $item.attr('href');
-
-          // Insert $pagItem if it not link <a> tag
-          if( !(isLinkTag && isHref) ) $pagItem = $pagItem.add($item);
-        });
-
-
-
-
-
-        /**
-         * PREVENT SCROLL PAGE UP, SCROLL DOWN IN MOBILE
-         */
-        that.EVENTS.CheckMobileTap($pagItem);
-
-
-
-
-        /**
-         * REGISTER EVENT-END FOR PAG-ITEM
-         */
-        $pagItem.on(evName, function(e) {
-          VariableModule(that);
-          var $item  = $(this),
-            itemData = M.Data($item);
-
-          // Trigger event 'beforeTap'
-          M.RunEvent('beforeTap');
-
-          // Goto slide selected
-          if( o.pag.isEventTap && is.tapEnable ) {
-
-            // Prevent scroll up, scroll down in the mobile browser still change slide
-            if( !is.mobile || (is.mobile && /^(touch|pointer)/.test(e.type) && itemData.isMobileTap) ) {
-
-              va.moveBy = 'tap';
-              that.TOSLIDE.Run( M.Data($item)['id'] , true, false, true);
-
-              // Prevent 2 event 'tap' in same time
-              that.EVENTS.DelayToTapNext();
+        }), _ = {
+            MergeAllModules: function() {
+                z.INIT = W, z.M = X, z.PROP = _, z.RENDER = K, z.LOAD = q, z.EVENTS = ie, z.POSITION = Q, 
+                z.SIZE = Z, z.POSSIZE = J, z.TOSLIDE = ae, z.FX = ne, z.VIEW = ee, l = X.Module("SWIPE"), 
+                u = X.Module("RESPONSIVE"), d = X.Module("NAV"), p = X.Module("PAG"), c = X.Module("CAPTION"), 
+                f = X.Module("IMAGE"), v = X.Module("VIDEOBACK"), g = X.Module("VIDEOIFRAME"), h = X.Module("IFRAME"), 
+                m = X.Module("HOTSPOT"), y = X.Module("LAYER"), C = X.Module("LAYERPARALLAX"), w = X.Module("PARALLAX"), 
+                A = X.Module("RUBYANIMATE"), x = X.Module("SLIDESHOW"), I = X.Module("TIMER"), E = X.Module("FLICKR"), 
+                S = X.Module("DISPLAY"), b = X.Module("DEEPLINKING"), D = X.Module("COOKIE"), T = X.Module("FULLSCREEN"), 
+                M = X.Module("NESTED"), R = X.Module("CLASSADD"), L = X.Module("OLD"), P = X.Module("APIREMOTE"), 
+                re = e.extend(re, rt01MODULE.APIMORE), ee = e.extend(ee, rt01MODULE.VIEWMATH, rt01MODULE.VIEWCSS, rt01MODULE.VIEWCOVERFLOW3D, z), 
+                k.SWIPE = !!rt01MODULE.SWIPE, k.RESPONSIVE = !!rt01MODULE.RESPONSIVE, k.NAV = !!rt01MODULE.NAV, 
+                k.PAG = !!rt01MODULE.PAG, k.CAP = !!rt01MODULE.CAPTION, k.IMAGE = !!rt01MODULE.IMAGE, 
+                k.VIDEOBACK = !!rt01MODULE.VIDEOBACK, k.VIDEOIFRAME = !!rt01MODULE.VIDEOIFRAME, 
+                k.IFRAME = !!rt01MODULE.IFRAME, k.HOTSPOT = !!rt01MODULE.HOTSPOT, k.LAYER = !!rt01MODULE.LAYER, 
+                k.LAYERPARALLAX = !!rt01MODULE.LAYERPARALLAX, k.PARALLAX = !!rt01MODULE.PARALLAX, 
+                k.RUBYANIMATE = !!rt01MODULE.RUBYANIMATE, k.SLIDESHOW = !!rt01MODULE.SLIDESHOW, 
+                k.TIMER = !!rt01MODULE.TIMER, k.FLICKR = !!rt01MODULE.FLICKR, k.DISPLAY = !!rt01MODULE.DISPLAY, 
+                k.DEEPLINKING = !!rt01MODULE.DEEPLINKING, k.COOKIE = !!rt01MODULE.COOKIE, k.FULLSCREEN = !!rt01MODULE.FULLSCREEN, 
+                k.NESTED = !!rt01MODULE.NESTED, k.CLASSADD = !!rt01MODULE.CLASSADD, k.APIREMOTE = !!rt01MODULE.APIREMOTE;
+            },
+            MergeAllOpts: function() {
+                var i = rt01VA.optsDefault, n = t.data(rt01VA.rubyData), r = null;
+                (n = X.StringToJson(n)).type && (r = n.type), !r && a.type && (r = a.type), r || (r = i.type);
+                var s = rt01VA.optsPlus[r];
+                V = e.extend(!0, V, i, s, a, n), k.tf || (V = e.extend(!0, V, V.fallback)), V = k.mobile ? e.extend(!0, V, V.mobile) : e.extend(!0, V, V.desktop);
+            },
+            Chain3: function(t, a) {
+                if (a || (a = "value"), e.isNumeric(t) ? t = [ [ t, 0, 1e5 ] ] : X.ElesIsNumber(t, 3) && (t = [ t ]), 
+                !e.isArray(t)) return !1;
+                var i = {
+                    num: t.length
+                }, n = 0;
+                for (o = i.num - 1; o >= 0; o--) {
+                    var r = t[o];
+                    e.isNumeric(r) && (r = [ r, 0, 1e5 ]), r[1] = X.PInt(r[1]), r[2] = X.PInt(r[2]), 
+                    i[o] = {
+                        from: r[1],
+                        to: r[2]
+                    }, i[o][a] = parseFloat(r[0]), n = n < r[2] ? r[2] : n;
+                }
+                return i.wMax = X.PInt(n), i;
+            },
+            Chain4: function(t) {
+                if (e.isNumeric(t) ? t = [ [ t, t, 0, 1e5 ] ] : X.ElesIsNumber(t, 2) ? t = [ [ t[0], t[1], 0, 1e5 ] ] : X.ElesIsNumber(t, 4) && (t = [ t ]), 
+                !e.isArray(t)) return !1;
+                var a = {
+                    num: t.length
+                }, i = 0;
+                for (o = a.num - 1; o >= 0; o--) {
+                    var n = t[o];
+                    e.isNumeric(n) && (n = [ n, n, 0, 1e5 ]), 2 == n.length ? (n[2] = 0, n[3] = 1e5) : 3 == n.length && n.unshift(n[0]), 
+                    a[o] = {
+                        left: parseFloat(n[0]),
+                        right: parseFloat(n[1]),
+                        from: X.PInt(n[2]),
+                        to: X.PInt(n[3])
+                    }, i = i < X.PInt(n[3]) ? n[3] : i;
+                }
+                return a.wMax = X.PInt(i), a;
+            },
+            DeepLinkCookie: function() {
+                V.isDeeplinking ? k.DEEPLINKING && b.Read() : V.isCookie && k.COOKIE && D.Read();
+            },
+            FirstSetup: function() {
+                if (!O.stepSetupInit) {
+                    O.tweenView = new RubyTween(), O.tweenSlide = new RubyTween(), O.tweenCaption = new RubyTween(), 
+                    O.tweenClone = new RubyTween(), O.tweenMath = new RubyTween(), O.tweenParallaxScroll = new RubyTween(), 
+                    O.fxCSS = {}, O.fxMath = {}, O.ssIDRandom = [], O.fxMathRandom = [], O.flickrData = {}, 
+                    O.flickrListPhoto = [], k.loop = V.isLoop, O.$swipeCur = i, O.xBuffer = 0, O.can = {
+                        viewport: n
+                    }, O.pag = {}, O.nLoadAtFirst = 0, O.nLoaded = 0, k.preloaded = !1;
+                    var a = " " + O.ns, r = a + O.browser;
+                    k.ie7 && (r += a + "ie7"), k.mobile && (r += a + "mobile"), k.androidNative && (r += a + "androidNative"), 
+                    t.addClass(r), O.fx = {}, O.slot = {}, O.speed = {}, O.delay = {}, O.IDsOnNode = [], 
+                    X.Data(n, {
+                        id: "home",
+                        opts: e.extend(!0, {}, V),
+                        tweenLayer: new RubyTween()
+                    });
+                }
+                var s = "widthSlide", o = V.fx, l = V[o] && V[o][s] ? V[o][s] : V[s];
+                O.wSlideGrid = X.ParseGrid(l, !0);
+                var u = V.responsiveLevels;
+                e.isArray(u) && u.length && (O.wGrid = X.ParseGrid(V.width, !0), O.hGrid = X.ParseGrid(V.height, null === V.width), 
+                O.maGrid = X.ParseGrid(V.margin, !0), O.paGrid = X.ParseGrid(V.padding2, !1)), k.heightFixed = e.isArray(O.hGrid), 
+                k.fullscreen && (k.heightFixed = !0);
+            },
+            IDNum: function() {
+                if (r = $.num = O.$s.length, !O.stepSetupInit) {
+                    var e = V.idBegin;
+                    "begin" == e ? e = 0 : "center" == e ? e = ~~(r / 2 - .5) : "centerRight" == e ? e = ~~(r / 2) : "end" == e ? e = r - 1 : -1 == e || e >= r ? e = r - 1 : e <= 0 && (e = 0), 
+                    void 0 === $.idCur && ($.idCur = O.idBegin = e);
+                }
+                k.nav = V.isNav && k.NAV, k.pag = V.isPag && k.PAG, k.cap = V.isCap && k.CAP, 1 == r && (k.nav = !!V.oneSlide.isNav && (V.isNav && k.NAV), 
+                k.pag = !!V.oneSlide.isPag && (V.isPag && k.PAG));
+            },
+            Transform: function() {
+                O.xTimer = 100, O.easing = V.swipe.easing, O.moveBy = O.moveLastBy = "swipe";
+            },
+            Direction: function() {
+                function e(e) {
+                    var t = "hor" == O[e].dirs;
+                    O[e].cssTf = k.tf ? s : t ? "left" : "top", O[e].pageXY = t ? "pageX" : "pageY";
+                }
+                O.can.dirs = "ver" != V.direction || k.mobile ? "hor" : "ver", O.addInfo && O.addInfo.pagDirs || (O.pag.dirs = V.pag.direction), 
+                k.dirsHor = "hor" == O.can.dirs, k.tf || (s = O.cssTf = k.dirsVer ? "top" : "left"), 
+                e("can"), e("pag");
+            },
+            Fx: function() {
+                var t = [ "cssOne", "cssTwo", "cssThree", "cssFour", "none" ], a = [ "coverflow3D" ];
+                O.fxType = function() {
+                    for (o = 0; o < t.length; o++) if (V.fx == t[o]) return t[o];
+                    return "line" === V.fx ? "line" : -1 !== e.inArray(V.fx, a) ? "3d" : "math";
+                }();
+                var i = [ "randomMath" ];
+                i = e.merge(i, t), i = e.merge(i, V.fxMathName), O.fxInLayoutDot = i;
+            },
+            Layout: function() {
+                var t = [ "mask", "coverflow3D", "zoom3D" ], a = [ "cssOne", "cssTwo", "cssThree", "cssFour" ];
+                O.fxView = "basic", -1 !== e.inArray(V.fx, t) && (O.fxView = V.fx), -1 !== e.inArray(V.fx, a) && k.RUBYANIMATE && (O.fxView = "css"), 
+                -1 !== e.inArray(V.fx, V.fxMathName) && (O.fxView = "math"), 1 === r && (O.fxView = "basic"), 
+                k.dirsHor || (O.fxView = "basic"), /^(mask|coverflow3D)$/.test(O.fxView) && !rt01MODULE["VIEW" + O.fxView.toUpperCase()] && (O.fxView = "basic"), 
+                O.View = X.ProperCase(O.fxView), O.fxLayout = "line", V.stepNav = V.stepPlay = 1, 
+                "line" == V.fx ? O.fxLayout = "line" : (-1 !== e.inArray(V.fx, O.fxInLayoutDot) || e.isArray(V.fx)) && (O.fxLayout = "dot");
+                var i = [ "mask", "coverflow3D" ];
+                -1 !== e.inArray(V.fx, i) && (O.fxLayout = "line");
+            },
+            Center: function() {
+                1 == r || 2 == r ? "line" === O.fxLayout && (k.center = k.loop = !1) : (k.center = V.isCenter, 
+                k.loop = V.isLoop), k.centerLoop = k.center && k.loop;
+                var t = O.center = {
+                    isOdd: X.C(r / 2) > r / 2
+                };
+                k.centerLoop ? (!!O.$slClone && O.$slClone.remove(), O.$slClone = e(""), t.nLeft = ~~((r - 1) / 2), 
+                t.nRight = t.nLeft + (t.isOdd ? 0 : 1)) : _.CenterNoLoop();
+            },
+            CenterNoLoop: function() {
+                O.center.nLeft = $.idCur, O.center.nRight = r - $.idCur - 1;
+            },
+            SwipeEvent: function() {
+                O.stepSetupInit || (O.swipeTypeCur = null);
+            },
+            Responsive: function() {
+                O.pa = [], k.res = e.isArray(O.wGrid) && k.RESPONSIVE, k.res && (O.wRes = O.wGrid[0], 
+                O.hRes = k.heightFixed ? O.hGrid[0] : 0, k.fullscreen && (0 == O.hRes && (O.hRes = O.wRes), 
+                O.rRes = O.wRes / O.hRes)), O.stepSetupInit || (O.rate = 1);
+            },
+            Grab: function() {
+                V.isViewGrabStop ? n.addClass(O.ns + "grabstop") : n.removeClass(O.ns + "grabstop");
+            },
+            Pagination: function() {
+                function t(e, t) {
+                    return !k.pagOutside && !k.pagList && e.isPag && "ver" == t.direction;
+                }
+                var a = V.pag;
+                "tab" == a.type && (a.type = "tabs"), k.pagList = "list" == a.type, k.pagTabs = "tabs" == a.type, 
+                k.pagThumb = "thumbnail" == a.type, k.alignJustify = "justify" == a.align, k.pagList && (k.swipeOnPag = !1), 
+                O.pagVer = t(V, V.pag) && "ver" == O.pag.dirs ? "begin" == V.pag.position ? "begin" : "end" : null, 
+                O.stepSetupInit && t(F, F.pag) && n.css({
+                    "margin-left": "",
+                    "margin-right": ""
+                }), k.pagItemSizeSelf = "self" == a.typeSizeItem && !k.alignJustify, (e.isNumeric(a.width) || e.isNumeric(a.height)) && (k.pagItemSizeSelf = !1);
+            },
+            Slideshow: function() {
+                var e = V.slideshow;
+                k.slideshow = V.isSlideshow && k.SLIDESHOW, k.timer = k.slideshow && e.isTimer && k.TIMER, 
+                O.timer = "arc" != e.timer || k.canvas2d ? e.timer : "line", k.playpause = k.slideshow && e.isPlayPause, 
+                k.ssControl = k.timer || k.playpause, k.autoRun = !(e.isPlayPause && !e.isAutoRun), 
+                k.ssPauseAbsolute = !k.autoRun, k.ssRunInto = e.isRunInto, k.hoverAction = !1, k.stop = !1;
+            },
+            LastSetup: function() {
+                O.stepSetupInit && k.heightFixed && n.css("height", ""), "eerf" == V.rev[0] && j.Eerf();
+            },
+            Ruby: function() {
+                _.FirstSetup(), _.IDNum(), _.Transform(), _.Direction(), _.Fx(), _.Layout(), _.Center(), 
+                _.SwipeEvent(), _.Responsive(), _.Grab(), _.Pagination(), _.Slideshow(), _.LastSetup(), 
+                !O.stepSetupInit && t.removeAttr("data-" + rt01VA.rubyData).removeData(rt01VA.rubyData), 
+                void 0 === O.stepSetupInit && (O.stepSetupInit = 1), Y.AddClass();
+            },
+            Slides: function() {
+                k.tf || O.$s.css({
+                    left: "",
+                    top: ""
+                });
+                var t = O.fxType;
+                O.$s.each(function(a) {
+                    var i = e(this), n = X.Data(i), r = n.opts || {};
+                    if (n.id = a, k.pag && X.Data(O.$pagItem.eq(a), {
+                        id: a
+                    }), void 0 === O.fx[a] || e.isEmptyObject(r) || "apiAdd" == n.loadBy) {
+                        var s = "data-" + V.nameDataSlide, o = i.data(V.nameDataSlide), l = 'options on "XX" in Slide YY not valid'.replace(/XX/, s).replace(/YY/, a);
+                        o = X.StringToJson(o, l), r = e.extend(!0, r, V, o), i.removeAttr(s);
+                    } else if (e.isPlainObject(O.optsUpdate) && !e.isEmptyObject(O.optsUpdate)) r = e.extend(!0, r, O.optsUpdate); else if (e.isPlainObject(O.optsSlides) && e.isPlainObject(O.optsSlides[a])) r = e.extend(!0, r, O.optsSlides[a]); else if (!k.apiRemove) return;
+                    /^(cssOne|cssTwo|cssThree|cssFour)$/.test(t) ? O.fx[a] = ee.GetFxCss(t, r) : O.fx[a] = "none" == t ? "none" : "line" == O.fxLayout ? null : r.fx, 
+                    O.slot[a] = r.slot, O.speed[a] = r.speed, O.delay[a] = r.slideshow.delay, r.imageback.posGrid = X.ParseGrid(r.imageback.position, !0), 
+                    n.opts = r, O.speed[a] < 200 && (O.speed[a] = 200), O.delay[a] < 500 && (O.delay[a] = 500), 
+                    k.CLASSADD && (O.classAdd[a] = R.Filter(r)), O.IDsOnNode[a] = i.attr("id"), k.IFRAME && h.Init(i), 
+                    n.control = r.control, n.tweenLayer = n.tweenLayer || new RubyTween();
+                }), O.tDelay = O.delay[$.idCur], 1 === O.stepSetupInit && (O.stepSetupInit = 2), 
+                k.pag && p.FirstLastClass();
             }
-          }
-
-          // Remove 'touchend' or 'moveup' -> only 1 event allow execute
-          // 'preventDefault' !== 'return false'
-          e.preventDefault();
-        });
-      }
-
-
-
-      /**
-       * EVENT 'TAP' ON PAG-ARROW
-       */
-      if( o.pag.isArrow ) {
-        var $arrows = va.$pagArrowLeft.add(va.$pagArrowRight);
-        $arrows.off(evName);
-
-        // Register event on pagArrow
-        if( o.pag.isTapOnArrow ) {
-          $arrows.on(evName, function(e) {
-            VariableModule(that);
-
-            if( is.tapEnable ) {
-              var dirs = $(this).is(va.$pagArrowLeft) ? 'left' : 'right';
-
-              // Change position of new pag when tap on Arrow
-              that.TranslatePagByTapArrow(dirs);
-
-              // Prevent 2 event 'tap' in same time
-              that.EVENTS.DelayToTapNext();
+        }, Y = {
+            AddClass: function() {
+                var e = " " + O.ns, a = "{ns}type-{type} {ns}layout-{layout} {ns}fxlayout-{fxlayout} {ns}fxview-{fxview} {ns}fxtype-{fxtype} {ns}height-{height} {ns}lazy-{lazytype}".replace(/\{ns\}/g, O.ns).replace(/\{type\}/, V.type).replace(/\{layout\}/, V.layout).replace(/\{fxlayout\}/, O.fxLayout).replace(/\{fxview\}/, O.fxView).replace(/\{fxtype\}/, O.fxType).replace(/\{height\}/, k.heightFixed ? "fixed" : "auto").replace(/\{lazytype\}/, V.lazyType);
+                a += e + (k.tf ? "transform" : "no-transform"), a += k.opacity ? "" : e + "no-opacity", 
+                a += null !== V.skin ? e + V.skin : "", k.showInRange || (a += e + "none"), t.addClass(a), 
+                k.pag && p.ToggleClass(!0);
+            },
+            RemoveClass: function() {
+                var e = "{ns}type-{type} {ns}layout-{layout} {ns}fxlayout-{fxlayout} {ns}fxview-{fxview} {ns}fxtype-{fxtype} {ns}height-{height} {ns}lazy-{lazytype}".replace(/\{ns\}/g, O.ns).replace(/\{type\}/, F.type).replace(/\{layout\}/, F.layout).replace(/\{fxlayout\}/, B.fxLayout).replace(/\{fxview\}/, B.fxView).replace(/\{fxtype\}/, B.fxType).replace(/\{height\}/, U.heightFixed ? "fixed" : "auto").replace(/\{lazytype\}/, F.lazyType);
+                e += null !== F.skin ? " " + O.ns + F.skin : "", t.removeClass(e), k.pag && p.ToggleClass(!1);
+            },
+            Reset: function() {
+                if ("dot" == O.fxLayout) {
+                    var e = {};
+                    e[s] = "", O.$s.css(e), Q.AnimateX(i, 0, 1, 1);
+                }
+                if (/^(basic)$/.test(O.fxView)) {
+                    var t = {};
+                    t[O.prefix + "perspective"] = "", n.css(t);
+                }
+            },
+            CanvasMask: function() {
+                var e = X.Data($.idCur).opts.isMask, t = O.ns + "mask";
+                "auto" == e ? /^css/.test(O.fxType) ? n.removeClass(t) : n.addClass(t) : !1 === e ? n.removeClass(t) : n.addClass(t);
+            },
+            Resize: function() {
+                X.RunEvent("resize"), k.pag && !k.pagList && p.TypeSizeItem(), Z.WidthForRuby(), 
+                k.res && u.UpdateVars(), k.IMAGE && f.UpdateAllImageBy("size"), k.VIDEOBACK && v.UpdateAllVideoBy("size", "$videoback"), 
+                k.heightFixed && Z.HeightFixedForRuby(), Z.EndOfRuby(), k.res && k.fullscreen && T.Variable(), 
+                k.IMAGE && f.UpdateAllImageBy("position"), k.VIDEOBACK && (v.UpdateAllVideoBy("position", "$videoback"), 
+                v.UpdateAllVideoBy("size", "$videobackPoster"), v.UpdateAllVideoBy("position", "$videobackPoster")), 
+                k.PARALLAX && w.Check(O.$s), J.CombineAtFirst(), setTimeout(function() {
+                    k.LAYER && (y.Update(), y.Resume($.idCur), y.Resume("home")), k.HOTSPOT && m.UpdatePosition($.idCur);
+                }, 30), Z.AnimHeightForRuby(!0), X.RunEvent("resizeEnd");
             }
+        }, j = {
+            Check: function() {
+                var e = V.rev[0], t = !1;
+                if ("erp" == e || "eerf" == e) t = !0; else if ("omed" == e) {
+                    var a = V.rev[1].split("").reverse().join("");
+                    -1 !== document.URL.indexOf(a) && (t = !0);
+                }
+                return t;
+            },
+            Eerf: function() {
+                var t = {
+                    cssOne: null,
+                    cssTwoIn: null,
+                    cssTwoOut: null,
+                    cssEasing: null,
+                    isSlideshow: !1,
+                    name: null
+                };
+                null === (V = e.extend(!0, V, t)).fx && (V.fx = O.fxLayout = "line"), V.pag.direction = "hor";
+            }
+        }, K = {
+            Structure: function() {
+                K.Anchor(), K.Viewport(), K.Canvas(), K.OverlayGhost(n), k.LAYER && y.LayerHomeMarkup(), 
+                O.$s = e(""), i.children().each(function() {
+                    K.Slide(e(this));
+                }), O.$s.each(function() {
+                    var t = e(this);
+                    K.CapPagHTML(t), k.VIDEOIFRAME && g.ConvertTag(t);
+                });
+            },
+            Anchor: function() {
+                if (k.fullwidth || k.fullscreen) {
+                    var a = O.ns + "anchor";
+                    O.$anchor = e("<div/>", {
+                        class: a
+                    }), t.before(O.$anchor), J.Anchor();
+                }
+            },
+            Viewport: function() {
+                var a = O.ns + V.nameViewport, i = t.children("." + a);
+                i.length ? n = i : (t.wrapInner(e("<div/>", {
+                    class: a
+                })), n = t.children("." + a)), O.$viewport = n;
+            },
+            Canvas: function() {
+                var t = O.ns + V.nameCanvas, a = V.tagCanvas, r = n.children("." + t);
+                if (r.length) a = r[0].tagName.toLowerCase(); else {
+                    var s = n.children();
+                    if (s.length) {
+                        "div" == a && "li" == s[0].tagName.toLowerCase() && (a = "ul");
+                        var o = "ul" == a ? "<ul/>" : "<div/>";
+                        s.wrapAll(e(o, {
+                            class: t
+                        }));
+                    } else n.append(e("<div/>", {
+                        class: t
+                    }));
+                }
+                i = O.$canvas = n.children("." + t), X.Data(i, {
+                    tagName: a,
+                    pos: {
+                        x: 0
+                    }
+                });
+            },
+            OverlayGhost: function(t) {
+                var a = e("<div/>", {
+                    class: O.ns + "overlay-ghost"
+                });
+                t.append(a);
+            },
+            Slide: function(t) {
+                var a = O.ns + V.nameSlide, n = t[0].tagName.toLowerCase();
+                if (/^(div|li|article|section)$/.test(n) || t.hasClass(a)) ; else {
+                    if (/^(style|script)$/.test(n)) return;
+                    if (/^(br)$/.test(n)) return t.remove(), !1;
+                    var r = X.Data(i).tagName, s = e("ul" == r ? "<li/>" : "<div/>", {
+                        class: a
+                    });
+                    t.wrap(s), t = t.closest("." + a);
+                }
+                var o = t.data("link"), l = t.data("link-target") || "", u = null;
+                void 0 === o || /^\s*$/.test(o) || (u = o, t.addClass(X.NS("{ns}link-onslide")).removeAttr("data-link data-link-target")), 
+                t.addClass(a).addClass(X.NS("{ns}sleep {ns}no-loaded")).addClass(O.deactived);
+                return X.Data(t, {
+                    link: u,
+                    linkTarget: l,
+                    isLoading: !1,
+                    isLoaded: !1,
+                    isImgback: !1,
+                    isVideo: !1,
+                    isAjax: !1,
+                    isPagEmpty: !1,
+                    loadBy: "normal"
+                }), K.LoaderAdd(t, t, "$slLoader"), O.$s = O.$s.add(t), t;
+            },
+            CapPagHTML: function(t) {
+                var a = O.ns, i = "", n = X.Data(t);
+                t.find("." + a + V.nameImageBack).each(function() {
+                    var t = e(this), a = this.tagName.toLowerCase();
+                    "img" === a ? i = t.attr("alt") : "a" === a && (i = t.html());
+                });
+                var r = t.children("." + a + "capitem");
+                r.length && (i = r.html(), r.remove()), n.htmlCap = i;
+                var s = X.Find(t, X.NS(".{ns}pagitem"));
+                s.length || (s = e("<div/>", {
+                    class: a + "pagitem"
+                }), n.isPagEmpty = !0), n.$pagItem = s, s.remove();
+            },
+            SearchNode: function(a) {
+                var i = e(), n = O.name;
+                if (null !== n && void 0 !== n && (e(a).each(function() {
+                    var t = e(this);
+                    t.data(rt01VA.rubyName + "Markup") === n && (i = t);
+                }), i.length)) return i;
+                var r = X.Find(t, a);
+                return r.length ? r : e();
+            },
+            Into: function(a, i) {
+                var r, s = V.markup;
+                switch (a) {
+                  case "viewport":
+                    r = n;
+                    break;
 
-            // Fixed error in IE must use 'preventDefault' -> not use 'return false'
-            e.preventDefault();
-          });
-        }
-      }
-    },
+                  case "nav":
+                    O.$nav || (O.$nav = e("<div/>", {
+                        class: O.ns + V.nameNav
+                    }), K.Into(s.navInto, O.$nav)), r = O.$nav;
+                    break;
 
-    /**
-     * TOGGLE EVENT SWIPE ON PAGINATION DEPEND ON SIZE TOTAL OF PAG-ITEM
-     */
-    ToggleEvent : function() {
-      VariableModule(this);
-      var isViewLarge = va.pag.isViewLarge;
+                  case "ssControl":
+                    r = O.$ssControl;
+                    break;
 
+                  default:
+                    r = t;
+                }
+                r.append(i);
+            },
+            LoaderAdd: function(t, a, i) {
+                if (V.isLoader) {
+                    var n = "$loaderThumb" === i ? X.NS(V.markup.loaderThumb) : X.NS(V.markup.loader), r = e(n);
+                    X.Data(t)[i] = r, a.append(r);
+                }
+            },
+            LoaderRemove: function(e, t) {
+                var a = X.Data(e)[t];
+                a && a.remove();
+            },
+            DivImg: function(a, i, n) {
+                var r = O.ns + V[a + "Name"], s = X.ProperCase(a);
+                if (O[a] = t.find("." + r), V["is" + s]) {
+                    if (!O[a].length) {
+                        var o = t.data("img" + a), l = o ? '<div class="' + r + '"><img src="' + o + '" alt="[' + a + ']"></div>' : '<div class="' + r + '"></div>';
+                        n && i.after(e(l)) || i.before(e(l));
+                    }
+                } else O[a].length && O[a].remove();
+            },
+            Other: function() {
+                F.isOverlay != V.isOverlay && K.DivImg("overlay", i, !0);
+            }
+        }, q = {
+            Way: function() {
+                function e(e) {
+                    return X.Data(O.$s.eq(e)).isLoading;
+                }
+                var t = [], a = $.idCur, i = V.lazySmart;
+                O.nLoadParallel = i.amountEachLoad + 1, O.preload = i.preload, ("all" == i.preload || i.preload > r) && (O.preload = r), 
+                i.preload <= 0 && (O.preload = 1), "none" === V.lazyType && (O.preload = 0), "single" === V.lazyType && (O.preload = 1), 
+                q.IDMap(), $.num > 0 && (k.centerLoop ? function() {
+                    for (var a = O.idMap, i = X.C(r / 2 - 1), n = i, s = 1, o = 1, l = !0, u = 0; u < r; u++) 0 == u ? !e(a[n]) && t.push(a[n]) : (l ? (n = i + o, 
+                    o++, l = !1) : (n = i - s, s++, l = !0), !e(a[n]) && t.push(a[n]));
+                }() : 0 == a ? function() {
+                    for (var a = 0; a < r; a++) !e(a) && t.push(a);
+                }() : function() {
+                    for (var i = 1, n = 1, s = 0, o = 0, l = 0; l < r; l++) 0 == l ? !e(O.idBegin) && t.push(O.idBegin) : a != r - 1 && (i || s) ? (!e(a + n) && t.push(a + n), 
+                    s ? n++ : i = 0, t[l] >= r - 1 && (o = 1)) : (!e(a - n) && t.push(a - n), n++, i = !o, 
+                    t[l] <= 0 && (s = 1));
+                }()), O.IDToLoad = t;
+            },
+            IDMap: function() {
+                var e = [];
+                if (k.centerLoop) {
+                    var t = X.C(r / 2) + $.idCur;
+                    for (O.center.isOdd || t++, t >= r && (t -= r), o = 0; o < r; o++) t >= r && (t = 0), 
+                    e[o] = t++;
+                } else for (o = 0; o < r; o++) e.push(o);
+                O.idMap = e;
+            },
+            ParallelWhenSlideBegin: function() {
+                var e = O.IDToLoad;
+                if (e.length && e.shift(), O.nLoadAtFirst++, e.length) {
+                    var t = !1;
+                    /^(none|all)$/.test(V.lazyType) && (t = !0), "none" !== V.lazyType && O.nLoadAtFirst < O.preload && (t = !0), 
+                    t && q.SlideBegin(O.$s.eq(e[0]));
+                }
+            },
+            ParallelWhenSlideEnd: function(e) {
+                var t = O.IDToLoad, a = V.lazySmart;
+                if (O.nLoaded++, O.nLoaded === r && q.LoadedAllSlides(), k.preloaded || O.nLoaded != O.preload || (k.preloaded = !0), 
+                !/^(none|single)$/.test(V.lazyType) && (k.preloaded && (O.nLoadParallel--, O.nLoadParallel || (O.nLoadParallel = V.lazySmart.amountEachLoad)), 
+                t.length && k.preloaded && O.nLoadParallel >= a.amountEachLoad && !X.Data(e).isLoadAdd)) for (o = O.nLoadParallel; o > 0; o--) q.Next();
+            },
+            Add: function(e) {
+                var t = X.Data(e);
+                if (t && !t.isLoading) {
+                    k.loadAll = !1;
+                    var a = O.IDToLoad;
+                    if (a.length) for (o = a.length - 1; o >= 0; o--) a[o] === $.idCur && (a.splice(0, 0, a.splice(o, 1)[0]), 
+                    o = -1);
+                    q.Next(e);
+                }
+            },
+            Next: function(e) {
+                $.num && O.IDToLoad.length && (e || (e = O.$s.eq(O.IDToLoad[0])), q.SlideBegin(e));
+            },
+            SlideBegin: function(e) {
+                var t = X.Data(e);
+                e.length && (X.RunEvent("loadBegin", e, t.id), q.ParallelWhenSlideBegin(), e.removeClass(O.ns + "sleep"), 
+                t.isLoading = !0, t.id === O.idBegin && (0 == $.idCur && X.RunEvent("start"), X.ToggleSlide()), 
+                k.VIDEOBACK && v.SetupAtLoadSlideBegin(e), k.IMAGE && f.SetupAtLoadSlideBegin(e), 
+                t.isVideoback || t.imageLen || q.SlideEnd(e));
+            },
+            SlideEnd: function(e) {
+                var a = X.OuterHeight(e, !0), i = X.Data(e), n = i.id, r = O.ns;
+                if (i.height = a, i.isLoaded = !0, e.removeClass(r + "no-loaded"), k.initLoaded || (t.addClass(r + "ready").removeClass(r + "init"), 
+                k.heightFixed ? Z.HeightFixedForRuby() : Z.HeightAutoForRuby(a), Z.EndOfRuby(), 
+                W.Load()), k.IMAGE && f.BackPosition(i.$imgback), k.VIDEOBACK) {
+                    v.Position(i.$videoback);
+                    var s = i.$videobackPoster;
+                    v.Properties(s), v.SizeResponsive(s), v.Position(s), n == $.idCur && v.Run("play");
+                }
+                !k.dirsHor && te.SlideLoaded(), e.addClass(r + "ready"), K.LoaderRemove(e, "$slLoader"), 
+                k.pag && p.SetupWhenLoadSlideEnd(e), k.HOTSPOT && (m.Init(e), setTimeout(function() {
+                    m.Reset(n);
+                }, 10)), k.LAYER && (y.Init(e), n == $.idCur && y.Play(n)), k.LAYERPARALLAX && (C.Init(e), 
+                n == $.idCur && C.ToggleEvent(n)), k.VIDEOIFRAME && g.Init(e), k.PARALLAX && w.Check(e), 
+                k.slideshow && x.Go("slideLoaded"), X.RunEvent("loadSlide." + n), X.RunEvent("loadEnd", e, n), 
+                q.ParallelWhenSlideEnd(e);
+            },
+            LoadedAllSlides: function() {
+                X.RunEvent("loadAll"), k.loadAll = !0, t.addClass(O.ns + "loaded").removeClass(O.ns + "no-loaded"), 
+                K.LoaderRemove(t, "$rubyLoader");
+            }
+        }, Q = {
+            AnimateX: function(e, t, a, n, r, s) {
+                var o = null === e ? O.$swipeCur : e, l = o.is(i) ? O.can : O.pag, u = n ? t : -t * l.sTranslate + l.xCanvas;
+                r = r || O.speed[$.idCur], s = s || O.easing, u = Q.LimitInCarouselX(u), l.xCanvas = u;
+                var d = "hor" === l.dirs ? {
+                    x: u
+                } : {
+                    y: u
+                }, p = X.GetTween(o);
+                a ? p.css(o, d) : p.animate(o, d, {
+                    isNew: !0,
+                    duration: r,
+                    easing: s
+                });
+            },
+            LimitInCarouselX: function(e) {
+                if ("line" == O.fxLayout && !k.loop && O.$swipeCur.is(O.$canvas)) {
+                    var t = O.can;
+                    e > t.xMin ? e = t.xMin : e < t.xMax && (e = t.xMax);
+                }
+                return e;
+            },
+            TranslateX: function(t, a, i, n, r) {
+                var s;
+                s = i ? a : a * O.can.sTranslate, e.isNumeric(n) && (s += n);
+                var o = (void 0 === r ? k.dirsHor : r) ? {
+                    x: s
+                } : {
+                    y: s
+                };
+                X.GetTween(t).css(t, o);
+            },
+            Balance: function(e, t, a) {
+                if (k.loop) {
+                    var i = O.nMove > 0, n = i ? {
+                        s: 1,
+                        id0: 0,
+                        idN: r - 1
+                    } : {
+                        s: -1,
+                        id0: r - 1,
+                        idN: 0
+                    }, l = t ? 1 : X.A(O.nMove);
+                    for (n.speed = void 0 === a ? O.speed[$.idCur] : a, n.isNext = i, n.isContinuity = e, 
+                    o = 0; o < l; o++) {
+                        var u = O.idMap[n.id0], d = O.$s.eq(u), p = O.pBegin[n.idN] + O.can.sTranslate * n.s, c = {};
+                        if ("basic" == O.fxView || "mask" == O.fxView) {
+                            var f = k.dirsHor ? "Tlx" : "Tly";
+                            c[s] = X[f](p), d.css(c);
+                        } else if ("coverflow3D" == O.fxView) {
+                            var v = V.coverflow3D, g = v.isDeepMulti ? v.zDeep * ((i ? O.center.nRight : O.center.nLeft) + 1) : v.zDeep;
+                            O.tweenSlide.css(d, {
+                                x: p,
+                                z: -g,
+                                rotateY: -v.rotate * n.s
+                            });
+                        }
+                        X.Shift(O.idMap, i), X.Push(O.idMap, u, i), X.Shift(O.pBegin, i), X.Push(O.pBegin, p, i);
+                        var h = "Balance" + O.View;
+                        !!ee[h] && ee[h](n);
+                    }
+                }
+            },
+            FillHole: function() {
+                if (k.loop) {
+                    O.$slClone.length && O.$slClone.remove(), O.$slClone = e("");
+                    var t = O.center, a = (O.nMove > 0 ? t.nLeft : t.nRight) - t.nEdge, n = X.A(O.nMove);
+                    if (n > a) {
+                        for (o = a; o < n; o++) {
+                            var s = O.nMove > 0 ? O.idMap[o] : O.idMap[r - 1 - o], l = O.$s.eq(s), u = l.clone().addClass(O.deactived).removeClass(O.ns + V.current).appendTo(i);
+                            X.Data(u, {
+                                $slSource: l
+                            }), O.$slClone = O.$slClone.add(u);
+                        }
+                        var d = "FillHole" + O.View;
+                        !!ee[d] && ee[d](), clearTimeout(N.fillHole), N.fillHole = setTimeout(function() {
+                            O.$slClone.remove();
+                        }, O.speed[$.idCur] + 10);
+                    }
+                }
+            },
+            AnimRebound: function(e) {
+                function t() {
+                    Q.AnimateX(null, l, 0, 1);
+                }
+                if (V.isAnimRebound) {
+                    var a = O.can, n = (O.fxLayout, "next" == e), r = n ? -1 : 1, o = 150, l = n ? a.xMax : a.xMin, u = 130 * r + l, d = i.css(s), p = 30 * r + (d = k.tf ? "none" == d ? l : X.ValueX(d) : "auto" == d ? l : X.PInt(d));
+                    p / r > u / r ? t() : (Q.AnimateX(null, p, 0, 1, o), clearTimeout(N.rebound), N.rebound = setTimeout(t, o));
+                }
+            },
+            Flywheel: function() {
+                var e = i.is(O.$swipeCur), t = e ? O.can : O.pag;
+                if (!e) {
+                    var a = O.tDrag1 - O.tDrag0;
+                    if (!(O.xBuffer < 0 && O.xBuffer > t.xMax && a < 200 && X.A(O.xOffset) > 10)) return;
+                    var n = O.pageX1 - O.x0Fix, r = O.xBuffer + n;
+                    r + 50 > 0 ? r = 0 : r - 50 < t.xMax && (r = t.xMax), p.TranslateTo(r);
+                }
+            },
+            CanvasBegin: function() {
+                var e = O.fxLayout, t = O.can, a = 0;
+                if ("line" == e && k.center) {
+                    var n = k.dirsHor ? O.wSlide : X.OuterHeight(O.$s.eq($.idCur), !0);
+                    a = X.R((O.sRuby - n) / 2);
+                }
+                if (t.xCanvas = a, "dot" == e) t.xMin = t.xMax = 0; else if ("line" == e) {
+                    t.xMin = a;
+                    var r = X.Sum(O.sSlideMap) - (O.ma[0] + O.ma[1]);
+                    t.xMax = O.wRuby < r ? -(r - O.wRuby + a) : a;
+                }
+                O.$swipeCur = i, k.loop ? Q.AnimateX(null, a, !0, !0) : Q.AnimateX(null, $.idCur, !0);
+            }
+        }, Z = {
+            Margin: function() {
+                var t = O.wRuby;
+                O.maGridCur = e.isArray(O.maGrid) ? O.maGrid[O.index] : null, null !== O.maGridCur ? O.ma = [ X.PercentToPixel(O.maGrid[O.index], t), X.PercentToPixel(O.maGrid[O.index], t) ] : (k.dirsHor && t !== X.InnerWidth(n) && (O.ma[0] = X.PInt(n.css("padding-left")), 
+                O.ma[1] = X.PInt(n.css("padding-right"))), k.dirsHor || O.hRuby === X.InnerHeight(n) || (O.ma[0] = X.PInt(n.css("padding-top")), 
+                O.ma[1] = X.PInt(n.css("padding-bottom"))));
+            },
+            TranslateS: function() {
+                Z.Margin(), O.wSlideFull = O.can.sTranslate = O.wSlide + O.ma[0] + O.ma[1];
+            },
+            WidthForRuby: function() {
+                k.pag && O.pagVer && (!O.pag.maRight && p.GetSizeOfItems(), p.MarginOnViewport()), 
+                J.Anchor(), O.wRuby = X.Width(n);
+                var t = O.index = X.GetIndexInResponsive(V.responsiveLevels);
+                O.wGridCur = e.isArray(O.wGrid) ? O.wGrid[t] : null, O.hGridCur = e.isArray(O.hGrid) ? O.hGrid[t] : null, 
+                O.paGridCur = e.isArray(O.paGrid) ? O.paGrid[t] : null;
+                var a = null;
+                a = k.dirsHor ? X.PercentToPixel(O.wSlideGrid[O.index], O.wRuby) : O.wRuby, O.wSlide = X.PInt(a);
+            },
+            HeightLockForAnim: function() {
+                n.css("height", X.Height(n)), clearTimeout(N.heightLock), N.heightLock = setTimeout(function() {
+                    n.css("height", "");
+                }, V.speedHeight + 10);
+            },
+            AnimHeightForRuby: function(e) {
+                function t(t) {
+                    if (O.hRuby = t, k.dirsHor || (O.sRuby = t), null === V.speedHeight || e) X.Scroll.Check(); else {
+                        var i = V.speedHeight - a;
+                        O.tweenView.animate(n, {
+                            height: t
+                        }, {
+                            isNew: !0,
+                            duration: i,
+                            complete: function() {
+                                n.css("height", ""), X.Scroll.Check();
+                            }
+                        });
+                    }
+                }
+                var a = 30, i = X.OuterHeight(O.$s.eq($.idCur), !0);
+                setTimeout(function() {
+                    !k.heightFixed && (O.hRuby != i && i > 0 || e) && (t(i), !k.pag || k.pagList || "ver" != O.pag.dirs || k.pagOutside || "full" != V.pag.sizeAuto || p.PropAndStyle());
+                }, a);
+            },
+            HeightAutoForRuby: function(e) {
+                O.hRuby = X.PInt(e);
+            },
+            HeightFixedForRuby: function() {
+                function t(e) {
+                    n.css("height", e);
+                }
+                if (k.fullscreen) {
+                    var a = G.height(), i = O.$anchor.offset().top;
+                    if (i < a && (a -= i), null !== V.offsetBy) {
+                        var r = e(V.offsetBy);
+                        r.each(function() {
+                            a -= X.OuterHeight(e(this), !0);
+                        }), r.find("img").length && G.on("load", function() {
+                            $.refresh();
+                        });
+                    }
+                    O.hRuby = a, t(O.hRuby);
+                } else O.hRuby = null, e.isArray(O.hGrid) && (e.isNumeric(O.hGridCur) ? O.hRuby = O.hGridCur : e.isArray(O.wGrid) && (O.hRuby = X.R(O.hGrid[0] * O.rate))), 
+                O.hRuby && t(O.hRuby);
+            },
+            EndOfRuby: function() {
+                var e = X.Width(n);
+                (k.fullwidth || k.fullscreen) && (e = G.width()), O.wSlide !== e && (Z.WidthForRuby(), 
+                k.res && u.UpdateVars(), k.heightFixed ? Z.HeightFixedForRuby() : Z.HeightAutoForRuby(X.OuterHeight(O.$s.eq($.idCur), !0))), 
+                O.sRuby = k.dirsHor ? O.wRuby : O.hRuby;
+            }
+        }, J = {
+            CombineAtFirst: function() {
+                if (/^(line|dot)$/.test(O.fxLayout) && (O.sCanvas = k.dirsHor ? O.wSlide : O.wRuby, 
+                i.css("width", O.sCanvas)), Z.TranslateS(), "line" == O.fxLayout) {
+                    if (k.centerLoop) {
+                        for (var e = 0, t = 0; e < O.wRuby; ) e = (O.wSlide + O.ma[0] + O.ma[1]) * (2 * t + 1), 
+                        t++;
+                        var a = t - 1;
+                        2 * a >= r && (a = ~~((r - 1) / 2)), O.center.nEdge = a;
+                    }
+                    var n = "TFSlide" + O.View;
+                    !!ee[n] && ee[n]();
+                }
+                Q.CanvasBegin(), k.pag && !k.pagList && (p.CSSPosForPag(), p.PropAndStyle(), p.PosAndSizeOfItems(), 
+                p.UpdateThumbnail(), V.pag.isMark && p.SizePosOfMark(), p.PosCenterForItemCur(!0, !0), 
+                setTimeout(function() {
+                    p.VerToHor();
+                }, 40));
+            },
+            SlideBasic: function() {
+                function e(e) {
+                    return X.OuterHeight(O.$s.eq(e), !0) + O.ma[0] + O.ma[1];
+                }
+                var t = O.pBegin = [], a = O.sSlideMap = [], i = k.centerLoop ? O.center.nLeft : 0;
+                if (k.dirsHor) for (o = 0; o < r; o++) a[o] = O.wSlideFull, t[o] = a[o] * (-i + o); else if (k.centerLoop) {
+                    var n = 0, s = 0;
+                    for (o = i; o < r; o++) a[o] = e(O.idMap[o]), t[o] = n, n += a[o];
+                    for (o = i - 1; o >= 0; o--) a[o] = e(O.idMap[o]), s -= a[o], t[o] = s;
+                } else for (o = 0; o < r; o++) 3[o] = e(o), t[o] = a[o] * o;
+            },
+            Anchor: function() {
+                if (k.fullwidth || k.fullscreen) {
+                    var e = G.width(), a = O.$anchor.width(), i = O.$anchor.offset().left;
+                    a === e ? t.css({
+                        width: "",
+                        left: ""
+                    }) : t.css({
+                        width: ~~e,
+                        left: -Math.ceil(i)
+                    });
+                }
+            }
+        }, ee = {
+            TFSlideBasic: function() {
+                J.SlideBasic();
+                var e = O.can, t = "hor" == e.dirs ? "Tlx" : "Tly";
+                for (O.tfMap = [], o = 0; o < r; o++) {
+                    var a = k.centerLoop ? O.idMap[o] : o, i = {};
+                    i[e.cssTf] = X[t](O.pBegin[o]), O.tfMap.push(i), O.$s.eq(a).css(i);
+                }
+            }
+        }, te = {
+            SlideLoaded: function() {
+                ee.TFSlideBasic(), "line" == O.fxLayout && Q.CanvasBegin();
+            }
+        }, ae = {
+            Run: function(e, a, i, n) {
+                var s = $.idCur;
+                if (!a && e <= $.num || a && s !== e) {
+                    O.ts = {
+                        num: e,
+                        isIDFixed: !!a,
+                        isContinuity: !!i,
+                        isPagCenter: void 0 === n || !!n
+                    }, k.fxRun = !0, t.addClass(O.ns + "fxRun"), k.slideNext = a ? e - $.idCur > 0 : e > 0, 
+                    X.RunEvent("fxBegin"), X.Data(O.$s.eq(s)).isLoaded && (k.HOTSPOT && m.Reset(s), 
+                    k.LAYER && y.PlayEnd(s), k.VIDEOIFRAME && g.SlideDeactived(s), k.LAYERPARALLAX && C.Reset(s), 
+                    k.VIDEOBACK && v.Run("pause")), k.slideshow && x.Go("slideToBegin"), a ? 0 == e && X.RunEvent("start") : (s + e == 0 || s + e - r == 0) && X.RunEvent("start"), 
+                    X.RunEvent("before"), a && (O.ts.num -= s);
+                    var o;
+                    "swipe" == O.moveBy && "swipe" != O.moveLastBy ? o = V.swipe.easing : "tap" == O.moveBy && "tap" != O.moveLastBy && (o = V.fxEasing), 
+                    o && (O.easing = o, O.moveLastBy = O.moveBy), ae[O.fxLayout]();
+                }
+            },
+            line: function() {
+                var e = O.ts;
+                if (ae.ToggleID(), !k.heightFixed && Z.AnimHeightForRuby(), clearTimeout(N.lineEnd), 
+                N.lineEnd = setTimeout(ae.End, O.speed[$.idCur]), k.dirsHor) {
+                    if (k.centerLoop) e.isIDFixed && Q.FillHole(), Q.Balance(e.isContinuity), !e.isContinuity && Q.AnimateX(i, e.num); else if (!e.isContinuity && Q.AnimateX(i, e.num), 
+                    "3d" == O.fxType) {
+                        var t = "Restore" + O.View;
+                        !!ee[t] && ee[t]();
+                    }
+                } else if (k.centerLoop && 1 == X.A(e.num)) {
+                    var a = e.num > 0 ? $.idLast : $.idCur, n = -((X.OuterHeight(O.$s.eq(a), !0) + O.ma[0] + O.ma[1]) * e.num - O.can.xCanvas);
+                    Q.Balance(e.isContinuity), !e.isContinuity && Q.AnimateX(i, n, !1, !0);
+                }
+            },
+            dot: function() {
+                var e = O.ts;
+                "math" == O.fxType && (e.isDelayWhenToggleID = !0), ae.ToggleID(), !k.heightFixed && Z.AnimHeightForRuby(), 
+                V.isBodyMaskInFxCSS && "css" === O.fxView && O.$body.addClass(O.ns + "mask-x"), 
+                ne.Init();
+            },
+            ToggleID: function() {
+                !k.heightFixed && null !== V.speedHeight && Z.HeightLockForAnim();
+                var e = O.ts, t = $.idCur, a = O.nMove = e.num;
+                $.idLast = t, t += a, k.loop && (a < 0 && t < 0 ? t = r + t : a > 0 && t >= r && (t -= r)), 
+                X.RunEvent("beforeSwapIDCur"), $.idCur = t, X.RunEvent("afterSwapIDCur"), e.isDelayWhenToggleID ? setTimeout(X.ToggleSlide, 10) : X.ToggleSlide(), 
+                ae.AfterToggleID();
+            },
+            AfterToggleID: function() {
+                if (k.pag && !k.pagList && O.ts.isPagCenter && ("swipe" == O.moveBy || "tap" == O.moveBy && V.pag.isItemCurCenterWhenTap || "ver" == O.pag.dirs)) {
+                    var e = "ver" == O.pag.dirs;
+                    p.PosCenterForItemCur(e);
+                }
+                k.LAYER && y.Update($.idCur), k.VIDEOBACK && v.Run("play");
+            },
+            End: function() {
+                var e = $.idCur;
+                V.isBodyMaskInFxCSS && "css" === O.fxView && O.$body.removeClass(O.ns + "mask-x"), 
+                k.fxRun = !1, t.removeClass(O.ns + "fxRun"), X.RunEvent("fxEnd"), k.LAYER && (y.Play(e), 
+                y.Resume("home")), k.HOTSPOT && m.UpdatePosition(e), k.LAYERPARALLAX && C.ToggleEvent(e), 
+                X.RunEvent("after"), e == r - 1 && X.RunEvent("end"), k.slideshow && (k.hoverAction = !0, 
+                V.slideshow.isLoop || $.idLast != r - 1 || 0 != e ? x.Go("slideToEnd") : $.pause());
+            }
+        }, ie = {
+            Setup: function() {
+                k.NAV && d.EventTap(), k.PAG && p.EventTap(), k.SLIDESHOW && (x.EventHover(), x.EventTap()), 
+                ie.Keyboard(), ie.Wheel({
+                    $wheel: n,
+                    direction: O.can.dirs,
+                    optsWheel: V.wheel
+                }), k.PAG && ie.Wheel({
+                    $wheel: O.$pag,
+                    direction: O.pag.dirs,
+                    optsWheel: V.pag.wheel
+                }), k.DEEPLINKING && b.Events(), k.FULLSCREEN && T.Events(), ie.Resize();
+            },
+            GetEventRight: function(e) {
+                var t = e;
+                return /^touch/.test(e.type) ? t = e.originalEvent.touches[0] : /pointer/i.test(e.type) && (t = e.originalEvent), 
+                t;
+            },
+            CheckMobileTap: function(t) {
+                t.each(function() {
+                    var t = e(this);
+                    t.on(O.ev.swipe.start, function(t) {
+                        var a = X.Data(e(this));
+                        ie.GetEventRight(t);
+                        a.isMobileTap = !0;
+                    }), t.on(O.ev.swipe.move, function(t) {
+                        var a = X.Data(e(this));
+                        ie.GetEventRight(t);
+                        a.isMobileTap = !1;
+                    });
+                });
+            },
+            DelayToTapNext: function() {
+                k.tapEnable = !1, setTimeout(function() {
+                    k.tapEnable = !0;
+                }, 10);
+            },
+            PrevCore: function(e) {
+                O.moveBy = "tap", e = e || 1, k.loop && $.num > 1 || !k.loop && $.idCur > 0 ? ae.Run(-e) : Q.AnimRebound("prev");
+            },
+            NextCore: function(e) {
+                O.moveBy = "tap", e = e || 1, k.loop && $.num > 1 || !k.loop && $.idCur < r - 1 ? ae.Run(e) : Q.AnimRebound("next");
+            },
+            Prev: function() {
+                if (k.tapEnable) {
+                    var e = V.stepNav;
+                    ie.PrevCore(e), ie.DelayToTapNext();
+                }
+            },
+            Next: function(e) {
+                if (k.tapEnable) {
+                    var t = e ? V.stepPlay : V.stepNav;
+                    ie.NextCore(t), ie.DelayToTapNext();
+                }
+            },
+            Keyboard: function() {
+                H.off(O.ev.key), V.isKeyboard && H.on(O.ev.key, function(e) {
+                    if (X.Scroll.Check(!0), k.into) {
+                        var t = e.keyCode, a = V.keyboard;
+                        t === a.prevKey || t === a.prevAlterKey ? ie.PrevCore(1) : t !== a.nextKey && t !== a.nextAlterKey || ie.NextCore(1);
+                    }
+                });
+            },
+            Wheel: function(e) {
+                function t(t, a) {
+                    function i(e) {
+                        0 !== e && void 0 !== e && (n += e > 0 ? e : -e, r = !0);
+                    }
+                    var n = o.delta, r = !1;
+                    switch (k.firefox && (t *= 20, a *= 20), e.optsWheel) {
+                      case "auto":
+                        i("hor" == e.direction ? t : a);
+                        break;
 
-      /**
-       * REGISTER - REMOVE EVENT 'SWIPE'
-       *  + if there are not option 'isAutoOnPag' == true -> not setup any more
-       *  + Depending on 'isViewLarge' & 'is.swipePagCur'
-       */
-      if( is.SWIPE && !!o.swipe.isAutoOnPag && ((isViewLarge && !!is.swipePagCur) || (!isViewLarge && !is.swipePagCur)) ) {
-
-        // Status current swipe on pagination
-        var statusSwipeOnPag = isViewLarge ? 'offPag' : 'onPag';
-
-        // Reset event swipe for pagination
-        M.Module('SWIPE').Events(statusSwipeOnPag);
-      }
-    },
-
-
-
-
-
-
-
-
-
-
-    /**
-     * CSS Position for the Pagination
-     */
-    CSSPosForPag : function() {
-      VariableModule(this);
-      var opag   = o.pag,
-        styles = { 'margin-left': '', 'margin-right': '', 'margin-top': '', 'margin-bottom': '' };
-
-      // Case horizontal offset
-      if( opag.hOffset !== null ) {
-        if( opag.cssPosition == 'relative' ) {
-          styles[opag.position == 'begin' ? 'margin-bottom' : 'margin-top'] = opag.hOffset;
-        }
-        else {
-          styles[opag.position == 'begin' ? 'margin-top' : 'margin-bottom'] = opag.hOffset;
-        }
-      }
-
-      // Case vertical offset
-      if( opag.vOffset !== null ) {
-        if( opag.cssPosition == 'relative' ) {
-          styles[opag.position == 'begin' ? 'margin-right' : 'margin-left'] = opag.vOffset;
-        }
-        else {
-          styles[opag.position == 'begin' ? 'margin-left' : 'margin-right'] = opag.vOffset;
-        }
-      }
-
-      // Set margin on the Pagination
-      va.$pag.css(styles);
-    },
-
-    /**
-     * SIZE OF WIDTH-HEIGHT FOR PAG-ITEM
-     */
-    TypeSizeItem : function() {
-      VariableModule(this);
-
-      var op  = o.pag,
-        p   = va.pag,
-        wfit  = va.ns +'wfit',
-        hfit  = va.ns +'hfit',
-        isHor = (p.dirs == 'hor'),
-        isSizeSelf = is.pagItemSizeSelf;
-
-
-      /**
-       * RESET WIDTH-HEIGHT FOR PAG-INNER
-       *  + Get correct value width/height of pagItem
-       *  + Toggle class 'wfit' & 'wfit' to get size
-       */
-      function ResetSizeOnInner() {
-
-        va.$pagInner
-          .css({
-            'width'     : '',
-            'height'    : '',
-            'margin-right'  : '',
-            'margin-bottom' : ''
-          })
-          .removeClass(wfit +' '+ hfit);
-
-        // Reset kich thuoc cua Pag Item
-        va.$pagItem.each(function() { $(this).css({'width': '', 'height': ''}); });
-      }
-
-
-      /**
-       * SETUP SIZE WIDTH/HEIGHT - MARGIN ON PAG-INNER
-       *  + Total distance is calculated by 'margin-right' & 'margin-bottom'
-       *  -> Not effect to size 100% & position of pagination
-       *  -> Check vertical tabs outside -> remove width on pagInner
-       */
-      function SetupSizeOnInner() {
-        var wInner = isHor  ? (op.typeSizeItem == 'max' ? p.wMax : p.wMin) : p.wMax,
-          hInner = !isHor ? (op.typeSizeItem == 'max' ? p.hMax : p.hMin) : p.hMax,
-          styles = {
-            'width'  : wInner,
-            'height' : hInner
-          };
-
-        // Add 'margin' to pagInner
-        // Remove width/height on pagInner when pagItem at size before
-        if( isHor ) {
-          styles['margin-bottom'] = p.maBottom;
-          if( isSizeSelf ) styles.width = p.wSum;
-        }
-        else {
-          styles['margin-right'] = p.maRight;
-          if( isSizeSelf) styles.height = p.hSum;
-          if( is.pagOutside ) styles.width = '';
-        }
-
-        // Setup style on pagInner
-        va.$pagInner.css(styles);
-
-
-
-        /**
-         * SETUP WIDTH/HEIGHT 'FIT' FOR PAG-ITEM
-         *  + If item is size 'self' depends on 'p.dirs' is 'wfit' or 'hfit'
-         *  + If item is not size 'self', must have 'wfit'-'hfit'
-         */
-        if( !is.pagList ) {
-          var classes = wfit +' '+ hfit;
-
-          if( isSizeSelf ) {
-            classes = isHor ? hfit : wfit;
-          }
-
-          // Setup class 'wfit'-'hfit' on pagInner
-          va.$pagInner.addClass(classes);
-        }
-      }
-
-
-      /**
-       * GET PADDING & BORDER OF VIEWPORT
-       *  -> support pagtype-tabs with 'sizeAuto-full' option
-       */
-      function GetSpaceOuterOfViewport() {
-
-        function Space(aProp) {
-          var sizeView = 0, sizePag  = 0;
-
-          for( i = aProp.length - 1; i >= 0; i-- ) {
-            sizeView += M.PInt(va.$viewport.css(aProp[i]));
-            sizePag  += M.PInt(va.$pag.css(aProp[i]));
-          }
-          return sizeView - sizePag;
-        }
-
-        va.viewSpace = {
-          'hor': Space(['padding-left', 'padding-right', 'border-left-width', 'border-right-width']),
-          'ver': Space(['padding-top', 'padding-bottom', 'border-top-width', 'border-bottom-width'])
+                      case "both":
+                        i(t || a);
+                    }
+                    return n <= -300 ? (ie.PrevCore(1), n = 0, o.type = null) : n >= 300 && (ie.NextCore(1), 
+                    n = 0, o.type = null), o.delta = n, r;
+                }
+                var a = "." + O.ns + O.rubykey, i = "wheel" + a, n = "mousewheel" + a, r = e.$wheel;
+                if (e.$wheel) {
+                    r.off(i + " " + n);
+                    var s = X.Data(r);
+                    s.wheelValue || (s.wheelValue = {
+                        type: null,
+                        delta: 0
+                    });
+                    var o = s.wheelValue;
+                    !1 !== V.wheel && r.on(n + " " + i, function(e) {
+                        var a = e.type, i = e.originalEvent;
+                        if ((null === o.type || o.type == a) && (null === o.type && (o.type = a), t(i.wheelDeltaX || i.deltaX || 0, i.wheelDeltaY || i.deltaY || 0))) return !1;
+                    });
+                }
+            },
+            LoadAll: function() {
+                function e() {
+                    k.res && O.rateInit != O.rate && $.refresh();
+                }
+                $.ev.off("loadAll").on("loadAll", function() {
+                    e();
+                }), G.on("load", function() {
+                    setTimeout($.refresh, 100);
+                });
+            },
+            Resize: function() {
+                G.off(O.ev.resize), G.on(O.ev.resize, function() {
+                    clearTimeout(N.resize), N.resize = setTimeout(function() {
+                        k.fullscreen && (O.hRuby = G.height()), k.slideshow && !k.ssPauseAbsolute && X.Scroll.Check(), 
+                        !!V.showInRange && k.DISPLAY && S.Toggle(), k.showInRange && (X.A(X.Width(n) - O.wRuby) > 1 || X.A(X.Height(n) - O.hRuby) > 1) && Y.Resize();
+                    }, 100);
+                }), clearInterval(N.resizeLoop), N.resizeLoop = setInterval(function() {
+                    var e, a;
+                    if (k.fullwidth || k.fullscreen) {
+                        e = G.width();
+                        var i = G.height(), r = t.offset().top;
+                        k.fullscreen && r < i && (a = i - r);
+                    } else e = X.Width(n), a = X.OuterHeight(O.$s.eq($.idCur), !0);
+                    k.fxRun || k.swiping || !(X.A(e - O.wRuby) > 1 || X.A(a - O.hRuby) > 1) || Y.Resize();
+                }, V.delayUpdate);
+            }
+        }, ne = {
+            Init: function() {
+                var e = O.fxType, t = "ToSlide" + O.View;
+                "math" == e && ee[t] ? ee[t]() : /^css/.test(e) && ee[t] ? ee[t]() : ne.none();
+            },
+            End: function(t) {
+                null === t ? ae.End() : (e.isNumeric(t) || (t = O.speed[$.idCur]), clearTimeout(N.fxEnd), 
+                N.fxEnd = setTimeout(ae.End, t));
+            },
+            none: function() {
+                ae.End();
+            }
+        }, re = {
+            prev: function(e) {
+                ie.PrevCore(e);
+            },
+            next: function(e) {
+                ie.NextCore(e);
+            },
+            first: function() {
+                ae.Run(0, !0);
+            },
+            last: function() {
+                ae.Run(r - 1, !0);
+            },
+            goto: function(t) {
+                function a(t) {
+                    if (t.length && O.$s.is(t)) {
+                        var a = X.Data(t).id;
+                        e.isNumeric(a) && ae.Run(a, !0);
+                    }
+                }
+                e.isNumeric(t) && (t = X.PInt(t)), t >= 0 && t < r ? ae.Run(t, !0) : "string" == typeof t ? a(e(t)) : t instanceof jQuery && a(t);
+            },
+            play: function() {
+                k.slideshow && x.Api("play");
+            },
+            pause: function() {
+                k.slideshow && x.Api("pause");
+            },
+            stop: function() {
+                k.slideshow && x.Api("stop");
+            },
+            playLayer: function() {
+                k.LAYER && y.Play($.idCur);
+            },
+            pauseLayer: function() {
+                k.LAYER && y.Pause($.idCur);
+            },
+            resumeLayer: function() {
+                k.LAYER && y.Resume($.idCur);
+            },
+            requestNativeFS: function() {
+                k.FULLSCREEN && T.RequestNativeFS();
+            },
+            exitNativeFS: function() {
+                k.FULLSCREEN && T.ExitNativeFS();
+            },
+            update: function(t, a) {
+                z.oo = F = e.extend(!0, {}, V), z.vava = B = e.extend(!0, {}, O), z.isis = U = e.extend(!0, {}, k), 
+                V = e.extend(!0, V, t), O.optsUpdate = t, !!k.awake && !a && $.refresh(), O.optsUpdate = O.addInfo = null;
+            },
+            updateOnSlides: function(t) {
+                e.isPlainObject(t) && (O.optsSlides = t, $.refresh(), O.optsSlides = null);
+            },
+            refresh: function() {
+                _.MergeAllModules(), Y.RemoveClass(), O.name = V.name || t.attr("id") || null, k.RUBYANIMATE && A.UpdateAllKeyframes(), 
+                _.Ruby(), k.SLIDESHOW && x.RenderControl(), k.TIMER && I.Render(), k.NAV && d.Render(), 
+                k.PAG && p.RenderSelf(), k.CAP && c.Render(), _.Slides(), q.IDMap(), _.DeepLinkCookie(), 
+                X.ToggleSlide(), Y.Reset(), Y.Resize(), K.Other(), ie.Setup(), k.APIREMOTE && P.Init(), 
+                k.SLIDESHOW && x.UpdateAll();
+            },
+            destroy: function(e) {
+                k.SWIPE && l.Events(!1);
+                var a = O.ev.mouse.end + " " + O.ev.swipe.end + " " + O.ev.click;
+                V.isNav && O.$prev.add(O.$next).off(a), V.isPag && O.$pagItem.off(a), H.off(O.ev.key), 
+                n.off(O.ev.wheel), clearInterval(N.resizeLoop), G.off(O.ev.resize), V.isSlideshow && (clearInterval(N.timer), 
+                G.off(O.ev.scroll), this.stop()), e && (t.removeData(rt01VA.rubyName), !!O.$nav && O.$nav.remove(), 
+                !!O.$pag && O.$pag.remove(), V.isCap && O.$cap.remove(), V.isSlideshow && (!!O.$timer && O.$timer.remove(), 
+                !!O.$playpause && O.$playpause.remove(), !!O.$ssControl && O.$ssControl.remove()), 
+                rt01VA.$ruby = rt01VA.$ruby.not(t), t.remove());
+            },
+            restore: function() {
+                W.Load();
+            },
+            index: function() {
+                return $.idCur;
+            },
+            indexLast: function() {
+                return $.idLast;
+            },
+            width: function() {
+                return O.wRuby;
+            },
+            height: function() {
+                return O.hRuby;
+            },
+            slideLength: function() {
+                return $.num;
+            },
+            slideCur: function() {
+                return O.$s.eq($.idCur);
+            },
+            slideAll: function() {
+                return O.$s;
+            },
+            opts: function() {
+                return V;
+            },
+            optsCur: function() {
+                return X.Data($.idCur).opts;
+            },
+            variable: function() {
+                return O;
+            },
+            browser: function() {
+                return O.browser;
+            },
+            isMobile: function() {
+                return k.mobile;
+            },
+            isTransform: function() {
+                return k.tf;
+            },
+            isTransition: function() {
+                return k.ts;
+            },
+            ev: e("<div/>")
         };
-      }
-
-
-
-      /**
-       * SETUP START
-       */
-      ResetSizeOnInner();
-      that.GetSizeOfItems();
-
-      SetupSizeOnInner();
-      GetSpaceOuterOfViewport();
-    },
-
-    /**
-     * GET WIDTH - HEIGHT OF EACH ITEMS
-     */
-    GetSizeOfItems : function() {
-      VariableModule(this);
-      var opag = o.pag,
-        p  = va.pag;
-
-
-      /**
-       * GET VALUE PADDING - BORSER - MARGIN OF PAG-ITEM
-       */
-      function GetPaBoMaOfItems() {
-        var cssName   = ['padding', 'border', 'margin'],
-          cssDirs   = ['Top', 'Right', 'Bottom', 'Left'],
-          cssSuffix = ['', 'Width', ''],
-          lenName   = cssName.length,
-          lenDirs   = cssDirs.length;
-
-        // First: reset value of CSS name
-        for( i = 0; i < lenName; i++ ) {
-          p[ cssName[i] ] = [[], [], [], []];
-        }
-
-        // Loop each $pagItem
-        va.$pagItem.each(function(index) {
-
-          // Get style-computed of item
-          var style = document.defaultView ? getComputedStyle(this) : this.currentStyle;
-
-
-          /**
-           * LOOP TO GET VALUE OF CSS NAME
-           *  + Loop 1: CSS name
-           *  + Loop 2: CSS diretion
-           *  + Value is arranged in order: Padding.Top.IDPagItem
-           */
-          for( i = 0; i < lenName; i++ ) {
-            for( j = 0; j < lenDirs; j++ ) {
-              p[ cssName[i] ][j][index] = M.PInt( style[cssName[i] + cssDirs[j] + cssSuffix[i]] );
+        W.Check();
+    }, e.fn[rt01VA.rubyName] = function() {
+        var t = arguments, a = rt01VA.rubyName, i = null;
+        return e(this).each(function() {
+            var n = e(this), r = n.data(a);
+            if (void 0 === t[0] && (t[0] = {}), e.isPlainObject(t[0])) r ? e.isEmptyObject(t[0]) || r.update(t[0]) : new e[a](n, t[0]), 
+            i = n.data(a); else try {
+                r[t[0]](t[1]);
+            } catch (e) {
+                !!window.console && console.warn("[" + a + ": function not exist!]");
             }
-          }
-        });
-      }
-
-      /**
-       * GET WIDTH - HEIGHT OF PAG-ITEM
-       */
-      function GetSizeOfItems(ns) {
-        var ns2   = (ns == 'w') ? 'width' : 'height',
-          ns3   = (ns == 'w') ? 'Width' : 'Height',
-          names = [ns +'Self', ns +'ToPadding', ns + 'ToBorder', ns +'ToMargin'];
-
-
-        // Reset property at first
-        for( i = 0; i < names.length; i++ ) {
-          p[names[i]] = [];
-        }
-
-
-        // Setup each item
-        va.$pagItem.each(function() {
-          var $itemCur   = $(this),
-            dSelf    = M.R( M[ns3]($itemCur) ),
-
-            // Distance around of item: padding, border, margin
-            dPadding   = M.R( M['Inner' + ns3]($itemCur) - dSelf ),
-            dPadToBor  = M.R( M['Outer' + ns3]($itemCur) - dSelf ),
-            dPadToMar  = M.R( M['Outer' + ns3]($itemCur, true) - dSelf );
-
-
-          // Setup size of pagItem when have option: width, height, minWidth, maxWidth...
-          var optsMin = opag['min'+ ns3],
-            optsMax = opag['max'+ ns3];
-
-          if( $.isNumeric(opag[ns2]) ) dSelf = opag[ns2];
-          if( $.isNumeric(optsMin) && dSelf < optsMin ) dSelf = optsMin;
-          if( $.isNumeric(optsMax) && dSelf > optsMax ) dSelf = optsMax;
-
-          // Push all size into array[]
-          // Part size is sum -> because size 'self' can change
-          p[names[0]].push(dSelf);
-          p[names[1]].push(dSelf + dPadding);
-          p[names[2]].push(dSelf + dPadToBor);
-          p[names[3]].push(dSelf + dPadToMar);
-        });
-
-
-
-        /**
-         * SETUP OTHER SIZE
-         *  + Size Min - Max of pagItem
-         *  + Total size of all pagItems
-         */
-        p[ns +'Min'] = Math.min.apply(null, p[names[0]]);
-        p[ns +'Max'] = Math.max.apply(null, p[names[0]]);
-        p[ns +'Sum'] = M.Sum(p[names[3]]);
-      }
-
-      /**
-       * GET MAXIMUM VALUE IN ARRAY[]
-       */
-      function MaxOfTwoArray(arr1, arr2) {
-        var maxValue = 0;
-        for( i = 0; i < cs.num; i++ ) {
-
-          var valueCur = arr1[i] - arr2[i];
-          if( valueCur > maxValue ) maxValue = valueCur;
-        }
-        return maxValue;
-      }
-
-
-
-      // Setup start
-      GetPaBoMaOfItems();
-      GetSizeOfItems('w');
-      GetSizeOfItems('h');
-
-      // Size of all pagItems depend on Direction
-      p.sSum = (p.dirs == 'hor') ? p.wSum : p.hSum;
-
-      // Valur largest of Margin for pagInner
-      p.maRight  = MaxOfTwoArray(p.wToMargin, p.wSelf);
-      p.maBottom = MaxOfTwoArray(p.hToMargin, p.hSelf);
-    },
-
-    // Get value properties of pagination relate to size
-    PropAndStyle : function() {
-      VariableModule(this);
-      var that  = this,
-        $pag  = va.$pag,
-        num   = cs.num,
-        p   = va.pag,
-        isHor = p.dirs == 'hor';
-
-
-      /**
-       * SIZE OF PAGINATION CHANGE DEPEND ON SWIPE-CUR DIRECTION
-       * Change by option 'sizeAuto' : null , 'full', 'self'
-       *  + Convert 'sizeAuto' when pagination has markup outside
-       *  + null: not setup
-       *  + 'full': width / height pag = width / height ruby
-       *  + 'self': width / height pag = sum total width / height all pagItem
-       */
-      var sizeAuto = (is.pagOutside && !isHor) ? 'self' : o.pag.sizeAuto,
-        style  = { 'width': '', 'height': '' },
-        sViewport;
-
-      if( sizeAuto === null ) {
-        sViewport = isHor ? M.Width($pag) : M.Height($pag);
-      }
-      else if( sizeAuto == 'full' ) {
-        if( isHor ) sViewport = style.width  = va.wRuby + va.viewSpace.hor;
-        else    sViewport = style.height = va.hRuby + va.viewSpace.ver;
-      }
-      else if( sizeAuto == 'self' ) {
-        if( isHor ) sViewport = style.width  = p.wSum;
-        else    sViewport = style.height = p.hSum;
-      }
-
-      // Setup size auto on pagination
-      p.sViewport = sViewport;
-      va.$pag.css(style);
-
-      // Size of pag -> place below must to update style first
-      p.wViewport = M.Width($pag);
-      p.hViewport = M.Height($pag);
-      p.sTranslate = 0;
-
-
-
-
-      /**
-       * SETUP ALIGN JUSTIFY
-       *  + Justify: option 'sizeAuto' is null || 'full' -> for markup inside & 'hor' direction
-       *  + Ver 1.5 - 05/10/2016: support Justify on markup outside
-       */
-      if( is.alignJustify && sizeAuto !== 'self' ) {
-
-        // Case: horizontal direction
-        if( isHor ) {
-
-          // Get maximum size of item
-          var wMaxItem  = Math.max.apply(null, p.wToMargin),
-            wSumItems = wMaxItem * num;
-
-          // Size of item depend on size-total sum all items with size-viewport
-          var wJustify = wMaxItem;
-          if( p.wViewport >= wSumItems || o.pag.isJustifyWhenLarge ) wJustify = ~~(p.wViewport / num);
-
-          // Update size of pagInner
-          var wItem = wJustify - p.maRight;
-          va.$pagInner.css({ 'width': wItem, 'height': p.hSelf[0] });
-        }
-      }
-
-
-
-
-      /**
-       * SETUP THE OTHER VARIABLE OF PAGINATION
-       *  + Distance remain of 'va.wRuby' with size-total pagItem -> for multiple use
-       *  + Check allow pagItem have center position -> width Viewport must > width-total pagItems sum
-       */
-      // First update property of pagItem
-      that.GetSizeOfItems();
-
-      // Setup next variables
-      var wRemain   = p.sViewport - p.sSum,
-        isViewLarge = p.isViewLarge = wRemain >= 0;
-
-
-
-      /**
-       * SETUP PULL - ALIGN OF PAG
-       *  + Pull will default return is 'begin' -> if width of pagination > Viewport
-       */
-      p.align = o.pag.align;
-
-      // Convert 'align' in the case
-      // Ver 1.4 - 21/09/2016 : convert align 'justify' to align 'center' when 'isViewLarge' === true
-      if( isViewLarge && p.align == 'justify' ) p.align = 'center';
-      if( !isViewLarge && p.align != 'begin' )  p.align = 'begin';
-
-
-      // Setup continue in difference position
-      if( p.align == 'begin' ) {
-        p.xMin = p.xCanvas = 0;
-        p.xMax = isViewLarge ? 0 : wRemain;
-      }
-      else if( p.align == 'end' ) {
-        p.xMin = p.xCanvas = wRemain;
-        p.xMax = p.sViewport;
-      }
-      else if( p.align == 'center' ) {
-        p.xMin = p.xCanvas = M.R(wRemain / 2);
-        p.xMax = p.xMin + p.sSum;
-      }
-
-
-
-      /**
-       * TOGGLE EVENT 'SWIPE' OF PAGINATION DEPENDING OF SIZE OF PAG-ITEM
-       */
-      that.ToggleEvent();
-    },
-
-    /**
-     * POSITION OF EACH ITEM IN 'SIZE.TRANSLATES()'
-     */
-    PosAndSizeOfItems : function() {
-      VariableModule(this);
-      var p   = va.pag,
-        isHor = p.dirs == 'hor';
-
-
-      /**
-       * FIRST UPDATE WIDTH - HEIGHT OF PAG-ITEM
-       */
-      that.GetSizeOfItems();
-
-
-
-      /**
-       * SETUP POSITION OF EACH ITEM DEPENDING TABS DIRECTION
-       */
-      var nameSize = isHor ? 'wToMargin' : 'hToMargin';
-      p.pBegin = [0];
-
-      for( i = 1; i < that.cs.num; i++ ) {
-        p.pBegin[i] = p.pBegin[i-1] + p[nameSize][i-1];
-      }
-
-
-
-
-      /**
-       * LOOP TO MOVE TO EACH ITEM BY POSITION BEFORE
-       */
-      var tl = (isHor ? 'Tlx' : 'Tly'), tf = {};
-
-      // Remove position 'left' - 'top' when swap between 'horizontal' and 'vertical'
-      if( !is.tf ) {
-        if( isHor ) tf['top']  = '';
-        else    tf['left'] = '';
-      }
-
-      // Setup continue
-      for( i = 0; i < that.cs.num; i++ ) {
-
-        // Setup position
-        tf[p.cssTf] = M[tl](p.pBegin[i]);
-
-        // Setup size
-        if( is.pagItemSizeSelf ) {
-          if( isHor ) tf['width']  = p.wSelf[i];
-          else    tf['height'] = p.hSelf[i];
-        }
-        va.$pagItem.eq(i).css(tf);
-      }
-    },
-
-
-
-
-
-
-
-
-
-
-    /**
-     * POSITION & SIZE FOR THUMBNAIL-ITEM
-     */
-    PosCenterForThumbItem : function($slCur) {
-      VariableModule(this);
-
-
-      /**
-       * CONDITIONAL EXECUTION
-       *  + Check thumbnail-wrap exist
-       *  + Check thumbnail-item exist
-       *  + check thumbnail-item has loaded
-       */
-      var slData   = M.Data($slCur),
-        $thumbWrap = slData.$thumbWrap,
-        $thumbItem = slData.$thumbItem,
-        iData    = M.Data($thumbItem);
-
-      if( !($thumbWrap && $thumbItem && iData.isLoaded) ) return;
-
-
-
-
-      /**
-       * SETUP RATIO WIDTH / HEIGHT OF THUMBNAIL-IMAGE
-       */
-      var ns     = va.ns,
-        wPagOpts = o.pag.width,
-        hPagOpts = o.pag.height,
-        wThumb   = $.isNumeric(wPagOpts) ? wPagOpts : M.Width($thumbWrap),
-        hThumb   = $.isNumeric(hPagOpts) ? hPagOpts : M.Height($thumbWrap),
-        rThumb   = wThumb / hThumb,
-        rImgItem = iData.rate;
-
-      if( rImgItem === undefined && iData.isImgback ) {
-        rImgItem = iData.rate = M.Data(iData.$imgback)['rate'];
-      }
-
-      // Case: It is Image transparent
-      if( $thumbItem.hasClass(va.ns + 'transparent') ) rImgItem = 1;
-
-
-
-
-      /**
-       * SETUP STYLE CENTER POSITION DEPENDING ON SIZE THUMBNAIL-ITEM
-       */
-      var classAdd = '',
-        style  = { 'width': '', 'height': '', 'left': '', 'top': '' };
-
-      if( wThumb && hThumb ) {
-        if( rImgItem > rThumb ) {
-          classAdd   = ns +'hfit';
-          style.left = - M.R((rImgItem * hThumb - wThumb) / 2);
-        }
-        else {
-          classAdd  = ns +'wfit';
-          style.top = - M.R((wThumb / rImgItem - hThumb) / 2);
-        }
-      }
-
-
-
-
-      /**
-       *SETUP STYLE TO IMAGE-ITEM
-       */
-      $thumbItem.css(style);
-
-      // Toggle class 'fit' for Thumbnail
-      var classRemove = '{ns}hfit{ns}wfit'
-                .replace(/\{ns\}/g, ns)
-                .replace(classAdd, '');
-
-      $thumbWrap
-        .addClass(classAdd)
-        .removeClass(classRemove);
-    },
-
-    /**
-     * UPDATE CENTER POSITION FOR ALL THUMBNAIL
-     */
-    UpdateThumbnail : function() {
-      var that = this;
-      VariableModule(that);
-
-      /**
-       * CONDITIONAL EXECUTION
-       */
-      if( !(is.pagThumb && is.initEnd) ) return;
-
-
-
-      /**
-       * UPDATE SIZE THUMBNAIL-ITEM FOR EACH SLIDE
-       */
-      va.$s.each(function() {
-        that.PosCenterForThumbItem( $(this) );
-      });
-    },
-
-    /**
-     * SETUP CENTER POSITION FOR CURRENT PAG-ITEM
-     */
-    PosCenterForItemCur : function(isForceTf, isNoAnim) {
-      var that = this, p = that.va.pag;
-      VariableModule(that);
-
-
-      /**
-       * MAIN FUNCTION
-       * Search position of pagInner
-       *  + Position: distance ahead ItemCur -> ((distance from ItemCur to Viewport) / 2)
-       */
-      function Translate() {
-        VariableModule(that);
-
-        // Case larger: size-viewport > size-pagItems
-        // If move by 'POSITION.AnimateX()', must check 'arrowActived()'
-        if( p.isViewLarge ) {
-          if( p.dirs == 'ver' ) isNoAnim = false;
-          that.TranslateTo(p.xCanvas, isForceTf, isNoAnim);
-        }
-
-        // Case smaller: size-viewport < size-pagItems
-        else {
-
-          // Position need to
-          var disOuter  = (p.dirs == 'hor') ? p.wToMargin : p.hToMargin,
-            disBefore = M.Sum(disOuter, cs.idCur),
-            xTarget   = - M.R(disBefore - ((p.sViewport - disOuter[cs.idCur]) / 2));
-
-
-          // Case the edge of Viewport: move to the edge
-          if   ( xTarget > 0 )    xTarget = 0;
-          else if( xTarget < p.xMax ) xTarget = p.xMax;
-
-          // Setup translate for pagination
-          that.TranslateTo(xTarget);
-        }
-      }
-
-
-      /**
-       * SETUP TIMER FOR TRANSLATE
-       *  + Vertical tabs wait after animate-height then comes translate pagination
-       */
-      if( p.dirs == 'hor' ) {
-        Translate();
-      }
-      else {
-        // Ver 1.7 - Jan 17, 2017 timer has value min > 200, fixed for "speedHeight" = null
-        var timer = 10 + (o.speedHeight || 200);
-
-        // Set translate
-        clearTimeout(ti.centerItemCur);
-        ti.centerItemCur = setTimeout(Translate, timer);
-      }
-    },
-
-    /**
-     * TRANSLATE PAG TO FIXED POSITION !!
-     *  + Difference position 'xCanvas' -> saving CPU
-     *  + Support 'pagItem0' at center position when resize smaller -> still recovery position of 'pagItem0'
-     *  + Setup manual, not use 'xAnimate()' -> Canvas & pagination transition together
-     *  + Support remove transition inline on object
-     *  + Support fallback browser have no transition
-     */
-    TranslateTo : function(xTarget, isForceTf, isNoAnim) {
-      VariableModule(this);
-      var that = this, p = va.pag;
-
-      // Conditional execution
-      if( !(xTarget != p.xCanvas || xTarget == 0 || !!isForceTf) ) return;
-
-
-      /**
-       * SETUP TRANSLATE ON PAG-INNER
-       */
-      // Setup transform support direction
-      var tweenPagInner = M.GetTween(va.$pagInner),
-        tf = (p.dirs === 'hor') ? { 'x': M.R(xTarget) }
-                    : { 'y': M.R(xTarget) };
-
-      // Case: have animation
-      if( !isNoAnim ) {
-
-        // Setup Tween animation
-        tweenPagInner
-          .animate(va.$pagInner, tf, {
-            isNew  : true,
-            duration : o.pag.speed,
-            easing   : o.pag.easing
-          });
-      }
-
-      // Case: without animation
-      else tweenPagInner.css(va.$pagInner, tf);
-
-
-
-
-
-      /**
-       * OHTER SETUP
-       *  + Update position 'xCanvas' of pagination
-       *  + Check Arrow 'actived' : after update position 'xCanvas'
-       *  + Update position of pagMark
-       */
-      p.xCanvas = xTarget;
-      o.pag.isArrow && that.ArrowActived(xTarget);
-      o.pag.isMark && that.SizePosOfMark();
-    },
-
-
-
-
-
-
-
-
-
-
-    /**
-     * ADD MARGIN INTO VIEWPORT -> GET CORRECT WIDTH OF VIEWPORT
-     */
-    MarginOnViewport : function() {
-      VariableModule(this);
-
-      // Conditional continue
-      if( is.pagOutside ) return;
-
-      // Case: CSS Position of the Pagination is 'relative'
-      if( o.pag.cssPosition == 'relative' ) {
-
-        // Set margin on Viewport
-        var margin = M.OuterWidth(va.$pag, true);
-        va.pagVer == 'begin' && va.$viewport.css('margin-left', margin);
-        va.pagVer == 'end'   && va.$viewport.css('margin-right', margin);
-      }
-
-      // Case: CSS Position of the Pagination is 'absolute'
-      else {
-        va.$viewport.css({ 'margin-left': '', 'margin-right': '' });
-      }
-    },
-
-    /**
-     * TABS 'VERTICAL' CONVERT TO 'HORIZONTAL' - AND REVERSE
-     */
-    VerToHor : function() {
-      VariableModule(this);
-      var op   = o.pag,
-        p  = va.pag,
-        dirs = null;
-
-      // Check any change 'direction' of tabs
-      if( is.pagTabs && op.direction == 'ver' ) {
-
-        // Check have convert to 'horizontal' direction
-        var isMinToHor = M.MatchMedia(0, op.widthMinToHor, true);
-        // Check continue if result == false
-        if( !isMinToHor ) isMinToHor = M.MatchMedia(0, op.rangeMinToHor);
-
-        // Setup continue
-        if( p.dirs == 'ver' && isMinToHor ) {
-          dirs = p.dirs = 'hor';
-
-          // Clear 'height' on paginaton
-          // Prevent setup height on pag in 'AnimHeightForRuby()'
-          !!va.$pag && va.$pag.stop(true).css('height', '');
-        }
-        else if( p.dirs == 'hor' && !isMinToHor ) {
-          dirs = p.dirs = 'ver';
-        }
-      }
-
-
-      // Update ruby if change direction
-      // Remove width-inline first to get correct width when update
-      if( !!dirs ) {
-        va.$canvas.add(va.$pag).css('width', '');
-        va.addInfo = { 'pagDirs': dirs };
-        cs.update({}, false);
-      }
-    },
-
-    /**
-     * ARROW TOGGLE ACTIVED
-     *  + Execute when have changed position of 'pag.xCanvas'
-     */
-    ArrowActived : function(xCanvasCur) {
-      VariableModule(this);
-
-      var xPlusToShow = 30,
-        actived   = va.actived,
-        $paLeft   = va.$pagArrowLeft,
-        $paRight  = va.$pagArrowRight;
-
-
-      // Case: width-wiewport < width-pagItems sum
-      if( !va.pag.isViewLarge ) {
-
-        // Arrow left
-        var isClassOnLeft = xCanvasCur < va.pag.xMin - xPlusToShow;
-        M.XClass($paLeft, isClassOnLeft, actived);
-
-        // Arrow Right
-        var isClassOnRight = xCanvasCur > va.pag.xMax + xPlusToShow;
-        M.XClass($paRight, isClassOnRight, actived);
-      }
-
-      // Case: width viewport larger
-      else $paLeft.add($paRight).removeClass(actived);
-    },
-
-    /**
-     * TRANSLATE PAGINATION BY 'TAP' ON ARROW
-     */
-    TranslatePagByTapArrow : function(dirs) {
-      VariableModule(this);
-      var p = va.pag;
-
-      // Conditional execute
-      if( p.isViewLarge ) return;
-
-
-      /**
-       * SEARCH POSTION MUST GO TO ON PAGINATION
-       */
-      var isLeft = dirs == 'left',
-        sign   = isLeft ? 1 : -1,
-        xPlus  = 10,
-        xWish  = p.xCanvas + ((p.sViewport - xPlus) * sign),
-        xLimit = isLeft ? p.xMin : p.xMax;
-
-      // Setup position need to place in allowable limit
-      if( (isLeft && xWish > xLimit ) || (!isLeft && xWish < xLimit) ) {
-        xWish = xLimit;
-      }
-
-      // Setup translate pagination
-      that.TranslateTo(xWish);
-    },
-
-    /**
-     * SIZE & POSITION OF PAG-MARK
-     */
-    SizePosOfMark : function() {
-      VariableModule(this);
-      var p = va.pag;
-
-      // Conditional execute
-      if( p.margin === undefined ) return;
-
-
-
-      /**
-       * FUNCTION : GET SIZE AND TRANSLATE ON PAG-MARK
-       */
-      function GetSizeAndTranslate(sizeTo) {
-        var nameSizeMark = 'dMark' + sizeTo,
-          $item    = va[ '$pagMarkItem' + sizeTo ],
-
-          isHor  = p.dirs == 'hor',
-          ns     = isHor ? 'w' : 'h',
-          ns2    = isHor ? '3' : '0',
-          idCur  = cs.idCur,
-          styles   = { 'width': '', 'height': '' },
-
-          margin   = p.margin[ns2][idCur],
-          marToBor = margin   + p.border[ns2][idCur],
-          marToPad = marToBor + p.padding[ns2][idCur],
-          xPlus, dItemCur;
-
-
-        // Condition continue: $item not "display: none"
-        if( !$item.is(':visible') ) return;
-
-        // Get size of pagMark depending on sizeTo
-        if( sizeTo == 'Margin' ) {
-          dItemCur = p[ns +'ToMargin'][idCur];
-          xPlus = 0;
-        }
-        else if( sizeTo == 'Border' ) {
-          dItemCur = p[ns +'ToBorder'][idCur];
-          xPlus = margin;
-        }
-        else if( sizeTo == 'Padding' ) {
-          dItemCur = p[ns +'ToPadding'][idCur];
-          xPlus = marToBor;
-        }
-        else {
-          dItemCur = p[ns +'Self'][idCur];
-          xPlus = marToPad;
-        }
-
-
-        // Condition to set size on $item
-        if( dItemCur !== p[nameSizeMark] ) {
-
-          // Setup size on pagMark
-          styles[isHor ? 'width' : 'height'] = dItemCur;
-          $item.css(styles);
-          p[nameSizeMark] = dItemCur;
-        }
-
-
-
-        /**
-         * TRANSLATE ON PAG-MARK
-         */
-        var nameXMark = 'xMark' + sizeTo;
-
-        // Search position for movement of pagMark
-        if( p.pBegin === undefined ) return;
-        var xMove = p.xCanvas + p.pBegin[cs.idCur] + xPlus;
-        if( xMove == p[nameXMark] ) return;
-
-        // Setup translate of pagMark
-        // Store position of pagMark
-        that.POSITION.TranslateX($item, xMove, true, null, p.dirs == 'hor');
-        p[nameXMark] = xMove;
-      }
-
-
-
-      GetSizeAndTranslate('Self');
-      GetSizeAndTranslate('Padding');
-      GetSizeAndTranslate('Border');
-      GetSizeAndTranslate('Margin');
-    },
-
-    /**
-     * MOVED TEMPORARILY ON PAG-MARK
-     */
-    XBufferOnMark : function(pageX) {
-      VariableModule(this);
-      var p = va.pag;
-
-
-      function XBuffer(sizeTo) {
-        var nameXMark = 'xMark' + sizeTo,
-          $item   = va[ '$pagMarkItem' + sizeTo ],
-          xMove   = pageX + p[nameXMark];
-
-        // Condition continue
-        if( !$item.is(':visible') ) return;
-
-        // Change position of pagMark depending on swipe gestures
-        that.POSITION.TranslateX($item, M.C(xMove), true, null, p.dirs == 'hor');
-        p[nameXMark] = xMove;
-      }
-
-      XBuffer('Self');
-      XBuffer('Padding');
-      XBuffer('Border');
-      XBuffer('Margin');
-    }
-  };
-})(jQuery);
-
-
-
-
-
-
-
-
-
-
-/**
- * MODULE CAPTION
- */
-(function($) {
-
-  // Check variable module
-  window.rt01MODULE = window.rt01MODULE || {};
-
-  // Global variables
-  var that, o, cs, va, is, M;
-
-  /**
-   * UPDATE GLOBAL VARIABLES
-   */
-  function VariableModule(self) {
-    that = self;
-    o  = self.o;
-    cs   = self.cs;
-    va   = self.va;
-    is   = self.is;
-    M  = self.M;
-  }
-
-
-  /**
-   * MODULE CAPTION
-   */
-  rt01MODULE.CAPTION = {
-
-    /**
-     * RENDER CAPTION ELEMENT
-     */
-    Render : function() {
-      VariableModule(this);
-
-
-      /**
-       * CASE: CREATE NEW CAPTION MARKUP
-       */
-      if( o.isCap && !is.$cap ) {
-
-        /**
-         * SEARCH CAPTION MARKUP AT OUTSIDE
-         */
-        var divdiv   = '<div/>',
-          classes  = '.'+ va.ns + o.nameCap,
-          $capHTML = that.RENDER.SearchNode(classes);
-
-        // setup markup for Caption
-        is.capOutside = !!$capHTML.length;
-        va.$cap     = is.capOutside ? $capHTML
-                        : $(divdiv, {'class' : va.ns + o.nameCap});
-
-
-
-        /**
-         * CREATE OTHER ELEMENTS MARKUP OF CAPTION
-         */
-        va.$capCur   = $(divdiv, { 'class': va.ns +'cap-cur' });
-        va.$capLast  = $(divdiv, { 'class': va.ns +'cap-last' });
-        va.$capInner = $(divdiv, { 'class': va.ns +'capinner' });
-        va.$capInner.append(va.$capCur, va.$capLast).appendTo(va.$cap);
-
-        // Append caption into ruby
-        !is.capOutside && cs.$ruby.append(va.$cap);
-
-        // Variable to recognize $caption exist
-        is.$cap = true;
-      }
-
-
-
-      /**
-       * CASE: REMOVE CAPTION MARKUP
-       */
-      else if( !o.isCap && is.$cap ) {
-
-        // Remove caption markup
-        va.$cap[ is.capOutside ? 'empty' : 'remove' ]();
-
-        // Update variable
-        is.$cap = false;
-      }
-    },
-
-
-    Toggle : function($slCur, $slLast) {
-      VariableModule(this);
-
-      // Initialize variables
-      var capCur  = M.Data($slCur)['htmlCap'],
-        capLast = $slLast.length ? M.Data($slLast)['htmlCap'] : '';
-
-      // Change content between current & last caption
-      va.$capCur.html(capCur);
-
-
-
-
-      /**
-       * SETUP EFFECT
-       *  + Not support on mobile -> unnecessary
-       *  + Effect between current & last caption is Fade
-       *  + Support effect-height for caption
-       */
-      if( !is.mobile && !is.ie7 ) {
-
-        // Content of last caption
-        va.$capLast.html(capLast);
-
-        // Get height of caption
-        var hCur  = M.OuterHeight(va.$capCur, true),
-          hLast = M.OuterHeight(va.$capLast, true) || hCur;    // Fixed at first = 0
-
-
-
-        /**
-         * SETUP AFTER END ANIMATION
-         */
-        function AnimComplete() {
-
-          // Add timer to mark sure at end place
-          setTimeout(function() {
-            VariableModule(that);
-
-            va.$capLast.css('visibility', '');
-            va.$capInner.css('height', '');
-          }, 10);
-        }
-
-
-
-
-        /**
-         * SETUP EFFECT WHEN TOGGLE CAPTION
-         */
-        va.tweenCaption
-          .css(va.$capCur, { 'opacity': 0 })
-          .animate(va.$capCur, { 'opacity': 1 }, {
-
-            isNew  : true,
-            duration : o.speedHeight,
-            complete : AnimComplete
-          })
-
-          .css(va.$capLast, { 'opacity': 1, 'visibility': 'visible' })
-          .animate(va.$capLast, { 'opacity': 0 }, {
-            duration : o.speedHeight
-          });
-
-        (hLast !== hCur) &&
-        va.tweenCaption
-          .css(va.$capInner, { 'height': hLast })
-          .animate(va.$capInner, { 'height': hCur }, {
-            duration : o.speedHeight
-          });
-      }
-    }
-  };
-})(jQuery);
-
-
-
-
-
-
-
-
-
-
-/**
- * MODULE IMAGE
- */
-(function($) {
-
-  // Check variable module
-  window.rt01MODULE = window.rt01MODULE || {};
-
-  // Global variables
-  var that, o, cs, va, is, ti, M, PAG;
-
-  /**
-   * UPDATE GLOBAL VARIABLES
-   */
-  function VariableModule(self) {
-    that = self;
-    o  = self.o;
-    cs   = self.cs;
-    va   = self.va;
-    is   = self.is;
-    ti   = self.ti;
-    M  = self.M;
-    PAG  = M.Module('PAG');
-  }
-
-
-  /**
-   * MODULE IMAGE
-   */
-  rt01MODULE.IMAGE = {
-
-    /**
-     * SETUP ALL IMAGES AT SLIDE-BEGIN
-     */
-    SetupAtLoadSlideBegin : function($slCur, selectorImage) {
-      VariableModule(this);
-      var ns   = va.ns,
-        slData = M.Data($slCur);
-
-
-      /**
-       * SEARCH IMAGE IN RUBY
-       *  + Must have class 'img' or image-layer
-       *  + Callback old-version: support 'imglazy'
-       */
-      selectorImage = selectorImage ||
-              '.{ns}{imgback}, .{ns}{imglazy}, img.{ns}{layer}'
-                .replace(/\{imgback\}/, o.nameImageBack)
-                .replace(/\{imglazy\}/, o.nameImageLazy)
-                .replace(/\{layer\}/, o.nameLayer)
-                .replace(/\{ns\}/g, ns);
-
-      // Image managed in current slide
-      var $images = M.Find($slCur, selectorImage);
-
-      // Search image in $pagItem
-      if( slData.$pagItem ) {
-        var selectorImageInPagItem = '.{ns}thumbitem, .{ns}{imglazy}'
-                        .replace(/\{imglazy\}/, o.nameImageLazy)
-                        .replace(/\{ns\}/g, ns),
-
-          $imageInPagItem = M.Find(slData.$pagItem, selectorImageInPagItem);
-
-        // Add image in pagItem into variable-manage image of ruby
-        $images = $images.add($imageInPagItem);
-      }
-
-      // Additional data in current slide at first
-      M.Data($slCur, {
-        '$images'  : $(),
-        'imageLen' : $images.length,
-        'nImage'   : 0
-      });
-
-
-
-
-
-      /**
-       * SETUP ALL IMAGES IN SLIDE
-       */
-      $images.each(function() {
-        var $i = $(this);
-
-
-        /**
-         * CONVERT '<A>' TO '<IMG> TAG
-         */
-        if( !/^img/i.test(this.tagName) ) $i = that.ConvertToImage($i);
-
-
-        /**
-         * CHECK IMAGE-LAZY & IMAGEBACK IN RUBY
-         *  + Only allow 1 Imageback in each slide
-         *  + Image will support 'lazyload' & 'responsive' options
-         */
-        var isImgback   = $i.hasClass(ns + o.nameImageBack),
-          isThumbItem = $i.hasClass(ns + 'thumbitem'),
-          isImgOfRuby = isImgback || $i.hasClass(ns + o.nameImageLazy);
-
-
-        /**
-         * INITIAL PROPERTIES STORE IN DATA-IMAGE
-         */
-        var iData = M.Data($i, {
-          '$slide'     : $slCur,
-          'isImgOfRuby'  : isImgOfRuby,
-          'isImgback'  : isImgback,
-          'isThumbItem'  : isThumbItem,
-          'isSrcOutside' : false,
-          'isLoaded'   : false,
-          'src'      : [],
-          'styleInline'  : M.PStyleToJson($i),
-          'opts'     : isImgback ? $.extend({}, slData.opts.imageback, $i.data('imageback'))
-                         : $.extend({}, slData.opts.image, $i.data('image'))
-        });
-
-
-
-
-        /**
-         * COMBINE BASIC PROPERTY && IMAGE PROPERTY
-         */
-        // Property 'responsive' : priority on Layer
-        if( iData.layer && (iData.layer.opts.isResponsive !== undefined) ) {
-          iData.opts.isResponsive = iData.layer.opts.isResponsive;
-        }
-
-
-
-
-
-        /**
-         * PROPERTIES ONLY IN IMAGE-BACK
-         */
-        if( isImgback  ) {
-
-          // Wrap imageItem by 'div.imgback'
-          that.Wrap($i);
-
-          // Store imageback into Data
-          M.Data($slCur, {
-            '$imgbackWrap' : $slCur.find('.' + ns + 'imgback-wrap'),
-            '$imgback'   : $i,
-            'isImgback'  : true
-          });
-
-          // Support option 'imagePosition' on option slide
-          iData.opts.position = slData.opts.imagePosition || iData.opts.position;
-        }
-
-
-
-
-        /**
-         * SETUP ARRAY[] SRC OF IMAGE IN ORDER PRIORITY
-         */
-        var iDataSRC  = iData.src,
-          iAttrSRC  = $i.attr('src'),
-          isSRCInline = /^data\:image\//g.test(iAttrSRC),
-          attrLazy  = $i.attr('data-' + o.nameDataLazy);
-
-
-        // Store 'src' on attribute of image
-        // Remove string with begin 'data:image/' -> ruby automatic add, conflict with load correct source
-        !isSRCInline && iDataSRC.push(iAttrSRC);
-
-        // Store 'src' on data image lazy
-        if( attrLazy !== undefined && !/^\s*$/.test(attrLazy) ) {
-          iDataSRC.push(attrLazy);
-        }
-        $i.removeAttr('data-' + o.nameDataLazy);
-
-
-
-
-
-        /**
-         * PAUSE TO SETUP CONTINUE 'URL' OF IMAGE IN THE SPECIAL CASES
-         *  + Support get 'url' of Flickr photo
-         */
-        // Case: have 'data-flickr'
-        if( is.FLICKR && !!$i.data('flickr') ) {
-
-          // Get link of photo by Flickr-ID
-          M.Module('FLICKR').GetLinkByPhotoID($i);
-        }
-
-        // Case: default
-        else {
-          that.EventLoad($i);
-        }
-      });
-    },
-
-    /**
-     * CONVERT OBJECT HAVE OTHER TAGS TO 'IMG' TAG
-     *  + Copy all data, alt, id of link <a>
-     *  + Video: wrap by 'div'
-     */
-    ConvertToImage : function($a) {
-      VariableModule(this);
-
-
-      /**
-       * CREATE NEW IAMGE WITH DEFAULT PROPERTIES
-       */
-      var attrs   = {},
-        imgGif  = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7',
-        imgAlt  = o.isCap ? 'image link' : $a.text(),
-        $imageNew = $('<img>', { 'src': imgGif, 'alt': imgAlt });
-
-      // Copy all properties on link <a> into new image node
-      $.each($a[0].attributes, function(key, attr) {
-        var nameCur  = attr.name,
-          valueCur = attr.value;
-
-        $imageNew.attr(nameCur, valueCur);
-        attrs[nameCur] = valueCur;
-      });
-
-
-
-
-      /**
-       * SETUP DATA-LAZY FOR NEW IMAGE
-       */
-      var nameDataLazy = 'data-NAME'.replace(/NAME/, o.nameDataLazy),
-        imageSRC   = $a.attr(nameDataLazy) || attrs.href || '';
-
-      // Insert data-lazy into new image
-      $imageNew
-        .attr(nameDataLazy, imageSRC)
-        .removeAttr('href');
-
-
-
-
-      /**
-       * OTHER SETUP
-       */
-      // IE fixed: remove 'width' / 'height' attribute on node
-      is.ie && $imageNew.removeAttr('width height');
-
-      // Replace new image
-      $a.after($imageNew).remove();
-      return $imageNew;
-    },
-
-    /**
-     * WRAP IMAGEBACK-ITEM BY 'DIV' TAG
-     */
-    Wrap : function($imgItem) {
-      VariableModule(this);
-
-
-      /**
-       * CHECK & CREATE NEW WRAP IMAGE
-       */
-      var classWrap = va.ns + 'imgback-wrap',
-        $imgWrap  = $imgItem.closest('.' + classWrap);
-
-      // Case: Image-wrap not exist
-      if( !$imgWrap.length ) {
-
-        /**
-         * CREATE NEW $IMAGE-WRAP
-         */
-        $imgWrap = $('<div/>', { 'class': classWrap });
-        $imgItem.wrap($imgWrap);
-
-        // Update variable Image-wrap
-        $imgWrap = $imgItem.closest('.' + classWrap);
-      }
-
-      // Copy all data of item to wrap
-      M.Data($imgWrap, M.Data($imgItem));
-      M.Data($imgWrap, { '$imgItem': $imgItem });
-
-
-
-
-      /**
-       * COPY PROPERTIES VIDEO TO IMAGE-WRAP
-       */
-      var attrName = ['data-video', 'data-video-link'];
-      for( var i = 0, len = attrName.length; i < len; i++ ) {
-
-        // Get current property
-        var attrCur = $imgItem.attr( attrName[i] );
-
-        // If property 'data' exist on node then copy to Image-wrap
-        // Remove 'data' on the Image-item in same time
-        if( !!attrCur ) {
-          $imgWrap.attr(attrName[i], attrCur);
-          $imgItem.removeAttr(attrName[i]);
-        }
-      }
-    },
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * EVENT LOAD EACH IMAGE
-     */
-    EventLoad : function($i) {
-      VariableModule(this);
-      var that   = this,
-        iData  = M.Data($i),
-        $slCur = iData.$slide,
-        slData = M.Data($slCur);
-
-
-
-      /**
-       * FUNCTION: SETUP AFTER IMAGE LOADED
-       */
-      function SetupAfterAllLoaded() {
-
-        /**
-         * CHECK IMAGE LOADED -> IF LOADED COMPLETE THEN EXECUTE 'SLIDE-END'
-         */
-        slData.nImage = slData.nImage + 1;
-
-        if( slData.nImage == slData.imageLen
-          && (!slData.isVideoback || (slData.isVideoback && slData.isVideobackLoaded)) ) {
-
-
-          setTimeout(function() {
-            VariableModule(that);
-
-            (slData['id'] == 'home') ? M.Module('LAYER').LoadHomeEnd()
-                         : that.LOAD.SlideEnd($slCur);
-          }, 10);
-        }
-      }
-
-
-      /**
-       * FUNCTION: SETUP WHEN IMAGE LOAD SUCCESS / FAIL
-       */
-      function LoadSuccess() {
-
-        // Image: set properties
-        that.Properties($i);
-
-        // Image: all image loaded
-        SetupAfterAllLoaded();
-      }
-
-      function LoadFail(src) {
-
-        // Image: change alt
-        $i
-          .addClass(va.ns + 'load-failed')
-          .attr('alt', 'image load failed');
-        M.Message('image load failed', src);
-
-        // Image: all image loaded
-        SetupAfterAllLoaded();
-      }
-
-
-      /**
-       * FUNCTION : IMAGE TRANSPARENT - SOLID
-       */
-      function ImageTransparent() {
-        // Image: all image loaded
-        SetupAfterAllLoaded();
-      }
-
-
-
-
-      /**
-       * CHECK IMAGE IN THE SPECIAL CASE
-       */
-      // Case: It is the transprent / solid image
-      if( $i.hasClass(va.ns + 'transparent') ) return LoadSuccess();
-
-      // Case: not 'scr' attribute found
-      else if( !iData.src.length ) return LoadFail('image source not found');
-
-
-
-
-      /**
-       * CHECK 'SRC' IMAGE LOADED SUCCESS
-       */
-      var imageNew = new Image(),
-        iDataSRC = iData.src,
-        srcCur   = iDataSRC.pop();
-
-
-      // Event image load success
-      imageNew.onload = function() {
-        VariableModule(that);
-        LoadSuccess();
-      };
-
-      // Event: image load fail
-      imageNew.onerror = function() {
-        VariableModule(that);
-
-        // If 'src' array[] have value -> load next 'src' remain in array[]
-        if( iDataSRC.length ) that.EventLoad($i);
-
-        // If 'src' array[] empty -> display message not loaded
-        else LoadFail(srcCur);
-      };
-
-      // Image-src : get at below 'i.onload()' -> fixed bug for IE
-      // Get 'src' in Data -> in order priority
-      $i.attr('src', srcCur);
-      imageNew.src = srcCur;
-    },
-
-    /**
-     * SETUP PROPERTIES OF IMAGE AFTER LOADED COMPLETE
-     */
-    Properties : function($i) {
-      VariableModule(this);
-
-      /**
-       * STORE SIZE OF IMAGE ON DATA
-       */
-      var iData  = M.Data($i),
-        i    = $i[0],
-        wImage = $i.data('width') || i.width,
-        hImage = $i.data('height') || i.height;
-
-      M.Data($i, {
-        'isLoaded' : true,
-        'width'  : wImage,
-        'height'   : hImage,
-        'rate'   : wImage / hImage
-      });
-
-
-
-      /**
-       * UPDATE $IMAGE INTO DATA-SLIDE
-       */
-      var slData = M.Data(iData.$slide);
-      slData.$images = slData.$images.add($i);
-
-      // Store thumbnail-item into Data
-      if( iData.isThumbItem ) slData.$thumbItem = $i;
-
-
-
-
-      /**
-       * SIZE RESPONSIVE FOR IMAGE
-       */
-      iData.isImgOfRuby && that.SizeResponsive($i);
-
-
-
-
-      /**
-       * IMAGEBACK & THUMBNAIL-ITEM
-       */
-      if( iData.isImgback || iData.isThumbItem ) {
-
-        // Remove event 'drag'
-        $i.on(va.ev.drag, function(e) { return false });
-
-        // Update size & style for thumbnail-item
-        PAG.PosCenterForThumbItem(iData.$slide);
-      }
-    },
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * UPDATE SIZE FOR IMAGE-ITEM
-     *  + Setup size first to get height of each slide
-     *  + Allways put css size on Image-item -> get correct size in IE
-     */
-    SizeResponsive : function($imgItem) {
-      VariableModule(this);
-      var iData  = M.Data($imgItem),
-        slData = M.Data(iData.$slide);
-
-      // Conditional execution
-      if( !(
-        $imgItem
-        && $imgItem.length
-        && iData.opts.isResponsive
-        && iData.type !== 'videoPoster'
-      )) return;
-
-
-      // Initialize variables
-      var iData   = M.Data($imgItem),
-        wInline = iData.styleInline.width,
-        hInline = iData.styleInline.height,
-        rate  = va.rate,
-
-        // Reset style css for Image-item
-        style = { 'width': '', 'height': '', 'left': '', 'top': '' },
-
-        // Identify type position of Imageback
-        // Ver 1.7 - 26/11/2016: fixed get type position from Slide data -> support update 'position' option
-        typePosition = slData.opts.imageback.posGrid[va.index];
-
-
-
-
-      /**
-       * FUNCTION: SIZE IMAGE DEPENDS ON DIFFERENT DIRECTION
-       */
-      function SizeDependRate() {
-        if   ( wInline == 'auto' )  style.width = wInline;
-        else if( $.isNumeric(wInline) ) style.width = M.R(wInline * rate);
-        else              style.width = M.R(iData.width * rate);
-
-        if   ( hInline == 'auto' )  style.height = hInline;
-        else if( $.isNumeric(hInline) ) style.height = M.R(hInline * rate);
-        else              style.height = M.R(iData.height * rate);
-
-        $imgItem.css(style);
-      }
-
-      function SizeDependWidth() {
-        style.width  = va.wSlide;
-        style.height = M.R( style.width / iData.rate);
-        $imgItem.css(style);
-      }
-
-      function SizeReset() {
-        if( wInline !== undefined ) style.width = wInline;
-        if( hInline !== undefined ) style.height = hInline;
-        $imgItem.css(style);
-      }
-
-
-
-
-      /**
-       * SIZE IMAGES IN RUBY
-       */
-      // Case: Imageback
-      if( iData.isImgback ) {
-
-        /**
-         * 'PIXEL-RATIO' FOR IMAGE-BACK ON EACH SLIDE
-         */
-        rate /= iData.opts.pixelRatio;
-
-
-
-        /**
-         * UPDATE SIZE FOR IMAGE
-         */
-        // Size by ratio responsive, include type: 'center', 'tile'
-        if( typePosition == 'center' || typePosition == 'tile' ) {
-          SizeDependRate();
-        }
-
-        // Size by width-viewport, include type: 'fill', 'fit', 'stretch'
-        else {
-          if( !is.heightFixed ) SizeDependWidth();
-        }
-      }
-
-      // Case: normal image
-      else {
-        // Case without 'responsive' : remove width / height css
-        // Case have 'responsive' : change size depending on 'rate'
-        if( va.rate == 1 ) SizeReset();
-        else         SizeDependRate();
-      }
-    },
-
-    /**
-     * SIZE & POSITION OF IMAGEBACK
-     */
-    BackPosition : function($imgItem) {
-      VariableModule(this);
-
-      // Conditional execution
-      var iData  = M.Data($imgItem),
-        slData = M.Data(iData.$slide);
-      if( !(iData.isImgback && iData.type !== 'videoPoster') ) return;
-
-      // Initialize variables
-      // Ver 1.7 - 26/11/2016: fixed get type position from Slide data, support update type 'position'
-      var typePosition = slData.opts.imageback.posGrid[va.index],
-        wImage     = iData.width,
-        hImage     = iData.height,
-        rateImage  = iData.rate,
-        rateCanvas   = va.wRuby / va.hRuby,
-        wImageCur,
-        hImageCur;
-
-
-
-
-
-
-      /**
-       * FUNCTION: RESIZE POSITION OF IAMGEBACK DEPENDING IN EACH CASES
-       */
-      // Size depend on width-viewport
-      function SizeDependWidth() {
-        wImageCur = va.wSlide;
-        hImageCur = M.R( wImageCur / rateImage);
-      }
-
-      // Size depend on height-ruby
-      function SizeDependHeight() {
-        hImageCur = va.hRuby;
-        wImageCur = M.R(hImageCur * rateImage);
-      }
-
-      // Position center-left for Imageback
-      function PosCenterLeft() {
-        var leftOnNode = M.PInt( $imgItem.css('left') ),
-          leftCur   = ~~( (va.wSlide - M.OuterWidth($imgItem, true)) / 2 );
-
-        // Setup css 'left'
-        if( leftOnNode !== leftCur ) $imgItem.css('left', leftCur);
-      }
-
-      // Position center-top for Imageback
-      function PosCenterTop() {
-        var top = M.R( (va.hRuby - M.OuterHeight($imgItem, true)) / 2 );
-        if( top == 0 ) top = '';
-
-        $imgItem.css('top', top);
-      }
-
-
-
-
-
-
-
-
-
-
-      /**
-       * CASE: POSITION TYPE 'FILL'
-       * Do not depend on ratio 'responsive'
-       */
-      if( typePosition == 'fill' ) {
-
-        // Case: height fixed
-        if( is.heightFixed ) {
-          (rateImage > rateCanvas) ? SizeDependHeight() : SizeDependWidth();
-
-          // Size for Image-item
-          $imgItem.css({ 'width' : wImageCur, 'height' : hImageCur });
-
-          // Position center left - top for Imageback
-          PosCenterLeft();
-          PosCenterTop();
-        }
-      }
-
-
-      /**
-       * CASE: POSITION TYPE 'FIT'
-       * Do not depend on ratio 'rasponsive'
-       */
-      else if( typePosition == 'fit' ) {
-
-        // Case: height fixed
-        if( is.heightFixed ) {
-          (rateImage > rateCanvas) ? SizeDependWidth() : SizeDependHeight();
-
-          // Size for Image-item
-          $imgItem.css({ 'width' : wImageCur, 'height' : hImageCur });
-
-          // Position center left - top for Imageback
-          PosCenterLeft();
-          PosCenterTop();
-        }
-      }
-
-
-      /**
-       * CASE: POSITION TYPE 'STRETCH'
-       * Do not depend on ratio 'responsive'
-       */
-      else if( typePosition == 'stretch' ) {
-
-        // Case: height fixed
-        if( is.heightFixed ) {
-          wImageCur = va.wSlide;
-          hImageCur = va.hRuby;
-
-          // Size for Image-item
-          $imgItem.css({ 'width' : wImageCur, 'height' : hImageCur });
-        }
-      }
-
-
-      /**
-       * CASE: POSITION TYPE 'TILE'
-       */
-      else if( typePosition == 'tile' ) {
-        var aPosition  = [],
-          wImageAll  = 0,
-          hImageAll  = 0,
-          leftCur    = 0,
-          topCur     = 0,
-          isWidthFill  = false,
-          isHeightFill = false;
-
-        // Get current size of Image-item
-        wImageCur = M.OuterWidth($imgItem, true);
-        hImageCur = M.OuterHeight($imgItem, true);
-
-
-        /**
-         * LOOP TO CALCULATE POSITION OF EACH IMAGE-CLONE
-         * Loop 1: loop height size
-         * @param array aPosition
-         */
-        do {
-          /**
-           * UPDATE VALUES FISRT
-           */
-          leftCur   = 0;
-          topCur    = hImageAll;
-          wImageAll   = 0
-          isWidthFill = false;
-
-
-          /**
-           * LOOP 2: LOOP WIDTH-DIRECTION
-           */
-          do {
-            // First store position left - top
-            aPosition.push([leftCur, topCur]);
-
-            // Update values
-            leftCur   += wImageCur;
-            wImageAll += wImageCur;
-
-            // Check to continue loop-2
-            if( wImageAll >= va.wSlide ) isWidthFill = true;
-
-          } while( !isWidthFill );
-
-
-          /**
-           * UPDATE VALUES AFTER CALCULATE POSITION IMAGE-CLONE BY WIDTH-DIRECTION
-           */
-          hImageAll += hImageCur;
-
-          /**
-           * CHECK CONTINUE LOOP-1
-           */
-          // Height-fixed is fill full height of ruby
-          if( is.heightFixed ) {
-            if( hImageAll >= va.hRuby ) isHeightFill = true;
-          }
-          // Height-auto is executed only once
-          else isHeightFill = true;
-
-        } while( !isHeightFill );
-
-
-
-        /**
-         * INSERT IMAGE-CLONE INTO IMAGEBACK WITH POSITION AVAILABLE
-         */
-        // Remove Image-clone before
-        var $imgItemClone = iData.$itemClone,
-          $imgWrap    = $imgItem.parent('.'+ va.ns + 'imgback-wrap');
-        if( !!$imgItemClone ) $imgItemClone.remove();
-
-        // Reset data Item Clone
-        iData.$itemClone = $();
-
-        // Loop to insert Image-clone
-        for( var i = 1, posLength = aPosition.length; i < posLength; i++ ) {
-          var $imgCloneCur = $imgItem.clone();
-
-          // Insert below Image-item
-          $imgCloneCur
-            .addClass(va.ns + 'imgclone')
-            .css({ 'left': aPosition[i][0], 'top': aPosition[i][1] })
-            .appendTo($imgWrap);
-
-          // Store Image-clone into Data
-          iData.$itemClone = iData.$itemClone.add($imgCloneCur);
-        }
-      }
-
-
-      /**
-       * CASE: POSITION TYPE 'CENTER'
-       */
-      else {
-
-        // Position center left - top for Imageback
-        PosCenterLeft();
-        is.heightFixed && PosCenterTop();
-      }
-    },
-
-    /**
-     * UPDATE SIZE || POSITION OF IMAGES
-     */
-    UpdateAllImageBy : function(typeUpdate) {
-      var that = this;
-      VariableModule(that);
-
-
-      /**
-       * RECOGNIZE NAME IMAGE IN DATA-SLIDE & NAME FUNCTION NEED TO UPDATE
-       */
-      var nameImage, nameFunction;
-      switch( typeUpdate ) {
-
-        // Update size of all images in ruby
-        case 'size' :
-          nameImage  = '$images';
-          nameFunction = 'SizeResponsive';
-          break;
-
-        // Update position for Imageback
-        case 'position' :
-          nameImage  = '$imgback';
-          nameFunction = 'BackPosition';
-          break;
-
-        default :
-          return;
-      }
-
-
-
-
-      /**
-       * SIZE & POSITION OF IMAGES
-       */
-      va.$s
-        .add(va.$viewport)
-        .each(function() {
-
-          // Get images need setup in current slide
-          var $images = M.Data($(this))[nameImage];
-
-          // Update size || position of image
-          $images && $images.each(function() {
-            that[nameFunction]($(this));
-          });
-        });
-    }
-  };
-})(jQuery);
-
-
-
-
-
-
-
-
-
-/**
- * MODULE CSS EFFECTS
- */
-(function($) {
-
-  // Check variable module
-  window.rt01MODULE = window.rt01MODULE || {};
-
-  // Global variables
-  var that, o, cs, va, is, ti, M, FX, i, j;
-
-  /**
-   * UPDATE GLOBAL VARIABLES
-   */
-  function VariableModule(self) {
-    that = self;
-    o  = self.o;
-    cs   = self.cs;
-    va   = self.va;
-    is   = self.is;
-    ti   = self.ti;
-    M  = self.M;
-    FX   = self.FX;
-  }
-
-
-  /**
-   * MODULE CSS EFFECTS
-   */
-  rt01MODULE.VIEWCSS = {
-
-    /**
-     * GET CURRENT CSS EFFECTS
-     */
-    GetFxCss : function(fxType, optsCur) {
-      VariableModule(this);
-
-      var keyframes = va.rubyAnimateKeyframes,
-        animOne   = va.rubyAnimateOne,
-        fxCur   = [];
-
-
-      /**
-       * FUNCTION: REMOVE THE EFFECT DO NOT EXIST IN SYSTEM
-       */
-      function RemoveFxNotExist(aFx) {
-
-        // Convert to array[] if that is not array
-        if( !$.isArray(aFx) ) aFx = [aFx];
-
-        // Each effect
-        $.each(aFx, function(i) {
-          if( !keyframes[aFx[i]] ) aFx.splice(i, 1);
-        });
-
-        // Return the array effect
-        return aFx;
-      }
-
-
-
-
-
-      /**
-       * CHECK THE EFFECT IN THE CASES:
-       */
-      switch(fxType) {
-
-        /**
-         * CASE: EFFECT CSS 'ONE'
-         */
-        case 'cssOne' :
-          var cssOne = optsCur.cssOne;
-
-          // Mandatory witch to array[]
-          if( !$.isArray(cssOne) ) cssOne = [cssOne];
-
-
-          /**
-           * SETUP EACH EFFECT
-           */
-          $.each(cssOne, function(i) {
-
-            // Store each effect if name is exist on system
-            if( animOne[cssOne[i]] ) {
-              fxCur.push( animOne[cssOne[i]] );
+        }), i;
+    }, rt01MODULE.AUTOINIT = function(e) {
+        document.querySelectorAll(e).forEach(function(e) {
+            var t = rt01VA.M.StringToJson(e.getAttribute("data-" + rt01VA.rubyData));
+            rt01VA.rubyName;
+            if (console.log(t), !("object" != typeof t || t instanceof Array || "{}" == rt01VA.M.JsonToString(t))) {
+                if ("string" == typeof t) {
+                    var a = 'main options on "data-XX" not valid'.replace(/XX/, rt01VA.rubyData);
+                    t = rt01VA.M.StringToJson(t, a), "{}" == rt01VA.M.JsonToString(t) && !1;
+                }
+                var i = t.isAutoInit;
+                void 0 === i && (i = rt01VA.optsDefault.isAutoInit);
             }
-          });
-          break;
-
-
-
-        /**
-         * CASE: EFFECT CSS 'TWO'
-         */
-        case 'cssTwo' :
-          var cssTwoOut = RemoveFxNotExist(optsCur.cssTwoOut),
-            cssTwoIn  = RemoveFxNotExist(optsCur.cssTwoIn);
-
-
-          // Check the array effect 'out' - 'in' exist
-          if( cssTwoOut.length && cssTwoIn.length ) {
-            fxCur = [{
-              'next' : [cssTwoOut, cssTwoIn],
-              'prev' : [cssTwoOut, cssTwoIn]
-            }];
-          }
-          break;
-
-
-
-        /**
-         * CASE: EFFECT CSS 'THREE'
-         */
-        case 'cssThree' :
-          var cssThreeNext = RemoveFxNotExist(optsCur.cssThreeNext),
-            cssThreePrev = RemoveFxNotExist(optsCur.cssThreePrev);
-
-
-          // Check the effect is exist
-          if( cssThreeNext.length && cssThreePrev.length ) {
-            fxCur = [{
-              'next' : [['slideShortLeftOut'], cssThreeNext],
-              'prev' : [['slideShortRightOut'], cssThreePrev]
-            }];
-          }
-          break;
-
-
-
-        /**
-         * CASE: EFFECT CSS 'FOUR'
-         */
-        case 'cssFour' :
-          var cssFourNextOut = RemoveFxNotExist(optsCur.cssFourNextOut),
-            cssFourNextIn  = RemoveFxNotExist(optsCur.cssFourNextIn),
-            cssFourPrevOut = RemoveFxNotExist(optsCur.cssFourPrevOut),
-            cssFourPrevIn  = RemoveFxNotExist(optsCur.cssFourPrevIn);
-
-
-          // Check the effect is exist
-          if( cssFourNextOut.length && cssFourNextIn.length && cssFourPrevOut.length && cssFourPrevIn.length ) {
-            fxCur = [{
-              'next' : [cssFourNextOut, cssFourNextIn],
-              'prev' : [cssFourPrevOut, cssFourPrevIn]
-            }];
-          }
-          break;
-      }
-
-
-
-
-      /**
-       * FALLBACK EFFECT CSS IF RUBY-ANIMATE KEYFRAMES DO NOT EXIST
-       */
-      if( !fxCur.length ) {
-        fxCur = [animOne['fade']];
-
-        // Change type effect
-        va.fxType = 'cssOne';
-
-        // Display the error message
-        M.Message('effect CSS need RubyAnimate object and keyframes');
-      }
-
-      // Return the current effect
-      return fxCur;
-    },
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * UPDATE TWEEN-ANIMATE FOR SLIDE
-     */
-    UpdateTweenFromCss : function($slCur, fxName) {
-      VariableModule(this);
-
-
-      /**
-       * CONVERT CSS-ANIMATE TO TWEEN-ANIMATE
-       */
-      var idNext  = va.fxCSS.idNext,
-        speedCur  = va.speed[idNext],
-        easingCur = M.Data(va.$s.eq(idNext))['opts']['cssEasing'],
-        cssTween  = M.Module('RUBYANIMATE').Tween(fxName, speedCur, undefined, easingCur);
-
-
-
-      /**
-       * TWEEN-ANIMATE FOR CURRENT SLIDE
-       */
-      if( !!cssTween ) {
-
-        for( var i = 0, len = cssTween.length; i < len; i++ ) {
-          var animCur = cssTween[i];
-
-          // Case: the first animate
-          if( i == 0 ) {
-            va.tweenSlide.css($slCur, animCur);
-          }
-
-          // Case: the rest aniamte
-          else {
-            va.tweenSlide.animate($slCur, animCur.prop, animCur.opts, false);
-          }
-        }
-      }
-
-
-      /**
-       * CASE: RUBY-ANIAMTE NOT EXIST
-       */
-      else {
-        va.tweenSlide.animate($slCur, {}, { duration: speedCur }, false);
-      }
-
-
-
-
-      /**
-       * CLASS 'MASK' FOR VIEWPORT IN 'CSS-ONE' EFFECT
-       */
-      if( va.fxCSS.isMask ) va.$viewport.addClass(va.ns + 'css-mask');
-    },
-
-    /**
-     * RESET TRANSFORM FOR SLIDE AFTER COMPLETE EFFECT
-     */
-    ResetTFSlideCss : function() {
-      VariableModule(this);
-
-
-      /**
-       * REMOVE STYLE + CLASS ON THE 'NEXT' / 'PREVIOUS' SLIDE
-       */
-      var fxCSS   = va.fxCSS,
-        $slCur  = va.$s.eq( fxCSS.idCur ),
-        $slNext   = va.$s.eq( fxCSS.idNext ),
-        $slCur2   = va.$s.eq( cs.idLast ),
-        $slNext2  = va.$s.eq( cs.idCur ),
-
-        $twoSlide = $('').add($slCur).add($slNext).add($slCur2).add($slNext2),
-        strClass  = '{ns}css-prev {ns}css-next'.replace(/\{ns\}/g, va.ns);
-
-
-      $twoSlide
-        // Remove css-style
-        .css('opacity', '')
-        .css(va.cssTf, '')
-        .css(va.prefix +'transform-origin', '')
-        .css('z-index', '')
-
-        // Remove class
-        .removeClass(strClass);
-
-
-
-      /**
-       * REMOVE CLASS 'MASK' ON VIEWPORT
-       */
-      va.$viewport.removeClass(va.ns + 'css-mask');
-    },
-
-    /**
-     * RESET TWEEN-ANIMATE OF SLIDE
-     */
-    ResetTweenCss : function(idCur, idNext) {
-      VariableModule(this);
-
-      var fxCSS  = va.fxCSS,
-        $slOut = va.$s.eq(idCur),
-        $slIn  = va.$s.eq(idNext);
-
-
-      /**
-       * EFFECT 'OUT' / 'IN'
-       * + Support get effect in array[]
-       */
-      var fxCur  = M.RandomInArray(va.fx[idNext], va.fxCssLast),
-        isMask = !!fxCur.isMask,
-        fxOut, fxIn;
-
-
-      // Setup in 'cssOne' effect
-      fxCur = fxCur[fxCSS.isNext ? 'next' : 'prev'];
-      fxOut = va.fxCssOutLast = M.RandomInArray(fxCur[0], va.fxCssOutLast);
-      fxIn  = va.fxCssInLast  = M.RandomInArray(fxCur[1], va.fxCssInLast);
-
-
-      // Reset Style & Transform for slide
-      // Use 'fxCSS' variable with old-value
-      that.ResetTFSlideCss();
-
-      // Update the properties in 'fxCSS'
-      fxCSS.idCur  = idCur;
-      fxCSS.idNext = idNext;
-      fxCSS.fxOut  = fxOut;
-      fxCSS.fxIn   = fxIn;
-      fxCSS.isMask = isMask;
-
-
-
-
-      /**
-       * THE START NEW EFFECT
-       */
-      // Reset tween-slide
-      va.tweenSlide.reset(true);
-
-      // Add class on slide when start swipe
-      $slOut.addClass(va.ns +'css-prev');
-      $slIn.addClass(va.ns +'css-next');
-
-      // Setup Tween-animate for slide
-      that.UpdateTweenFromCss($slOut, fxOut);
-      that.UpdateTweenFromCss($slIn, fxIn);
-    },
-
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * THE SLIDE IS BUFFER TRANSLATE
-     */
-    BufferCss : function(sign) {
-      VariableModule(this);
-      var fxCSS = va.fxCSS;
-
-
-      /**
-       * ID CURRENT - NEXT
-       */
-      var idCur  = cs.idCur,
-        idNext = idCur + sign;
-
-      if   ( idNext < 0 ) idNext = cs.num - 1;
-      else if( idNext > cs.num - 1 ) idNext = 0;
-
-      // Check change on ID-next
-      var isIDNextChange = (fxCSS.idNext != idNext);
-
-
-
-
-      /**
-       * UPDATE TWEEN-SLIDE WHEN CHANGE VALUE
-       */
-      if( !fxCSS.status || isIDNextChange ) {
-
-        // Reset Tween-animate of slide
-        fxCSS.isNext = sign > 0;
-        that.ResetTweenCss(idCur, idNext);
-      }
-
-      // Update variable 'status'
-      fxCSS.status = 'buffer';
-
-
-
-      /**
-       * THE CURRENT VALUE OF TWEEN
-       */
-      var movePercent = M.A(va.xOffset) / va.wSlide * 100;
-      va.tweenSlide.go( movePercent );
-    },
-
-    /**
-     * RESTORE TRANSFORM OF SLIDE IN SWIPE-GESTURES
-     */
-    RestoreCss : function() {
-      VariableModule(this);
-
-
-      /**
-       * UPDATE VARIABLE 'STATUS' TO RECOGNIZE THE TYPE ACTION
-       */
-      va.fxCSS.status = 'restore';
-
-
-      /**
-       * REVERSE DIRECTION OF TWEEN & RESET TRANSFORM OF SLIDE
-       */
-      that.ToSlideCss();
-    },
-
-    /**
-     * COMPLETE EFFECT AFTER MOVE BUFFER || TOGGLE SLIDE BY NAG - PAG
-     */
-    ToSlideCss : function() {
-      VariableModule(this);
-      var that     = this,    // Support use correct the variables in event 'complete' of tween
-        fxCSS    = va.fxCSS,
-        tweenSlide = va.tweenSlide;
-
-
-      /**
-       * FUNCTION : COMPLETE EFFECT
-       */
-      function TweenComplete() {
-        tweenSlide.eventComplete(function() {
-
-          // Reset 'style' & 'transform' for slide
-          that.ResetTFSlideCss();
-
-          // Update the variable in toggle-end
-          that.TOSLIDE.End();
-          fxCSS.status = null;
         });
-      }
-
-
-
-
-      /**
-       * TWEEN-ANIMATE EXECUTE CONTINUOUS AFTER SWIPE BUFFER
-       */
-      if( fxCSS.status == 'buffer' ) {
-        fxCSS.status = 'play';
-
-        // Event 'complete' when complete effect
-        TweenComplete();
-
-        // Continue execute the effect
-        tweenSlide.resume();
-      }
-
-
-
-      /**
-       * CASE: RESTORE TWEEN-ANIMATE AFTER SWIPE BUFFER
-       */
-      else if( fxCSS.status == 'restore' ) {
-
-        // Event 'complete' when complete tween
-        TweenComplete();
-
-        // Reverse effect
-        va.tweenSlide.reverse();
-      }
-
-
-
-      /**
-       * CASE: TOGGLE SLIDE BY NAV - PAG
-       */
-      else {
-
-        // ID of current - next slide
-        var idCur  = cs.idLast,
-          idNext = cs.idCur;
-
-        // Reset Tween-animate of slide
-        fxCSS.isNext = va.nMove > 0;
-        that.ResetTweenCss(idCur, idNext);
-
-        // Event 'complete'
-        TweenComplete();
-
-        // Start play Tween-animate
-        fxCSS.status = 'play';
-        tweenSlide.restart();
-      }
+    }, document.addEventListener("DOMContentLoaded", function() {
+        rt01MODULE.AUTOINIT("." + rt01VA.namespace);
+    });
+}(jQuery), function(e) {
+    e.GSGDEasing = e.GSGDEasing || {
+        def: "easeOutQuad",
+        swing: function(t, a, i, n, r) {
+            return e.GSGDEasing[e.GSGDEasing.def](t, a, i, n, r);
+        },
+        easeInQuad: function(e, t, a, i, n) {
+            return i * (t /= n) * t + a;
+        },
+        easeOutQuad: function(e, t, a, i, n) {
+            return -i * (t /= n) * (t - 2) + a;
+        },
+        easeInOutQuad: function(e, t, a, i, n) {
+            return (t /= n / 2) < 1 ? i / 2 * t * t + a : -i / 2 * (--t * (t - 2) - 1) + a;
+        },
+        easeInCubic: function(e, t, a, i, n) {
+            return i * (t /= n) * t * t + a;
+        },
+        easeOutCubic: function(e, t, a, i, n) {
+            return i * ((t = t / n - 1) * t * t + 1) + a;
+        },
+        easeInOutCubic: function(e, t, a, i, n) {
+            return (t /= n / 2) < 1 ? i / 2 * t * t * t + a : i / 2 * ((t -= 2) * t * t + 2) + a;
+        },
+        easeInQuart: function(e, t, a, i, n) {
+            return i * (t /= n) * t * t * t + a;
+        },
+        easeOutQuart: function(e, t, a, i, n) {
+            return -i * ((t = t / n - 1) * t * t * t - 1) + a;
+        },
+        easeInOutQuart: function(e, t, a, i, n) {
+            return (t /= n / 2) < 1 ? i / 2 * t * t * t * t + a : -i / 2 * ((t -= 2) * t * t * t - 2) + a;
+        },
+        easeInQuint: function(e, t, a, i, n) {
+            return i * (t /= n) * t * t * t * t + a;
+        },
+        easeOutQuint: function(e, t, a, i, n) {
+            return i * ((t = t / n - 1) * t * t * t * t + 1) + a;
+        },
+        easeInOutQuint: function(e, t, a, i, n) {
+            return (t /= n / 2) < 1 ? i / 2 * t * t * t * t * t + a : i / 2 * ((t -= 2) * t * t * t * t + 2) + a;
+        },
+        easeInSine: function(e, t, a, i, n) {
+            return -i * Math.cos(t / n * (Math.PI / 2)) + i + a;
+        },
+        easeOutSine: function(e, t, a, i, n) {
+            return i * Math.sin(t / n * (Math.PI / 2)) + a;
+        },
+        easeInOutSine: function(e, t, a, i, n) {
+            return -i / 2 * (Math.cos(Math.PI * t / n) - 1) + a;
+        },
+        easeInExpo: function(e, t, a, i, n) {
+            return 0 == t ? a : i * Math.pow(2, 10 * (t / n - 1)) + a;
+        },
+        easeOutExpo: function(e, t, a, i, n) {
+            return t == n ? a + i : i * (1 - Math.pow(2, -10 * t / n)) + a;
+        },
+        easeInOutExpo: function(e, t, a, i, n) {
+            return 0 == t ? a : t == n ? a + i : (t /= n / 2) < 1 ? i / 2 * Math.pow(2, 10 * (t - 1)) + a : i / 2 * (2 - Math.pow(2, -10 * --t)) + a;
+        },
+        easeInCirc: function(e, t, a, i, n) {
+            return -i * (Math.sqrt(1 - (t /= n) * t) - 1) + a;
+        },
+        easeOutCirc: function(e, t, a, i, n) {
+            return i * Math.sqrt(1 - (t = t / n - 1) * t) + a;
+        },
+        easeInOutCirc: function(e, t, a, i, n) {
+            return (t /= n / 2) < 1 ? -i / 2 * (Math.sqrt(1 - t * t) - 1) + a : i / 2 * (Math.sqrt(1 - (t -= 2) * t) + 1) + a;
+        },
+        easeInElastic: function(e, t, a, i, n) {
+            var r = 1.70158, s = 0, o = i;
+            if (0 == t) return a;
+            if (1 == (t /= n)) return a + i;
+            if (s || (s = .3 * n), o < Math.abs(i)) {
+                o = i;
+                r = s / 4;
+            } else r = s / (2 * Math.PI) * Math.asin(i / o);
+            return -o * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * n - r) * (2 * Math.PI) / s) + a;
+        },
+        easeOutElastic: function(e, t, a, i, n) {
+            var r = 1.70158, s = 0, o = i;
+            if (0 == t) return a;
+            if (1 == (t /= n)) return a + i;
+            if (s || (s = .3 * n), o < Math.abs(i)) {
+                o = i;
+                r = s / 4;
+            } else r = s / (2 * Math.PI) * Math.asin(i / o);
+            return o * Math.pow(2, -10 * t) * Math.sin((t * n - r) * (2 * Math.PI) / s) + i + a;
+        },
+        easeInOutElastic: function(e, t, a, i, n) {
+            var r = 1.70158, s = 0, o = i;
+            if (0 == t) return a;
+            if (2 == (t /= n / 2)) return a + i;
+            if (s || (s = n * (.3 * 1.5)), o < Math.abs(i)) {
+                o = i;
+                r = s / 4;
+            } else r = s / (2 * Math.PI) * Math.asin(i / o);
+            return t < 1 ? o * Math.pow(2, 10 * (t -= 1)) * Math.sin((t * n - r) * (2 * Math.PI) / s) * -.5 + a : o * Math.pow(2, -10 * (t -= 1)) * Math.sin((t * n - r) * (2 * Math.PI) / s) * .5 + i + a;
+        },
+        easeInBack: function(e, t, a, i, n, r) {
+            return void 0 == r && (r = 1.70158), i * (t /= n) * t * ((r + 1) * t - r) + a;
+        },
+        easeOutBack: function(e, t, a, i, n, r) {
+            return void 0 == r && (r = 1.70158), i * ((t = t / n - 1) * t * ((r + 1) * t + r) + 1) + a;
+        },
+        easeInOutBack: function(e, t, a, i, n, r) {
+            return void 0 == r && (r = 1.70158), (t /= n / 2) < 1 ? i / 2 * (t * t * ((1 + (r *= 1.525)) * t - r)) + a : i / 2 * ((t -= 2) * t * ((1 + (r *= 1.525)) * t + r) + 2) + a;
+        },
+        easeInBounce: function(t, a, i, n, r) {
+            return n - e.GSGDEasing.easeOutBounce(t, r - a, 0, n, r) + i;
+        },
+        easeOutBounce: function(e, t, a, i, n) {
+            return (t /= n) < 1 / 2.75 ? i * (7.5625 * t * t) + a : t < 2 / 2.75 ? i * (7.5625 * (t -= 1.5 / 2.75) * t + .75) + a : t < 2.5 / 2.75 ? i * (7.5625 * (t -= 2.25 / 2.75) * t + .9375) + a : i * (7.5625 * (t -= 2.625 / 2.75) * t + .984375) + a;
+        },
+        easeInOutBounce: function(t, a, i, n, r) {
+            return a < r / 2 ? .5 * e.GSGDEasing.easeInBounce(t, 2 * a, 0, n, r) + i : .5 * e.GSGDEasing.easeOutBounce(t, 2 * a - r, 0, n, r) + .5 * n + i;
+        },
+        linear: function(e, t, a, i, n) {
+            return t / n;
+        }
+    };
+}(jQuery), function($) {
+    "use strict";
+    function TIMER(e) {
+        var t = this, a = window.rt00VA.data;
+        t.id = null, t.rubyID = null, t.save = function() {
+            a[t.rubyID].id = t.id;
+        }, t.clear = function() {
+            t.id = a[t.rubyID].id, clearTimeout(t.id), clearInterval(t.id), a[t.rubyID].id = t.id = null;
+        };
+        t.rubyID = DB.GetRubyID(e), t.clear();
     }
-  };
-})(jQuery);
-
-
-
-
-
-
-
-
-
-
-
-/**
- * MODULE RUBYANIMATE KEYFRAMES
- */
-(function($) {
-
-  // Check variable module
-  window.rt01MODULE = window.rt01MODULE || {};
-
-  // Global variables
-  var that, o, va;
-
-  /**
-   * UPDATE GLOBAL VARIABLES
-   */
-  function VariableModule(self) {
-    that = self;
-    o  = self.o;
-    va   = self.va;
-  }
-
-
-  /**
-   * RUBY ANIMATE KEYFRAMES
-   */
-  rt01MODULE.RUBYANIMATE = {
-
-    /**
-     * ANIMATE DEFAULT KEYFRAME
-     */
-    keyframeDefault : {
-      duration : 400,
-      easing   : 'easeOutQuad',
-      animEnd  : {
-        pos   : 100,
-        x     : 0,
-        y     : 0,
-        z     : 0,
-        scale   : 1,
-        skew  : 0,
-        rotate  : 0,
-        rotateX : 0,
-        rotateY : 0,
-        rotateZ : 0,
-        opacity : 1
-      }
-    },
-
-    /**
-     * COPY ALL PROPERTY FROM THIS OBJECT TO THAT OBJECT
-     */
-    CopyData : function(source) {
-      var copy = {};
-      for( var name in source ) {
-
-        if( name != 'pos' ) copy[name] = source[name];
-      }
-      return copy;
-    },
-
-
-
-
-
-
-
-
-
-
-
-    /**
-     * UPDATE & COMPLETE PARTICULAR KEYFRAME
-     */
-    UpdateDataToKeyframe : function(animate) {
-      VariableModule(this);
-      var keyframes = window.__rubyAnimateKeyframes__ || {};
-
-      // Conditional execution
-      if( !($.isArray(animate) && animate.length) ) return false;
-
-
-
-
-      /**
-       * SPLIT INTO PARTICULAR ANIAMTE IF POSITION IS ARRAY[]
-       */
-      var deleteID = [];
-      for( var i = 0, len = animate.length; i < len; i++ ) {
-        var animCur = animate[i];
-
-
-        /**
-         * CASE: ARRAY[]
-         */
-        if( $.isArray(animCur['pos']) ) {
-
-          /**
-           * COPY ANIMATE WITH DIFFERENT POSITION
-           */
-          for( var j = 0, lenJ = animCur.pos.length; j < lenJ; j++ ) {
-
-            var animAdd = that.CopyData(animCur);
-            animAdd.pos = animCur.pos[j];
-
-            // Insert to current Animate
-            animate.push(animAdd);
-          }
-
-
-          /**
-           * STORE ID NEED DELETE
-           */
-          deleteID.push(i);
+    function ANIMATE(e) {
+        function t() {
+            a(), i();
         }
-      }
-
-
-
-
-      /**
-       * DELETE ANIMATE WITH ID STORED ABOVE
-       */
-      var iPlus = 0;
-      for( var i = 0, len = deleteID.length; i < len; i++ ) {
-
-        animate.splice(deleteID[i] - iPlus, 1);
-        iPlus++;
-      }
-
-
-
-
-
-      /**
-       * ARRANGE POSITION IN ORDER INCREASE IN ANIMATION
-       */
-      var animNew = [];
-      for( var i = 0, len = animate.length; i < len; i++ ) {
-
-        /**
-         * RESET PROPERTIES AT FIRST
-         */
-        var posCur = Number.MAX_VALUE,
-          jCur   = 0;
-
-
-
-        /**
-         * LOOP TO GET SMALLEST IN CURRENT ARRAY[]
-         */
-        for( var j = 0, lenJ = animate.length; j < lenJ; j++ ) {
-          if( animate[j].pos < posCur ) {
-            posCur = animate[j].pos;
-            jCur = j;
-          }
+        function a() {
+            var t = f.optsEnd.styleBegin, a = f.optsEnd.styleEnd, i = v.opts, n = i.length > 1;
+            for (var r in f.propEnd) if (-1 === $.inArray(r, VA.nameTf)) {
+                var s = f.propEnd[r];
+                a[r] = M.ParseCssStyle(s), -1 !== $.inArray(r, VA.propFixed) ? t[r] = a[r] : (s = e.css(r), 
+                t[r] = M.ParseCssStyle(s));
+            }
+            n && (t = $.extend(t, i[i.length - 2].styleEnd)), null !== v.cssStyle && (t = $.extend(!0, t, v.cssStyle), 
+            v.cssStyle = null);
+            for (var r in t) a[r] === UNDE && (a[r] = t[r]);
         }
-
-        // Store into new array[]
-        animNew.push( animate[jCur] );
-
-        // Remove aniamte with smallest position
-        animate.splice(jCur, 1);
-      }
-
-      keyframes[name] = animate = animNew;
-
-
-
-
-      /**
-       * UPDATE ANIMATE BEGIN FOR KEYFRAME
-       */
-      var animBegin = animate[0];
-
-      // Additional position-end if Keyframe only 1 animation & without property 'position'
-      if( animBegin.pos === undefined && animate.length == 1 ) {
-        animBegin.pos = 100;
-      }
-
-      // Additional empty property with position-begin no exist
-      if( animBegin.pos !== 0 ) {
-        animate.unshift({ pos: 0 });
-      }
-
-
-
-      /**
-       * UPDATE ANIMATE-END FOR KEYFRAME IF THERE IS NOT
-       */
-      var animEnd = animate[animate.length - 1];
-
-      if( animEnd.pos != 100 ) {
-        animate.push( that.keyframeDefault.animEnd );
-      }
-
-      return animate;
-    },
-
-    /**
-     * UPDATE ALL KEYFRAMES IN SYSTEM
-     *  + Support call function from outside
-     */
-    UpdateAllKeyframes : function() {
-      VariableModule(this);
-
-
-      /**
-       * SETUP ALL KEYFRAMES TRONG PARTICULAR RUBY & DEFAULT KEYFRAME IN SYSTEM
-       */
-      var keyframes = $.extend(true, {}, o.rubyAnimateKeyframes, window.__rubyAnimateKeyframes__);
-
-
-
-      /**
-       * SETUP EACH RUBY-ANIMATE KEYFRAME
-       */
-      for( var name in keyframes ) {
-
-        // Get animate of current keyframe
-        var animate = keyframes[name];
-
-        // Add data into animate keyframe
-        keyframes[name] = that.UpdateDataToKeyframe(animate);
-      }
-
-      // Store into ruby system
-      va.rubyAnimateKeyframes = keyframes;
-
-
-
-
-      /**
-       * UPDATE RUBY-ANIMATE ONE
-       *  + Update RubyAnimate window
-       */
-      va.rubyAnimateOne = $.extend(true, {}, o.rubyAnimateOne, window.__rubyAnimateOne__);
-    },
-
-
-
-
-
-
-
-
-
-
-    /**
-     * SETUP RUBY-ANIMATE TO TWEEN-ANIAMTE
-     */
-    Tween : function(nameKey, duration, delay, easing, keyframes) {
-      VariableModule(this);
-      var tween, animate;
-
-
-      /**
-       * SETUP KEYFRAMES: SUPPORT KEYFRAMES OUTSIDE
-       */
-      keyframes = keyframes || va.rubyAnimateKeyframes;
-
-
-
-
-      /**
-       * GET KEYFRAME AT FIRST
-       */
-      // Case normal: namekey is string
-      if( typeof nameKey === 'string' ) {
-        animate = keyframes[nameKey];
-      }
-
-      // Case: namekey is array[] -> Animate custom
-      else if( $.isArray(nameKey) && nameKey.length ) {
-
-        // Copy array to new array
-        var keyframe = nameKey.slice();
-
-        // Update data into keyframe
-        animate = that.UpdateDataToKeyframe(keyframe);
-      }
-
-
-
-      /**
-       * CONDITIONAL EXECUTION
-       */
-      if( !animate ) return;
-      tween = [];
-
-
-
-      /**
-       * VALUE TRANSFORM AT FIRST
-       */
-      tween[0] = that.CopyData(animate[0]);
-
-
-
-      /**
-       * CONVERT DURATION-TIME IN ANIAMTION
-       */
-      var posLast = 0;
-      for( var i = 1, len = animate.length; i < len; i++ ) {
-
-        var animCur  = animate[i],
-          tweenCur = { prop: that.CopyData(animCur), opts: {} };
-
-
-
-        /**
-         * PROPERTY 'DURATION'
-         */
-        var optsCur = tweenCur.opts,
-          posCur  = animCur.pos;
-
-        optsCur.duration = (posCur - posLast) / 100 * duration;
-        posLast = posCur;
-
-
-
-        /**
-         * GET PROPERTY 'DELAY'
-         *  + Only setup first property
-         */
-        if( delay !== undefined && delay !== null && i == 1 ) {
-          optsCur.delay = delay;
+        function i() {
+            var t, a = v.opts;
+            if (a.length > 1) t = $.extend({}, a[a.length - 2].tfEnd); else if ((t = v.tfCur) == UNDE) {
+                var i = MATRIX.getFromItem(e);
+                t = MATRIX.parse(i);
+            }
+            null !== v.cssTf && (t = $.extend(!0, t, v.cssTf), v.cssTf = null);
+            var n = TF.FromProp(f.propEnd);
+            n = TF.Extend(t, n, f.optsEnd);
+            var r = VA.tfDefault;
+            for (var s in n) t[s] === UNDE && (n[s] != r[s] ? -1 !== $.inArray(s, VA.propFixed) ? t[s] = n[s] : t[s] = r[s] : delete n[s]), 
+            t[s] == r[s] && n[s] == r[s] && (delete t[s], delete n[s]);
+            f.optsEnd.tfBegin = t, f.optsEnd.tfEnd = n;
         }
-
-
-
-        /**
-         * PROPERTY 'EASING'
-         *  + Only setup first property
-         */
-        if( easing !== undefined && easing !== null && i == 1 ) {
-          optsCur.easing = easing;
+        function n() {
+            var t = e.attr("style");
+            p = t && -1 !== t.indexOf("overflow"), !!f.optsEnd.start && f.optsEnd.start();
         }
-
-
-
-        /**
-         * INSERT CURRENT TWEEN INTO SYSTEM
-         */
-        tween.push(tweenCur);
-      }
-
-      // Return Tween-animate after setup
-      return tween;
-    },
-
-
-
-
-
-
-
-
-
-
-    /**
-     * CONVERT RUBY-ANIMATE ONE TO 4 PARTICULAR NAME
-     */
-    OneConvertFour : function(nameKey) {
-      var animateOne = this.va.rubyAnimateOne;
-
-      // Return keyframe
-      return animateOne[nameKey] || animateOne['_default_'];
+        function r(e, t) {
+            if ("string" == typeof t) if (/px$/.test(t)) t = parseFloat(t); else if (/\%$/.test(t)) {
+                var a = VA.percentRef[e];
+                a !== UNDE && (t = f.size[a] * parseFloat(t) / 100);
+            }
+            return t;
+        }
+        function s() {
+            f.size = {
+                OuterWidth: M.OuterWidth(e),
+                OuterHeight: M.OuterHeight(e)
+            };
+        }
+        function o(e, t, a) {
+            var i = [ "opacity" ], n = (a - t) * f.xCur;
+            return n = -1 !== $.inArray(e, i) ? Math.round(1e3 * n) / 1e3 : Math.round(10 * n) / 10, 
+            t + n;
+        }
+        function l(e, t, a) {
+            for (var i = [], n = 0, s = a.length; n < s && (!(n >= 2) || VA.isTf3D); n++) {
+                var o = r(e + n, a[n]), l = r(e + n, t[n]);
+                l === UNDE && (l = o);
+                var u = (o - l) * f.xCur, d = Math.round(10 * (l + u)) / 10;
+                i.push(d + "px");
+            }
+            return i.join(" ");
+        }
+        function u() {
+            var e = v.opts[f.optsPos];
+            for (var t in e.styleBegin) {
+                var a, i = e.styleBegin[t], n = e.styleEnd[t];
+                $.isArray(i) ? a = l(t, i, n) : (i = r(t, i), n = r(t, n), a = $.isNumeric(i) && $.isNumeric(n) ? o(t, i, n) : i), 
+                e.isClearStyleDefault && VA.styleDefault[t] === a && (a = ""), g[t] = a;
+            }
+        }
+        function d() {
+            var t = v.opts[f.optsPos], a = t.tfBegin, i = t.tfEnd, n = {};
+            for (var r in i) {
+                var s = TF.ConvertValueToPX(e, r, a[r]), o = s + (TF.ConvertValueToPX(e, r, i[r]) - s) * f.xCur;
+                n[r] = o;
+            }
+            var l = TF.ToCss(n, t), u = VA.prefix + "transform";
+            g[u] = l, v.tfCur = n;
+        }
+        var p, c = this, f = {}, v = {}, g = {};
+        c.next = function(t) {
+            for (var a = v.opts, i = !1, n = !1, r = v.tCur = VA.tsCur - v.tsInit, o = 0, l = a.length; o < l; o++) {
+                if (r < (p = a[o]).tPlay && 0 == o) {
+                    t ? (f.optsPos = o, f.xCur = 0) : f.xCur = null;
+                    break;
+                }
+                if (r > p.tEnd && o == l - 1) {
+                    f.optsPos = o, f.xCur = 1, n = !0;
+                    break;
+                }
+                if (p.tPlay <= r && r <= p.tEnd) {
+                    f.optsPos = o, f.xCur = $.GSGDEasing[p.easing](null, r - p.tPlay, 0, 1, p.duration), 
+                    i = !0;
+                    break;
+                }
+                if (a[o + 1] && p.tEnd < r && r < a[o + 1].tPlay) {
+                    f.optsPos = o, f.xCur = 1;
+                    break;
+                }
+            }
+            if (null !== f.xCur && a.length && (s(), g = {}, u(), d(), e.css(g)), n) {
+                var p = a[f.optsPos];
+                !!p.complete && p.complete();
+            }
+            return i;
+        }, function() {
+            f.rubyID = DB.GetRubyID(e), (v = c.data = vData[f.rubyID]).tsInit == UNDE && (v.tsInit = VA.tsCur);
+            var a = v.prop, i = v.opts;
+            f.propEnd = a[a.length - 1], f.optsEnd = i[i.length - 1], t(), n();
+        }();
     }
-  };
-})(jQuery);
-
-
-
-
-
-
-
-
-
-
-/**
- * MODULE NESTED
- */
-(function($) {
-
-  // Check variable module
-  window.rt01MODULE = window.rt01MODULE || {};
-
-  /**
-   * MODULE NESTED
-   */
-  rt01MODULE.NESTED = {
-
-    /**
-     * REMOVE RUBY-NESTED IN CURRENT SLIDE WHEN USE 'API.REMOVE()'
-     */
-    Destroy : function($slCur) {
-      var that = this;
-
-      // Check ruby-nested exist
-      var $nested = $slCur.find('.'+ that.va.ns);
-      if( $nested.length ) {
-
-        // Check ruby already initialized & have 'api.destroy()'
-        var nestedData = $nested.data(rt01VA.rubyName);
-        nestedData && nestedData.destroy && nestedData.destroy(true);
-      }
-    },
-
-
-    /**
-     * REFRESH THE VARIABLE IN RUBY-NESTED IN CURRENT SLIDE
-     */
-    RefreshInSlide : function($slCur) {
-      var that = this,
-        va   = that.va,
-        $rubyNested = $slCur.find('.'+ va.ns);
-
-
-      // Check in each ruby-nested (if have)
-      $rubyNested.each(function() {
-        var $self = $(this),
-          ruby  = $self.data(rt01VA.rubyName);
-
-        // Only apply for ruby active
-        if( !!ruby ) {
-
-          // Refresh ruby-nested for width / height < 10px
-          if( ruby.one.va.wRuby < 10 || ruby.one.va.hRuby < 10 ) ruby.refresh();
-        }
-      });
-    }
-  };
-})(jQuery);
-
-
-
-
-
-
-
-
-
-
-/**
- * MODULE CLASSADD
- */
-(function($) {
-
-  // Check variable module
-  window.rt01MODULE = window.rt01MODULE || {};
-
-  /**
-   * MODULE CLASSADD
-   */
-  rt01MODULE.CLASSADD = {
-
-    // Check & store 'classAdd' of each slide
-    Filter : function(opt) {
-
-      var classAdd = '';
-      if( opt.classAdd !== undefined ) {
-
-        // Mark sure convert 'classAdd' to string
-        classAdd = opt.classAdd.toString();
-      }
-      return classAdd;
-    },
-
-
-    // Toggle class on ruby when swap slide
-    Toggle : function() {
-      var va = this.va,
-        cs = this.cs;
-
-      var classLast = va.classAdd[cs.idLast],
-        classCur  = va.classAdd[cs.idCur];
-
-      // Remove class-old & add class-new
-      if( classLast !== undefined && classLast != '' ) cs.$ruby.removeClass(classLast);
-      if( classCur  !== undefined && classCur  != '' ) cs.$ruby.addClass(classCur);
-    }
-  };
-})(jQuery);
-
-
-
-
-
-
-
-
-
-
-/**
- * MODULE DISPLAY
- */
-(function($) {
-
-  // Check variable module
-  window.rt01MODULE = window.rt01MODULE || {};
-
-  // Global variables
-  var that, o, cs, va, is;
-
-  /**
-   * UPDATE GLOBAL VARIABLES
-   */
-  function VariableModule(self) {
-    that = self;
-    o  = self.o;
-    cs   = self.cs;
-    va   = self.va;
-    is   = self.is;
-  }
-
-
-  /**
-   * MODULE DISPLAY RUBY
-   */
-  rt01MODULE.DISPLAY = {
-
-    /**
-     * INITIAZLIZE IN RUBY
-     *  + Check ruby is 'sleep' mode (option 'show', 'showInRange')
-     */
-    SetupInit : function() {
-      VariableModule(this);
-
-      /**
-       * DISPLAY ON THE DEVICE: 'DESKTOP' & 'MOBILE'
-       */
-      var isShowRuby = true;
-      if( (is.mobile && o.showBy == 'desktop')
-      ||  (!is.mobile && o.showBy == 'mobile') ) isShowRuby = false;
-
-      if( isShowRuby ) {
-
-        /**
-         * CONTINUE WITH OPTION 'SHOW-FROM'
-         */
-        that.SetupVars();
-        that.Check();
-
-        // Swap to 'INIT.Ready' || event 'resize'
-        is.awake ? that.INIT.Ready() : that.ResizeON();
-      }
-
-      // Remove ruby if that is unvalid device
-      else cs.$ruby.remove();
-    },
-
-
-
-    /**
-     * VARIABLES OF 'SHOW-HIDE'
-     * @param array va.showInRange
-     * @param boolean is.showRuby
-     */
-    SetupVars : function() {
-      VariableModule(this);
-      var M = that.M;
-
-
-      /**
-       * VARIABLE 'SHOW-FROM'
-       */
-      if( !!o.showInRange ) {
-
-        /**
-         * FUNCTION: CONVERT VARIABLE TO RANGE{}
-         * @return object chain
-         */
-        function Chain2(val) {
-
-          if( $.isNumeric(val) )      val = [[val, 100000]];
-          else if( M.ElesIsNumber(val, 2) ) val = [val];
-
-          // Check value is array[] to continue
-          if( !$.isArray(val) ) return false;
-
-
-          var chain = { num : val.length };
-          for( i = chain.num - 1; i >= 0; i-- ) {
-            var a = val[i];
-
-            // Additonal value is missing
-            if( $.isNumeric(a) ) a = [a, 100000];
-
-            // Convert value to other elements of 'chain'
-            chain[i] = { 'from': M.PInt(a[0]), 'to': M.PInt(a[1]) };
-          }
-          return chain;
-        }
-
-        // Convert 'showInRange' to Range{}
-        va.showInRange = Chain2(o.showInRange);
-      }
-
-      // Default setup: if no showInRange value
-      else {
-        is.showInRange = is.awake = true;
-      }
-    },
-
-
-
-
-    /**
-     * KIEM RUBY DISPLAY IN CURRENT VISIBLE AREA WINDOW
-     * @param boolean is.showInRange
-     * @param boolean is.wake
-     */
-    Check : function() {
-      VariableModule(this);
-      var range = va.showInRange;
-
-
-      /**
-       * VARIABLE 'IS.SHOWINRANGE'
-       */
-      if( $.isPlainObject(va.showInRange) ) {
-        is.showInRange = false;
-
-        // Check continue in va.showInRange[]
-        for( i = range.num - 1; i >= 0; i-- ) {
-          if( that.M.MatchMedia(range[i].from, range[i].to) ) {
-            is.showInRange = true;
+    window.rt00VA || (window.rt00VA = {
+        fps: 60,
+        data: {},
+        nTween: 0,
+        nameTf: [ "x", "y", "z", "rotate", "rotateX", "rotateY", "rotateZ", "scale", "scaleX", "scaleY", "scaleZ", "skew", "skewX", "skewY", "perspectiveDirect" ],
+        nameTf3D: [ "z", "rotateZ", "scaleZ", "perspectiveDirect" ],
+        tfDefault: {
+            x: 0,
+            y: 0,
+            z: 0,
+            scale: 1,
+            scaleX: 1,
+            scaleY: 1,
+            scaleZ: 1,
+            rotate: 0,
+            rotateX: 0,
+            rotateY: 0,
+            rotateZ: 0,
+            skew: 0,
+            skewX: 0,
+            skewY: 0,
+            perspectiveDirect: null
+        },
+        styleDefault: {
+            opacity: 1
+        },
+        propFixed: [ "perspectiveDirect", "overflow" ],
+        percentRef: {
+            x: "OuterWidth",
+            y: "OuterHeight",
+            left: "OuterWidth",
+            right: "OuterWidth",
+            top: "OuterHeight",
+            bottom: "OuterHeight"
+        },
+        optsAnimDefault: {
+            duration: 1e3,
+            delay: 0,
+            easing: "easeOutQuad",
+            xParentOrigin: 0,
+            yParentOrigin: 0,
+            styleBegin: {},
+            styleEnd: {},
+            isFallbackTF: !0,
+            isXYAlone: !1,
+            isClearStyleDefault: !1,
+            isClearTFDefault: !0,
+            isTFOrderByEnd: !1,
+            isNew: !1
+        },
+        optsCssDefault: {
+            type: "reset"
+        },
+        nameOptsInherit: [ "xParentOrigin", "yParentOrigin" ]
+    }, window.rt00VA.GetData = function(e) {
+        var t = null, a = window.rt00VA.data;
+        for (var i in a) if (a[i].$item.is(e)) {
+            t = a[i];
             break;
-          }
         }
-      }
+        return t;
+    });
+    var VA = window.rt00VA, va = {}, is = {}, vData = VA.data, UNDE = void 0, M = $.extend({}, rt01VA.M, {
+        GetSize: function(e) {
+            var t = 0;
+            for (var a in e) e[a] !== UNDE && t++;
+            return t;
+        },
+        ToPI: function(e) {
+            return e * Math.PI / 180;
+        },
+        ProperCase: function(e) {
+            return e.charAt(0).toUpperCase() + e.slice(1);
+        },
+        CamelCase: function(e) {
+            return e.replace(/-([a-z])/gi, function(e, t) {
+                return t.toUpperCase();
+            });
+        },
+        CssCheck: function(e, t) {
+            var a = document.createElement("p").style, i = "Webkit Moz ms O".split(" "), n = "-webkit- -moz- -ms- -o-".split(" "), r = this.CamelCase(e);
+            if (a[r] !== UNDE) return !t || "";
+            for (var s = M.ProperCase(r), o = 0, l = i.length; o < l; o++) if (a[i[o] + s] !== UNDE) return !t || n[o];
+            return !1;
+        },
+        ArrayMinToMax: function(e) {
+            for (var t, a, i = $.extend([], e), n = [], r = 0, s = i.length; r < s; r++) {
+                a = i[0], t = 0;
+                for (var o = 1; o < i.length; o++) a > i[o] && (a = i[o], t = o);
+                n.push(a), i.splice(t, 1);
+            }
+            return n;
+        },
+        ValidName: function(e, t) {
+            var a = {};
+            for (var i in e) "originTF" == i ? a[VA.prefix + "transform-origin"] = e[i] : a[i] = e[i];
+            if (!VA.isTf3D) for (var i in a) -1 !== $.inArray(i, VA.nameTf3D) && delete a[i];
+            if (!VA.isTf) {
+                if (t.isFallbackTF) for (var n = [ "x", "y" ], r = [ "left", "top" ], s = 0, o = n.length; s < o; s++) a[n[s]] !== UNDE && (a[r[s]] = a[n[s]], 
+                delete a[n[s]]);
+                for (var i in a) -1 !== $.inArray(i, VA.nameTf) && delete a[i];
+            }
+            var l = [];
+            for (var i in VA.optsAnimDefault) l.push(i);
+            for (var s = 0, o = l.length; s < o; s++) {
+                var u = a[l[s]];
+                u !== UNDE && (t[l[s]] = u, delete a[l[s]]);
+            }
+            return a;
+        },
+        ParseCssStyle: function(e) {
+            if ("string" == typeof e) if (e.split(" ").length >= 2) e = e.split(" "), e = $.grep(e, function(e) {
+                return "" !== e;
+            }); else if (/px$/.test(e)) e = parseFloat(e); else if (/\%$/.test(e)) ; else {
+                var t = parseFloat(e);
+                isNaN(t) || (e = t);
+            }
+            return e;
+        },
+        MergeOptions: function(e, t) {
+            var a = VA.nameOptsInherit, i = t.length, n = {}, r = {};
+            if (i > 0) {
+                r = t[i - 1];
+                for (var s = 0, o = a.length; s < o; s++) n[a[s]] = r[a[s]];
+            }
+            return $.extend(!0, {}, r, VA.optsAnimDefault, e);
+        }
+    }), MATRIX = {
+        getFromItem: function(e) {
+            var t = e.css(VA.prefix + "transform");
+            if (/^matrix(3d)?\(/i.test(t)) {
+                for (var a = t.indexOf("(") + 1, i = t.length - a - 1, n = t.substr(a, i).split(", "), r = 0, s = n.length; r < s; r++) n[r] = parseFloat(n[r]);
+                return n;
+            }
+            return [ 1, 0, 0, 1, 0, 0 ];
+        },
+        getFromProp: function(e) {
+            var t = [ 1, 0, 0, 1, 0, 0 ];
+            for (var a in e) {
+                var i = null;
+                switch (a) {
+                  case "x":
+                    i = [ 1, 0, 0, 1, e[a], 0 ];
+                    break;
 
+                  case "y":
+                    i = [ 1, 0, 0, 1, 0, e[a] ];
+                    break;
 
-      /**
-       * VARIABLE 'IS.AWAKE'
-       *  + Ruby is sleeping -> ruby not initialize -> continue setup
-       */
-      if( is.awake === undefined && is.showInRange ) is.awake = true;
-    },
+                  case "rotate":
+                    var n = M.ToPI(e[a]), r = parseFloat(Math.cos(n).toFixed(5)), s = parseFloat(Math.sin(n).toFixed(5));
+                    i = [ r, s, -s, r, 0, 0 ];
+                    break;
 
+                  case "scale":
+                    i = [ e[a], 0, 0, e[a], 0, 0 ];
+                    break;
 
+                  case "scaleX":
+                    i = [ e[a], 0, 0, 1, 0, 0 ];
+                    break;
 
+                  case "scaleY":
+                    i = [ 1, 0, 0, e[a], 0, 0 ];
+                    break;
 
-    /**
-     * TOGGLE CLASS 'NONE' ON RUBY
-     */
-    Toggle : function() {
-      VariableModule(this);
-
-      // Show: check
-      that.Check();
-
-      // Toggle class 'none' on ruby
-      var hide = va.ns + 'none';
-      cs.$ruby[(is.showInRange ? 'remove' : 'add') + 'Class'](hide);
-    },
-
-
-
-
-    /**
-     * EVENT RESIZE
-     */
-    ResizeON : function() {
-      var that = this,
-        cs   = that.cs,
-        va   = that.va,
-        ti   = that.ti,
-        is   = that.is;
-
-
-      // Hidden ruby
-      cs.$ruby.addClass(va.ns + 'none');
-
-      // Register event 'resize' for ruby
-      va.$w.on('resize.rubyShow' + va.rubykey, function() {
-
-        clearTimeout(ti.showResize);
-        ti.showResize = setTimeout(function() {
-
-          that.Check();
-          is.awake && that.ResizeOFF();
-        }, 200);
-      });
-    },
-
-    ResizeOFF : function() {
-      VariableModule(this);
-
-      va.$w.off('resize.rubyShow' + va.rubykey);
-      cs.$ruby.removeClass(va.ns + 'none');
-
-      // Init ready when Ruby awake
-      that.INIT.Ready();
+                  case "skew":
+                  case "skewX":
+                  case "skewY":
+                    if ((e[a] - 90) % 180 != 0) {
+                        var n = M.ToPI(e[a]), o = parseFloat(Math.tan(n).toFixed(5));
+                        "skew" == a ? i = [ 1, 0, o, 1, 0, 0 ] : "skewX" == a ? i = [ 1, 0, o, 1, 0, 0 ] : "skewY" == a && (i = [ 1, o, 0, 1, 0, 0 ]);
+                    }
+                }
+                null !== i && (t = MATRIX.combine(t, i));
+            }
+            return t;
+        },
+        propertyInherit: function(e, t, a) {
+            return 1 == t[0] && 0 == t[1] && 0 == t[2] && 1 == t[3] && a.rotate == UNDE && a.scale == UNDE && a.scaleX == UNDE && a.scaleY == UNDE && a.skew == UNDE && a.skewX == UNDE && a.skewY == UNDE && (t[0] = e[0], 
+            t[1] = e[1], t[2] = e[2], t[3] = e[3]), 0 == t[4] && a.x == UNDE && (t[4] = e[4]), 
+            0 == t[5] && a.y == UNDE && (t[5] = e[5]), t;
+        },
+        parse: function(e) {
+            var t = {};
+            return t.x = e[4], t.y = e[5], 0 == e[1] && 0 == e[2] && (t.scaleX = e[0], t.scaleY = e[3]), 
+            1 == e[0] && 1 == e[3] && (0 != e[2] && (t.skewX = parseFloat((180 * Math.atan(e[2]) / Math.PI).toFixed(1))), 
+            0 != e[1] && (t.skewY = parseFloat((180 * Math.atan(e[1]) / Math.PI).toFixed(1)))), 
+            e[0] == e[3] && e[1] == -e[2] && (t.rotate = parseFloat((180 * Math.acos(e[0]) / Math.PI).toFixed(1))), 
+            t;
+        },
+        combine: function(e, t) {
+            e = [ e[0], e[1], 0, e[2], e[3], 0, e[4], e[5], 1 ];
+            for (var a = [], i = 0, n = (t = [ t[0], t[1], 0, t[2], t[3], 0, t[4], t[5], 1 ]).length; i < n; i++) {
+                var r = i % 3, s = ~~(i / 3);
+                a[i] = e[r + 0] * t[3 * s + 0], a[i] += e[r + 3] * t[3 * s + 1], a[i] += e[r + 6] * t[3 * s + 2];
+            }
+            return [ a[0], a[1], a[3], a[4], a[6], a[7] ];
+        },
+        toCss: function(e) {
+            var t = {};
+            return t[VA.prefix + "transform"] = "matrix(" + e.join(", ") + ")", t;
+        }
+    }, TF = {
+        CheckValueDefault: function(e, t) {
+            var a = !0;
+            if (t.isClearTFDefault) {
+                for (var i in e) if (a) {
+                    var n = VA.tfDefault[i];
+                    e[i] !== n && (a = !1);
+                }
+            } else a = !1;
+            return a ? {} : e;
+        },
+        Extend: function(e, t, a) {
+            if (a.isTFOrderByEnd) for (var i in e) t[i] === UNDE && (t[i] = e[i]); else t = $.extend(!0, {}, e, t);
+            var n = t.perspectiveDirect;
+            return n !== UNDE && (t = $.extend(!0, {
+                perspectiveDirect: n
+            }, t)), t;
+        },
+        FromProp: function(e) {
+            var t = {};
+            for (var a in e) -1 !== $.inArray(a, VA.nameTf) && ("scale" == a ? t.scaleX = t.scaleY = e[a] : "skew" == a ? t.skewX = e[a] : t[a] = e[a]);
+            return t;
+        },
+        ConvertValueToPX: function($anim, name, valueCur) {
+            function ConvertPercentByItem(e) {
+                var t = $.inArray(name, aNamePercent);
+                return -1 !== t && (e = parseFloat(e), e = M[aFnSizeRef[t]]($anim) * e / 100, e = Math.round(e)), 
+                e;
+            }
+            function ConvertPercentByParent(e, t) {
+                var a = $.inArray(name, aNamePercent);
+                if (-1 !== a) {
+                    var i = $anim.parent();
+                    if (t) {
+                        var n = $anim.closest(t);
+                        n.length && (i = n);
+                    }
+                    e = M[aFnSizeRef[a]](i) * e / 100, e = Math.round(e);
+                }
+                return e;
+            }
+            var aNamePercent = [ "x", "y", "left", "right", "top", "bottom" ], WIDTH = "OuterWidth", HEIGHT = "OuterHeight", aFnSizeRef = [ WIDTH, HEIGHT, WIDTH, WIDTH, HEIGHT, HEIGHT ], reOnlyContainMath = /^[0-9\(\)\+\-\*\/\%\s]|(\{.+\})+$/;
+            if ("string" == typeof valueCur && reOnlyContainMath.test(valueCur) && valueCur.length < 200) {
+                var reParent = /\d+\.?\d*\%?\{.+\}/g, matchParent = valueCur.match(reParent);
+                if ($.isArray(matchParent)) for (var i = 0, len = matchParent.length; i < len; i++) {
+                    var vMatch = matchParent[i], vConvert = parseFloat(vMatch), rePercent = /\d+\.?\d*\%\{(.+)\}/;
+                    if (rePercent.test(vMatch)) {
+                        var vParent = vMatch.match(rePercent), selectorParent = null;
+                        if (vParent && vParent[1]) try {
+                            $(vParent[1]), selectorParent = vParent[1];
+                        } catch (e) {
+                            !!console && console.warn(e);
+                        }
+                        vConvert = ConvertPercentByParent(vConvert, selectorParent);
+                    }
+                    valueCur = valueCur.replace(vMatch, vConvert);
+                }
+                var rePercent = /\d+\.?\d*\%/g, matchPercent = valueCur.match(rePercent);
+                if ($.isArray(matchPercent)) for (var i = 0, len = matchPercent.length; i < len; i++) {
+                    var vPercent = matchPercent[i], vPixel = ConvertPercentByItem(vPercent);
+                    valueCur = valueCur.replace(vPercent, vPixel);
+                }
+                var reOnlyNumber = /^[0-9\(\)\+\-\*\/\%\s]+$/;
+                reOnlyNumber.test(valueCur) && (valueCur = eval(valueCur));
+            }
+            return valueCur;
+        },
+        ToCss: function(e, t) {
+            e = TF.CheckValueDefault(e, t);
+            var a = {};
+            for (var i in e) {
+                var n = /^(x|y|z)$/.test(i) ? 100 : 1e4, r = Math.round(e[i] * n) / n;
+                /^(x|y|z)$/.test(i) ? t.isXYAlone ? ("x" == i && e.x !== UNDE && (a.x = r), "y" == i && e.y !== UNDE && (a.y = r), 
+                "z" == i && e.z !== UNDE && (a.z = r)) : (a.xy = a.xy || [ 0, 0, 0 ], "x" == i && e.x !== UNDE && (a.xy[0] = r), 
+                "y" == i && e.y !== UNDE && (a.xy[1] = r), "z" == i && e.z !== UNDE && (a.xy[2] = r)) : /^scale/.test(i) ? (a.scale = a.scale || [ 1, 1 ], 
+                "scaleX" == i && e.scaleX !== UNDE && (a.scale[0] = r), "scaleY" == i && e.scaleY !== UNDE && (a.scale[1] = r), 
+                "scaleZ" == i && e.scaleZ !== UNDE && a.scale.push(r)) : /^skew/.test(i) ? (a.skew = a.skew || [ 0, 0 ], 
+                "skewX" == i && e.skewX !== UNDE && (a.skew[0] = r), "skewY" == i && e.skewY !== UNDE && (a.skew[1] = r)) : /^rotate/.test(i) ? ("rotate" == i && e.rotate !== UNDE && (a.rotate = r), 
+                "rotateX" == i && e.rotateX !== UNDE && (a.rotateX = r), "rotateY" == i && e.rotateY !== UNDE && (a.rotateY = r), 
+                "rotateZ" == i && e.rotateZ !== UNDE && (a.rotateZ = r)) : /^perspectiveDirect$/.test(i) && (a.perspectiveDirect = r);
+            }
+            var s = is.tf3D, o = "";
+            for (var i in a) if ("xy" == i) o += (s ? "translate3d(_x_px, _y_px, _z_px) " : "translate(_x_px, _y_px) ").replace(/_x_/, a.xy[0]).replace(/_y_/, a.xy[1]).replace(/_z_/, a.xy[2]); else if ("x" == i) o += "translateX(_x_px) ".replace(/_x_/, a.x); else if ("y" == i) o += "translateY(_y_px) ".replace(/_y_/, a.y); else if ("z" == i) o += (s ? "translateZ(_z_px) " : "").replace(/_z_/, a.z); else if ("scale" == i) {
+                var l = a.scale, u = (s && 3 == l.length ? "scale3d(_x_, _y_, _z_) " : "scale(_x_, _y_) ").replace(/_x_/, l[0]).replace(/_y_/, l[1]).replace(/_z_/, l[2]);
+                2 == l.length && l[0] === l[1] && (u = "scale(_x_) ".replace(/_x_/, l[0])), o += u;
+            } else if ("skew" == i) {
+                var d = a.skew;
+                0 === d[1] ? o += "skew(_x_deg) ".replace(/_x_/, d[0]) : o += "skew(_x_deg, _y_deg) ".replace(/_x_/, d[0]).replace(/_y_/, d[1]);
+            } else "rotate" == i ? o += "rotate(_x_deg) ".replace(/_x_/, a.rotate) : "rotateX" == i ? o += (s ? "rotateX(_x_deg) " : "rotate(_x_deg) ").replace(/_x_/, a.rotateX) : "rotateY" == i ? o += (s ? "rotateY(_y_deg) " : "").replace(/_y_/, a.rotateY) : "rotateZ" == i ? o += (s ? "rotateZ(_z_deg) " : "").replace(/_z_/, a.rotateZ) : "perspectiveDirect" == i && (o += (s ? "perspective(_x_px) " : "").replace(/_x_/, a.perspectiveDirect));
+            return o.replace(/\s+$/, "");
+        }
+    }, DB = {
+        CheckRubyID: function(e) {
+            var t = null;
+            for (var a in vData) if (vData[a].$item.is(e)) {
+                t = a;
+                break;
+            }
+            return t;
+        },
+        GetRubyID: function(e) {
+            var t = DB.CheckRubyID(e);
+            if (null === t) for (var a = 0, i = M.GetSize(vData); a <= i; a++) if (vData[a] === UNDE) {
+                vData[a] = {
+                    $item: e,
+                    id: null,
+                    idDB: a,
+                    prop: [],
+                    opts: [],
+                    cssStyle: null,
+                    cssTf: null,
+                    isAnimate: !1
+                }, t = a;
+                break;
+            }
+            return t;
+        },
+        Update: function(e, t, a) {
+            var i = DB.GetRubyID(e), n = VA.data[i];
+            return t || (t = {}), a || (a = {}), a.isNew ? (a = $.extend(!0, {}, VA.optsAnimDefault, a), 
+            n.prop = [], n.opts = []) : a = M.MergeOptions(a, n.opts), t = M.ValidName(t, a), 
+            n.prop.push(t), n.opts.push(a), n;
+        },
+        Delete: function(e) {
+            var t = DB.CheckRubyID(e);
+            null !== t && delete VA.data[t];
+        }
+    }, __Init__ = function() {
+        VA.timeLoop = ~~(1e3 / VA.fps), VA.prefix = M.CssCheck("transform", !0), VA.isTf = is.tf = M.CssCheck("transform"), 
+        VA.isTf3D = is.tf3D = M.CssCheck("perspective"), VA.isTs = is.ts = M.CssCheck("transition"), 
+        VA.isOpacity = is.opacity = M.CssCheck("opacity");
+        var e = VA.prefix;
+        VA.percentRef[e + "transform-origin0"] = "OuterWidth", VA.percentRef[e + "transform-origin1"] = "OuterHeight";
+    }();
+    window.RubyTween = function() {
+        function e(e, t, a, i) {
+            e.tweenID === UNDE ? e.tweenID = l.id : e.tweenID != l.id && (i.isNew = !0, e.tsInit = l.tsCur, 
+            e.tCur = 0, (e = DB.Update(t, a, i)).tweenID = l.id);
+        }
+        function t(e) {
+            for (var t = 0, a = l.animate.length; t < a; t++) if (l.animate[t].data.$item.is(e.$item)) return !0;
+            return !1;
+        }
+        function a() {
+            for (var e = 0, t = l.animate.length; e < t; e++) l.animate[e].data.tsInit = l.tsInit;
+        }
+        function i(e, t) {
+            l.$items = l.$items.add(e);
+            var a = t.opts.length, i = t.opts[a - 1], n = t.opts[a - 2];
+            i.tWait = 1 == a ? 0 : n.tEnd, i.tPlay = i.tWait + i.delay, i.tEnd = i.tPlay + i.duration, 
+            -1 === $.inArray(i.tWait, l.timeData) && (l.timeData.push(i.tWait), l.timeRef[i.tWait] = "wait"), 
+            -1 === $.inArray(i.tPlay, l.timeData) ? (l.timeData.push(i.tPlay), l.timeRef[i.tPlay] = "play") : l.timeRef[i.tPlay] = "play", 
+            -1 === $.inArray(i.tEnd, l.timeData) && (l.timeData.push(i.tEnd), l.timeRef[i.tEnd] = "end"), 
+            l.timeData = M.ArrayMinToMax(l.timeData), l.tMax = l.timeData[l.timeData.length - 1], 
+            l.timeline = [];
+            for (var r = "end", s = 0, o = l.timeData.length; s < o; s++) {
+                var u = l.timeData[s], d = l.timeData[s + 1], p = l.timeRef[u], c = l.timeRef[d], f = "end" == r && "wait" == p, v = "end" == p && "play" == c;
+                if (f || v) {
+                    var g;
+                    if (f) for (m = s; m < o; m++) if ("play" == l.timeRef[l.timeData[m]]) {
+                        g = l.timeData[m];
+                        break;
+                    }
+                    v && (g = d), l.timeline.push({
+                        type: "timeout",
+                        time: u,
+                        delay: g - u
+                    });
+                }
+                /^(wait|end)$/.test(r) && "play" == p && l.timeline.push({
+                    type: "interval",
+                    time: u
+                }), r = p;
+            }
+            for (var h = $.extend([], l.timeline), s = 0; s < h.length; s++) if ("timeout" == h[s].type) for (var m = 0, y = l.animate.length; m < y; m++) {
+                var w = l.animate[m].data;
+                if (w.tPlay < h[s].time && h[s].time < w.tEnd) {
+                    h.splice(s, 2), s--;
+                    break;
+                }
+            }
+            l.timeline = h;
+        }
+        function n() {
+            for (var e = null, t = 0, a = l.timeline.length; t < a; t++) if (l.timeline[t].time > l.tCur) {
+                e = t - 1;
+                break;
+            }
+            null === e && (e = l.timeline.length - 1), l.timePosCur = e;
+        }
+        function r() {
+            var e = l.dirs, t = l.tsCur;
+            if (l.tsCur = VA.tsCur = +new Date(), "forward" == e ? l.tCur = l.tsCur - l.tsInit : "reverse" == e && (l.tCur -= l.tsCur - t, 
+            l.tsInit = l.tsCur - l.tCur, a()), n(), "reverse" == e && l.timePosCur < 0) s(); else {
+                var i = l.timeline[l.timePosCur], o = 0;
+                "timeout" == i.type && ("forward" == e && (o = i.delay - (l.tCur - i.time)), "reverse" == e && (o = l.tCur - i.time)), 
+                l.animateCur = $.extend([], l.animate), "wait" == l.status ? (clearTimeout(l.timer), 
+                "timeout" == i.type ? l.timer = setTimeout(r, o) : "interval" == i.type && (l.timer = setInterval(s, VA.timeLoop))) : "pause" == l.status && ("timeout" == i.type ? (l.status = "wait", 
+                l.timer = setTimeout(r, o)) : "interval" == i.type && (l.status = "play", l.timer = setInterval(s, VA.timeLoop)));
+            }
+        }
+        function s() {
+            var e = l.dirs, t = l.animateCur.length;
+            if (t) {
+                var i = l.tsCur;
+                l.tsCur = VA.tsCur = +new Date(), "forward" == e ? l.tCur = l.tsCur - l.tsInit : "reverse" == e && (l.tCur -= l.tsCur - i, 
+                l.tsInit = l.tsCur - l.tCur, a()), !!l.evStep && l.evStep();
+                for (var n = 0, s = l.animateCur.length; n < s; n++) l.animateCur[n].next() || t--, 
+                t || (clearInterval(l.timer), l.tCur < l.tMax ? "forward" == e ? (l.status = "wait", 
+                r()) : "reverse" == e && (l.tCur > 0 ? (l.status = "wait", r()) : (l.dirs = "forward", 
+                o.go(0), !!l.evComplete && l.evComplete())) : l.tCur >= l.tMax && (l.status = "pause", 
+                !!l.evComplete && l.evComplete()));
+            } else clearInterval(l.timer);
+        }
+        var o = this, l = o.tw = {
+            id: VA.nTween++,
+            $items: $(),
+            data: [],
+            animate: [],
+            tsInit: +new Date(),
+            tCur: 0,
+            tMax: Number.MAX_VALUE,
+            status: "pause",
+            dirs: "forward",
+            timeline: [],
+            timeData: [],
+            timeRef: {},
+            timePosCur: 0,
+            timeTypeCur: null
+        };
+        o.animate = function(a, n, s, u) {
+            if (!a || !a.length) return o;
+            l.tsCur = VA.tsCur = +new Date(), l.tCur = l.tsCur - l.tsInit;
+            var d = DB.Update(a, n, s);
+            s || (s = d.opts[d.opts.length - 1]), s.isNew && (d.tweenID = null), d.isAnimate = !0, 
+            e(d, a, n, s), i(a, d);
+            var p = new ANIMATE(a);
+            return !t(d) && l.animate.push(p), (u = u === UNDE || u) && r(), o;
+        }, o.css = function(e, t, a) {
+            if (!e || !e.length) return o;
+            var i = (a = $.extend(!0, {}, VA.optsCssDefault, a)).type;
+            if ("reset" === i) {
+                t = $.extend({
+                    originTF: "",
+                    perspective: ""
+                }, t), o.pause(), a.isNew = !0, (d = DB.Update(e, t, a)).tweenID = null;
+                var n = {};
+                t = d.prop[0], a = d.opts[0];
+                for (var r in t) -1 === $.inArray(r, VA.nameTf) && (n[r] = t[r]);
+                var s = TF.FromProp(t);
+                d.tfCur = $.extend({}, s);
+                for (var r in s) s[r] = TF.ConvertValueToPX(e, r, s[r]);
+                c = TF.ToCss(s, a);
+                n[VA.prefix + "transform"] = c, e.css(n), l.$items = l.$items.add(e);
+            } else if (/^(point|inherit)$/.test(i)) {
+                var u = DB.GetRubyID(e), d = VA.data[u], p = {}, c = {};
+                t = M.ValidName(t, a);
+                for (var r in t) {
+                    var f = t[r];
+                    -1 === $.inArray(r, VA.nameTf) ? p[r] = M.ParseCssStyle(f) : c[r] = f;
+                }
+                "point" == i && (c = TF.Extend(VA.tfDefault, c, {
+                    isTFOrderByEnd: !0
+                })), d.cssStyle = p, d.cssTf = c;
+            }
+            return o;
+        }, o.go = function(e, t) {
+            o.pause();
+            var a = e * l.tMax / 100;
+            "ms" == t && (a = e);
+            var i = l.animate.length;
+            if (0 != a || i) {
+                l.tCur = a, l.tsCur = VA.tsCur = +new Date(), l.tsInit = l.tsCur - l.tCur;
+                for (var n = 0, r = l.animate.length; n < r; n++) l.animate[n].data.tsInit = l.tsInit, 
+                l.animate[n].next(!0);
+            } else for (var n = 0, r = l.$items.length; n < r; n++) {
+                var s = l.$items.eq(n), u = VA.data[DB.GetRubyID(s)];
+                u.isAnimate || 1 != u.prop.length || o.css(s, u.prop[0], u.opts[0]);
+            }
+            return o;
+        }, o.pause = function() {
+            return o.isPlay() && (clearTimeout(l.timer), clearInterval(l.timer), l.status = "pause"), 
+            o;
+        }, o.play = function() {
+            return o.isPause() && l.animate.length && (l.tsCur = VA.tsCur = +new Date(), l.tsInit = l.tsCur - l.tCur, 
+            a(), r()), o;
+        }, o.toggle = function() {
+            return l.tCur >= l.tMax ? o.restart() : o.isPause() ? o.play() : o.pause(), o;
+        }, o.resume = function() {
+            return o.go(l.tCur, "ms").play(), o;
+        }, o.restart = function() {
+            return o.go(0).play(), o;
+        }, o.reverse = function() {
+            return l.dirs = "reverse", o.go(l.tCur, "ms"), l.tCur <= 0 && o.go(100), o.play(), 
+            o;
+        }, o.reset = function(e) {
+            if (e) for (var t = 0, a = l.animate.length; t < a; t++) {
+                var i = l.animate[t].data.idDB;
+                delete vData[i];
+            }
+            return l.dirs = "forward", l.tCur = 0, l.tMax = 0, l.timeData = [], l.animate = [], 
+            l.$items = $(), l.evComplete = null, l.evStep = null, o;
+        }, o.clearDB = function() {}, o.positionCur = function() {
+            var e = Math.round(l.tCur / l.tMax * 1e6) / 1e4;
+            return e > 100 && (e = 100), e;
+        }, o.isPlay = function() {
+            return /^(wait|play)$/.test(l.status);
+        }, o.isPause = function() {
+            return /^(stop|pause)$/.test(l.status);
+        }, o.eventComplete = function(e) {
+            return l.evComplete = e, o;
+        }, o.complete = function() {
+            return o.go(100), !!l.evComplete && l.evComplete(), o;
+        }, o.eventStep = function(e) {
+            return l.evStep = e, o;
+        };
+    };
+}(jQuery), function(e) {
+    function t(e) {
+        a = e, i = e.o, n = e.cs, r = e.va, s = e.is, o = e.ti, l = e.M, u = e.VIEW, d = e.POSITION, 
+        p = l.Module("PAG");
     }
-  };
-})(jQuery);
+    window.rt01MODULE = window.rt01MODULE || {};
+    var a, i, n, r, s, o, l, u, d, p;
+    rt01MODULE.SWIPE = {
+        ToggleEvent: function() {
+            t(this), a.Properties(l.Data(n.idCur).opts), s.swipeCur != s.swipeLast && a.Events(!!s.swipeCur), 
+            void 0 !== s.swipeOnBodyLast && s.swipeOnBodyCur !== s.swipeOnBodyLast && a.Events(s.swipeOnBodyCur ? "onBody" : "offBody"), 
+            s.swipeLast = s.swipeCur, s.swipeOnBodyLast = s.swipeOnBodyCur;
+        },
+        Properties: function(e) {
+            if (t(this), s.swipeCur = e.isSwipe, 1 == n.num && (s.swipeCur = !!i.oneSlide.isSwipe && e.isSwipe), 
+            s.swipeOnBodyCur = e.swipe.isBody, s.swipeCur) {
+                e.swipe;
+                s.swipeOnPag = !0;
+            } else s.swipeOnBodyCur = s.swipeOnPag = !1;
+        },
+        Events: function(e) {
+            var a = this;
+            t(a);
+            var o = l.Data(n.idCur), u = s.swipeSupport, d = r.ev.mouse, p = r.ev.swipe, c = {
+                offStart: function(e) {
+                    e.removeClass(r.ns + "swipe-on").addClass(r.ns + "swipe-off").off(r.ev.mouse.start + " " + r.ev.swipe.start).off(r.ev.drag);
+                },
+                offMoveEnd: function() {
+                    var e = r.ev;
+                    r.$doc.off(e.mouse.move + " " + e.mouse.end + " " + e.swipe.move + " " + e.swipe.end);
+                },
+                offBody: function() {
+                    l.ToggleClass("grab", -1), c.offStart(r.$viewport);
+                },
+                offPag: function() {
+                    s.swipePagCur = !1, l.ToggleClass("grab", -1, r.$pag), s.pag && c.offStart(r.$pag);
+                },
+                onBody: function() {
+                    s.swipeOnBodyCur && (c.offMoveEnd(), c.offBody(), l.ToggleClass("grab", 0), a.EventStart(r.$viewport, r.$canvas, d), 
+                    u && a.EventStart(r.$viewport, r.$canvas, p));
+                },
+                onPag: function() {
+                    s.swipeOnPag && s.pag && (c.offMoveEnd(), c.offPag(), s.swipePagCur = !0, l.ToggleClass("grab", 0, r.$pag), 
+                    a.EventStart(r.$pag, r.$pagInner, d), u && a.EventStart(r.$pag, r.$pagInner, p));
+                },
+                offClickOnSlide: function() {
+                    o.$self.off(r.ev.click);
+                },
+                onClickOnSlide: function() {
+                    c.offClickOnSlide(), o.link && o.$self.on(r.ev.click, function() {
+                        window.open(o.link, o.linkTarget);
+                    });
+                }
+            };
+            !0 === e ? (c.onBody(), c.offClickOnSlide(), i.swipe.isAutoOnPag ? !r.pag.isViewLarge && c.onPag() : c.onPag()) : !1 === e ? (c.onClickOnSlide(), 
+            c.offBody(), c.offPag()) : c[e]();
+        },
+        EventStart: function(a, o, d) {
+            t(this);
+            var p = this, c = r.ns;
+            a.addClass(c + "swipe-on").removeClass(c + "swipe-off"), a.off(r.ev.drag).on(r.ev.drag, function() {
+                return !1;
+            }), a.on(d.start, {
+                swipeType: d.type
+            }, function(f) {
+                t(p), r.swipeDirs = null;
+                var v = f.data.swipeType;
+                null === r.swipeTypeCur && (r.swipeTypeCur = v);
+                var g = [ "input", "textarea", "label", "a" ], h = f.target, m = h.tagName.toLowerCase(), y = -1 === e.inArray(m, g);
+                if (y) {
+                    var w = "." + c + "swipe-prevent, ." + c + i.namePrev + ", ." + c + i.nameNext;
+                    e(h).closest(w).length && (y = !1, p.EventDragToggle(a, r.ev[v]));
+                }
+                if (y) {
+                    var C = e(h), A = C.closest("a");
+                    if (A.length) {
+                        var x = A.closest("." + c + i.nameViewport);
+                        x.length && x.is(r.$viewport) && (y = !1);
+                    }
+                    if (y) {
+                        var I = C.closest("." + rt01VA.namespace).parent().closest("." + rt01VA.namespace);
+                        n.$ruby.is(I) && (y = !1);
+                    }
+                }
+                if (y && !s.lockSwipe && r.swipeTypeCur == v && n.num > 0) {
+                    p.EventMove(r.ev[v]), r.$doc.one(d.end, {
+                        swipeType: d.type
+                    }, function(e) {
+                        p.is.iOS ? setTimeout(function() {
+                            p.LastSetup(e, e.data.swipeType, !1);
+                        }, 0) : p.LastSetup(e, e.data.swipeType, !1);
+                    });
+                    var E = o.is(r.$canvas);
+                    r.tDrag0 = r.tDrag1 = +new Date(), r.$swipeCur = o, l.GetTween(r.$swipeCur).go(100);
+                    var S = l.SwapVaOnSwipe();
+                    "3d" == r.fxType && r.tweenSlide.go(100);
+                    var b = p.EVENTS.GetEventRight(f);
+                    r.x0 = r.x0Fix = r.pageX1 = l.R(b[S.pageXY]), r.y0 = r.pageY1 = b.pageY, r.xOffset = r.xBuffer = 0, 
+                    r.xBuffer = S.xCanvas, s.swipeBegin = !0, r.nMoveEvent = 0, i.isBodyMaskInFxCSS && "css" === r.fxView && r.$body.addClass(r.ns + "mask-x"), 
+                    s.clickOnSlide = !0, E && l.ToggleClass("grab", 1);
+                    var D = "SwipeBegin" + r.View;
+                    E && !!u[D] && u[D](), "mouse" == v && f.preventDefault();
+                }
+            });
+        },
+        EventMove: function(a) {
+            var i = this;
+            e(document).on(a.move, {
+                swipeType: a.type
+            }, function(e) {
+                t(i);
+                var a = e.data.swipeType, n = r.$swipeCur.is(r.$canvas);
+                if (!s.lockSwipe && r.swipeTypeCur == a) {
+                    r.nMoveEvent || (n && (s.swiping = !0), l.RunEvent("swipeBegin")), r.nMoveEvent++;
+                    var o = i.EVENTS.GetEventRight(e), u = l.SwapVaOnSwipe();
+                    r.pageX0 = r.pageX1, r.pageX1 = l.R(o[u.pageXY]), r.pageX0 != r.pageX1 && (r.xOffset = r.pageX1 - r.x0, 
+                    s.swipeNav = r.pageX1 > r.pageX0 ? "right" : "left", "swipe" == a ? (r.y = l.A(r.y0 - o.pageY), 
+                    null === r.swipeDirs && l.A(r.xOffset) >= r.y && (r.swipeDirs = "chieuX"), null === r.swipeDirs && r.y > 5 && (r.swipeDirs = "chieuY"), 
+                    null === r.swipeDirs || "chieuX" == r.swipeDirs ? (e.preventDefault(), i.XBuffer(r.pageX1)) : i.Events("offMoveEnd")) : i.XBuffer(r.pageX1)), 
+                    !n && l.ToggleClass("grab", 1, r.$pag), l.A(r.xOffset) > 10 && s.tapEnable && (s.tapEnable = !1), 
+                    (l.A(o.pageX - r.x0) > 10 || l.A(o.pageY - r.y0) > 10) && (s.clickOnSlide = !1);
+                }
+            });
+        },
+        LastSetup: function(e, o, u) {
+            t(this);
+            var d = r.$swipeCur.is(r.$canvas);
+            if (!s.lockSwipe && r.swipeTypeCur == o) {
+                "swipe" != o || u || e.preventDefault(), d && (s.swiping = !1), !s.swipeBegin && l.RunEvent("swipeEnd"), 
+                r.tDrag1 = +new Date(), a.XNear(), d ? l.ToggleClass("grab", s.swipeOnBodyCur ? 0 : -1) : l.ToggleClass("grab", -1, r.$pag), 
+                i.isViewGrabStop && l.ToggleClass("stop", -1);
+                var p = l.Data(n.idCur);
+                s.clickOnSlide && p.link && window.open(p.link, p.linkTarget);
+            }
+            r.swipeTypeCur == o && (r.swipeTypeCur = null), s.mobile ? s.tapEnable = !0 : setTimeout(function() {
+                s.tapEnable = !0;
+            }, 10), a.Events("offMoveEnd");
+        },
+        EventDragToggle: function(e, a) {
+            var i = this;
+            t(i), e.off(r.ev.drag);
+            var n = a.end + "stopDrag";
+            r.$doc.on(n, function() {
+                t(i), e.on(r.ev.drag, function() {
+                    return !1;
+                }), r.$doc.off(n);
+            });
+        },
+        EventClickOnSlide: function() {
+            t(this);
+        },
+        XBuffer: function() {
+            function e() {
+                if (f && r.xBuffer > h.xMin || v && r.xBuffer < h.xMax) {
+                    var e = s.mobile ? 4 : 8;
+                    w /= e;
+                }
+            }
+            t(this);
+            var o = r.fxLayout, d = r.fxView, c = n.idCur, f = "right" == s.swipeNav, v = "left" == s.swipeNav, g = r.$swipeCur.is(r.$canvas), h = g ? r.can : r.pag, m = h.sTranslate, y = r.xOffset < 0 ? 1 : -1, w = r.pageX1 - r.pageX0, C = !0, A = !0;
+            if (g && ("math" != r.fxType && "css" != r.fxView || (A = !1), i.swipe.isLiveEffect || (C = A = !1)), 
+            A && C && (g ? ("line" != o || s.loop || e(), "dot" == o && function() {
+                var e = s.mobile ? 3 : 6;
+                w /= e, !s.loop && (c <= 0 && f || c >= n.num - 1 && v) && (w /= 4);
+            }(), !s.loop && i.isViewGrabStop && (f && r.xBuffer > 0 ? l.ToggleClass("stop", 0) : v && r.xBuffer < h.xMax && l.ToggleClass("stop", 1))) : s.pag && (e(), 
+            i.pag.isArrow && p.ArrowActived(r.xBuffer), i.pag.isMark && p.XBufferOnMark(w))), 
+            r.xBuffer += w, A) {
+                var x = "hor" === h.dirs ? {
+                    x: l.R(r.xBuffer)
+                } : {
+                    y: l.R(r.xBuffer)
+                };
+                l.GetTween(r.$swipeCur).css(r.$swipeCur, x);
+            }
+            if (i.swipe.isLiveEffect) {
+                var I = "Buffer" + r.View;
+                g && !!u[I] && u[I](y);
+            }
+            if (g && "line" == o) {
+                var E = h.xCanvas - m * y;
+                r.xBuffer * y < E * y && (s.swipeBegin = !0, r.x0 = r.pageX1, h.xCanvas -= m * y, 
+                a.TOSLIDE.Run(y, !1, !0));
+            }
+            s.swipeBegin && (s.swipeBegin = !1, "mask" == d && u.CloneImgbackInMask());
+        },
+        XNear: function() {
+            t(this);
+            var e = r.$swipeCur.is(r.$canvas), o = r.fxLayout, c = n.num, f = e ? r.can : r.pag, v = r.xOffset;
+            if (r.moveBy = "swipe", e) {
+                var g = r.pa.left ? r.wSlideFull - 2 * r.pa.left : r.wSlideFull, h = s.mobile ? 600 : 400, m = r.tDrag1 - r.tDrag0 < h, y = l.R(g / 3), w = l.R(g / 20), C = m ? w : y;
+                if (v < -C && (s.loop || !s.loop && n.idCur < c - 1) && c - 1) "dot" == o && d.AnimateX(null, 0, !1, !1, 100), 
+                a.TOSLIDE.Run(1); else if (v > C && (s.loop || !s.loop && n.idCur > 0) && c - 1) "dot" == o && d.AnimateX(null, 0, !1, !1, 100), 
+                a.TOSLIDE.Run(-1); else if (v) {
+                    d.AnimateX(null, 0, !1, !1, 400);
+                    var A = "Restore" + r.View;
+                    !!u[A] && u[A]();
+                }
+                (v < -C || v > C) && i.isSlideshow && (s.hoverAction = !0);
+            } else if (s.pag && 0 != v) {
+                f.xCanvas = r.xBuffer;
+                var x = i.pag.speed;
+                "center" == f.align || "end" == f.align ? f.xCanvas != f.xMin && d.AnimateX(null, f.xMin, !1, !0, x) : f.xCanvas > 0 ? d.AnimateX(null, 0, !1, !0, x) : f.xCanvas < f.xMax && d.AnimateX(null, f.xMax, !1, !0, x), 
+                i.pag.isArrow && p.ArrowActived(f.xCanvas), i.pag.isMark && p.SizePosOfMark();
+            }
+            d.Flywheel();
+        }
+    };
+}(jQuery), jQuery, window.rt01MODULE = window.rt01MODULE || {}, rt01MODULE.RESPONSIVE = {
+    UpdateVars: function() {
+        var e = this, t = (e.o, e.va);
+        e.M;
+        null !== t.paGridCur ? t.pa.left = t.paGridCur : t.wSlide > t.wGridCur ? t.pa.left = (t.wSlide - t.wGridCur) / 2 : t.pa.left = 0, 
+        t.pa.left = ~~t.pa.left;
+        var a = (t.wSlide - 2 * t.pa.left) / t.wRes;
+        t.rate = a > 1 ? 1 : a;
+    }
+}, function(e) {
+    function t(e) {
+        a = e, i = e.o, n = e.cs, r = e.va, s = e.is, o = e.M;
+    }
+    window.rt01MODULE = window.rt01MODULE || {};
+    var a, i, n, r, s, o;
+    rt01MODULE.NAV = {
+        Render: function() {
+            t(this);
+            var n = r.ns;
+            if (s.nav && !s.$nav) {
+                var l = "." + n + i.nameNav, u = a.RENDER.SearchNode(l);
+                u.length ? (r.$nav = u, r.$nav.append(o.NS(i.nav.markupOutside)), s.navOutside = !0) : (r.$nav = e(o.NS(i.nav.markup)), 
+                a.RENDER.Into(i.markup.navInto, r.$nav)), r.$prev = r.$nav.find("." + n + i.namePrev), 
+                r.$next = r.$nav.find("." + n + i.nameNext), s.$nav = !0;
+            } else !s.nav && s.$nav && (r.$nav[s.navOutside ? "empty" : "remove"](), s.$nav = !1);
+        },
+        EventTap: function() {
+            t(this);
+            var e = this, a = r.ev.click + " " + r.ev.swipe.end;
+            if (!r.$nav) return !1;
+            r.$prev.add(r.$next).off(a), e.is.nav && (r.$prev.on(a, function(a) {
+                t(e), o.RunEvent("beforeTap"), i.nav.isEventTap && e.EVENTS.Prev(), a.preventDefault();
+            }), r.$next.on(a, function(a) {
+                t(e), o.RunEvent("beforeTap"), i.nav.isEventTap && e.EVENTS.Next(), a.preventDefault();
+            }));
+        },
+        Toggle: function() {
+            t(this);
+            var e = r.deactived, a = n.idCur, i = n.num;
+            s.loop ? r.$prev.add(r.$next).removeClass(e) : (0 == a && r.$prev.addClass(e), a == i - 1 && r.$next.addClass(e), 
+            0 != a && r.$prev.removeClass(e), a != i - 1 && r.$next.removeClass(e));
+        }
+    };
+}(jQuery), function(e) {
+    function t(e) {
+        a = e, n = e.o, r = e.oo, s = e.cs, o = e.va, l = e.is, u = e.ti, d = e.M;
+    }
+    window.rt01MODULE = window.rt01MODULE || {};
+    var a, n, r, s, o, l, u, d;
+    rt01MODULE.PAG = {
+        RenderSelf: function() {
+            var a = this;
+            if (t(a), n.isPag && !l.$pag) {
+                var i = o.ns, r = " " + i, u = r + "outside", p = n.pag, c = (p.direction, i + n.namePag), f = a.RENDER.SearchNode("." + c);
+                "string" == typeof p.moreClass && (c += " " + p.moreClass), l.pagOutside = !!f.length, 
+                o.$pag = l.pagOutside ? f.addClass(c + u) : e("<div/>", {
+                    class: c
+                }), o.$pagItem = e(""), o.$s.each(function() {
+                    a.RenderPagItem(e(this));
+                }), o.$pagInner = e("<div/>", {
+                    class: i + "paginner"
+                }), o.$pagInner.append(o.$pagItem), o.$pag.prepend(o.$pagInner), l.pagOutside || s.$ruby["begin" == p.position ? "prepend" : "append"](o.$pag), 
+                a.ToggleClass(!0, !0), l.$pag = !0;
+            } else !n.isPag && l.$pag && (o.$s.each(function() {
+                d.Data(e(this), {
+                    $thumbWrap: void 0
+                });
+            }), o.$pag[l.pagOutside ? "empty" : "remove"](), l.$pag = l.$pagArrow = l.$pagMark = !1, 
+            l.swipePagCur = !1);
+            n.isPag && (a.RenderPagArrow(), a.RenderPagMark()), l.$pag && o.$s.each(function() {
+                a.RenderThumbnail(e(this));
+            });
+        },
+        RenderPagItem: function(e) {
+            t(this);
+            var a = d.Data(e).$pagItem;
+            return o.$pagItem = o.$pagItem.add(a), a;
+        },
+        RenderPagArrow: function() {
+            if (t(this), n.pag.isArrow && !l.$pagArrow) {
+                var a = d.NS(n.pag.markupArrow);
+                o.$pagArrowLeft = e(a.replace(/\{dirs\}/g, "left")), o.$pagArrowRight = e(a.replace(/\{dirs\}/g, "right")), 
+                o.$pag.append(o.$pagArrowLeft, o.$pagArrowRight), l.$pagArrow = !0;
+            }
+            !n.pag.isArrow && l.$pagArrow && (o.$pagArrowLeft.remove(), o.$pagArrowRight.remove(), 
+            l.$pagArrow = !1);
+        },
+        RenderPagMark: function() {
+            t(this);
+            var a = o.ns;
+            n.pag.isMark && !l.$pagMark ? (o.$pagMark = e(d.NS(n.pag.markupMark)), o.$pagMarkItem = o.$pagMark.children(), 
+            o.$pag.removeClass(a + "pagmark-no").addClass(a + "pagmark-yes").prepend(o.$pagMark), 
+            o.$pagMarkItemSelf = o.$pagMark.find(d.NS(".{ns}pagmark-self")), o.$pagMarkItemPadding = o.$pagMark.find(d.NS(".{ns}pagmark-padding")), 
+            o.$pagMarkItemBorder = o.$pagMark.find(d.NS(".{ns}pagmark-border")), o.$pagMarkItemMargin = o.$pagMark.find(d.NS(".{ns}pagmark-margin")), 
+            l.$pagMark = !0) : n.pag.isMark || (l.$pagMark && (o.$pagMark.remove(), l.$pagMark = !1), 
+            o.$pag.removeClass(a + "pagmark-yes").addClass(a + "pagmark-no"));
+        },
+        RenderThumbnail: function(a) {
+            t(this);
+            var i = this, r = d.Data(a);
+            if (l.pagThumb && !r.$thumbWrap) {
+                var s, u = d.Find(a, "." + o.ns + "thumbitem"), p = d.Find(a, "." + o.ns + n.nameImageBack), c = d.Find(a, "." + o.ns + "videoback"), f = c.length && !/^\s*$/.test(c.attr("href"));
+                if ((p.length || c.length) && (s = (p.length && p || c.length && c).data("thumbnail-link"), 
+                /^\s*$/g.test(s) && (s = !1)), u.length || p.length || s || f || r.isLoaded && r.$thumbItem) {
+                    var v = r.$pagItem, g = e("<div/>", {
+                        class: "{ns}thumbwrap {ns}wfit".replace(/\{ns\}/g, o.ns)
+                    });
+                    v.append(g), r.$thumbWrap = g, i.RENDER.LoaderAdd(a, v, "$loaderThumb"), r.isLoaded && r.$thumbItem ? (g.append(r.$thumbItem), 
+                    i.SetupWhenLoadSlideEnd(a), i.PosCenterForThumbItem(a)) : u.length ? g.append(u) : s ? (u = e("<img></img>", {
+                        src: s,
+                        class: o.ns + "thumbitem"
+                    }), g.append(u)) : p.length && ((u = p.clone()).addClass(o.ns + "thumbitem").removeClass(o.ns + "imgback").css({
+                        width: "",
+                        height: ""
+                    }), u.data("width") && u.css("width", u.data("width")), u.data("height") && u.css("height", u.data("height")), 
+                    g.append(u));
+                }
+            } else !l.pagThumb && r.$thumbWrap && (r.$thumbWrap.remove(), r.$thumbWrap = null);
+        },
+        SetupWhenLoadSlideEnd: function(e) {
+            t(this), l.pagThumb && a.RENDER.LoaderRemove(e, "$loaderThumb");
+        },
+        ToggleClass: function(a, i) {
+            if (t(this), !e.isEmptyObject(r) || i) {
+                e.isEmptyObject(r) && (r.pag = {});
+                var u = a ? n : r, p = u.pag, c = o.ns, f = "", v = "", g = "";
+                if (n.pag.type != r.pag.type && (v += " {ns}" + p.type, g += " {ns}pagtype-" + p.type), 
+                n.pag.position != r.pag.position && (f += " {ns}pagpos-" + p.position), n.pag.direction != r.pag.direction && p.direction) f += " {ns}pagdirs-" + p.direction; else if (o.addInfo) {
+                    var h = o.addInfo.pagDirs;
+                    f += a ? " {ns}pagdirs-" + h : " {ns}pagdirs-" + ("hor" == h ? "ver" : "hor");
+                }
+                n.pag.cssPosition != r.pag.cssPosition && (v += " {ns}pos-" + p.cssPosition), n.pag.moreClass != r.pag.moreClass && (v += " " + p.moreClass), 
+                a === n.pag.isMarkTransition && (v += " {ns}pagmark-transition"), v += " " + f, 
+                v = d.NS(v), !!o.$pag && o.$pag[a ? "addClass" : "removeClass"](v), l.pagOutside && null !== u.skin && (a ? o.$pag.parent().addClass(c + u.skin) : o.$pag.parent().removeClass(c + u.skin)), 
+                g += " " + f, g = d.NS(g), s.$ruby[a ? "addClass" : "removeClass"](g);
+            }
+        },
+        FirstLastClass: function() {
+            var e = this.va, t = e.$pagItem, a = e.ns + "first", i = e.ns + "last";
+            t && (t.removeClass(a + " " + i), t.first().addClass(a), t.last().addClass(i));
+        },
+        EventTap: function() {
+            var a = this;
+            if (t(a), !o.$pag) return !1;
+            var i = o.ev.click + " " + o.ev.swipe.end, r = i + " " + o.ev.swipe.start + " " + o.ev.swipe.move;
+            if (o.$pagItem.off(r), l.pag) {
+                var s = e();
+                o.$pagItem.each(function() {
+                    var t = e(this), a = "a" === t[0].tagName.toLowerCase(), i = t.attr("href");
+                    a && i || (s = s.add(t));
+                }), a.EVENTS.CheckMobileTap(s), s.on(i, function(i) {
+                    t(a);
+                    var r = e(this), s = d.Data(r);
+                    d.RunEvent("beforeTap"), n.pag.isEventTap && l.tapEnable && (!l.mobile || l.mobile && /^(touch|pointer)/.test(i.type) && s.isMobileTap) && (o.moveBy = "tap", 
+                    a.TOSLIDE.Run(d.Data(r).id, !0, !1, !0), a.EVENTS.DelayToTapNext()), i.preventDefault();
+                });
+            }
+            if (n.pag.isArrow) {
+                var u = o.$pagArrowLeft.add(o.$pagArrowRight);
+                u.off(i), n.pag.isTapOnArrow && u.on(i, function(i) {
+                    if (t(a), l.tapEnable) {
+                        var n = e(this).is(o.$pagArrowLeft) ? "left" : "right";
+                        a.TranslatePagByTapArrow(n), a.EVENTS.DelayToTapNext();
+                    }
+                    i.preventDefault();
+                });
+            }
+        },
+        ToggleEvent: function() {
+            t(this);
+            var e = o.pag.isViewLarge;
+            if (l.SWIPE && n.swipe.isAutoOnPag && (e && l.swipePagCur || !e && !l.swipePagCur)) {
+                var a = e ? "offPag" : "onPag";
+                d.Module("SWIPE").Events(a);
+            }
+        },
+        CSSPosForPag: function() {
+            t(this);
+            var e = n.pag, a = {
+                "margin-left": "",
+                "margin-right": "",
+                "margin-top": "",
+                "margin-bottom": ""
+            };
+            null !== e.hOffset && ("relative" == e.cssPosition ? a["begin" == e.position ? "margin-bottom" : "margin-top"] = e.hOffset : a["begin" == e.position ? "margin-top" : "margin-bottom"] = e.hOffset), 
+            null !== e.vOffset && ("relative" == e.cssPosition ? a["begin" == e.position ? "margin-right" : "margin-left"] = e.vOffset : a["begin" == e.position ? "margin-left" : "margin-right"] = e.vOffset), 
+            o.$pag.css(a);
+        },
+        TypeSizeItem: function() {
+            t(this);
+            var r = n.pag, s = o.pag, u = o.ns + "wfit", p = o.ns + "hfit", c = "hor" == s.dirs, f = l.pagItemSizeSelf;
+            o.$pagInner.css({
+                width: "",
+                height: "",
+                "margin-right": "",
+                "margin-bottom": ""
+            }).removeClass(u + " " + p), o.$pagItem.each(function() {
+                e(this).css({
+                    width: "",
+                    height: ""
+                });
+            }), a.GetSizeOfItems(), function() {
+                var e = {
+                    width: c ? "max" == r.typeSizeItem ? s.wMax : s.wMin : s.wMax,
+                    height: c ? s.hMax : "max" == r.typeSizeItem ? s.hMax : s.hMin
+                };
+                if (c ? (e["margin-bottom"] = s.maBottom, f && (e.width = s.wSum)) : (e["margin-right"] = s.maRight, 
+                f && (e.height = s.hSum), l.pagOutside && (e.width = "")), o.$pagInner.css(e), !l.pagList) {
+                    var t = u + " " + p;
+                    f && (t = c ? p : u), o.$pagInner.addClass(t);
+                }
+            }(), function() {
+                function e(e) {
+                    var t = 0, a = 0;
+                    for (i = e.length - 1; i >= 0; i--) t += d.PInt(o.$viewport.css(e[i])), a += d.PInt(o.$pag.css(e[i]));
+                    return t - a;
+                }
+                o.viewSpace = {
+                    hor: e([ "padding-left", "padding-right", "border-left-width", "border-right-width" ]),
+                    ver: e([ "padding-top", "padding-bottom", "border-top-width", "border-bottom-width" ])
+                };
+            }();
+        },
+        GetSizeOfItems: function() {
+            function a(t) {
+                var a = "w" == t ? "width" : "height", n = "w" == t ? "Width" : "Height", r = [ t + "Self", t + "ToPadding", t + "ToBorder", t + "ToMargin" ];
+                for (i = 0; i < r.length; i++) u[r[i]] = [];
+                o.$pagItem.each(function() {
+                    var t = e(this), i = d.R(d[n](t)), s = d.R(d["Inner" + n](t) - i), o = d.R(d["Outer" + n](t) - i), p = d.R(d["Outer" + n](t, !0) - i), c = l["min" + n], f = l["max" + n];
+                    e.isNumeric(l[a]) && (i = l[a]), e.isNumeric(c) && i < c && (i = c), e.isNumeric(f) && i > f && (i = f), 
+                    u[r[0]].push(i), u[r[1]].push(i + s), u[r[2]].push(i + o), u[r[3]].push(i + p);
+                }), u[t + "Min"] = Math.min.apply(null, u[r[0]]), u[t + "Max"] = Math.max.apply(null, u[r[0]]), 
+                u[t + "Sum"] = d.Sum(u[r[3]]);
+            }
+            function r(e, t) {
+                var a = 0;
+                for (i = 0; i < s.num; i++) {
+                    var n = e[i] - t[i];
+                    n > a && (a = n);
+                }
+                return a;
+            }
+            t(this);
+            var l = n.pag, u = o.pag;
+            !function() {
+                var e = [ "padding", "border", "margin" ], t = [ "Top", "Right", "Bottom", "Left" ], a = [ "", "Width", "" ], n = e.length, r = t.length;
+                for (i = 0; i < n; i++) u[e[i]] = [ [], [], [], [] ];
+                o.$pagItem.each(function(s) {
+                    var o = document.defaultView ? getComputedStyle(this) : this.currentStyle;
+                    for (i = 0; i < n; i++) for (j = 0; j < r; j++) u[e[i]][j][s] = d.PInt(o[e[i] + t[j] + a[i]]);
+                });
+            }(), a("w"), a("h"), u.sSum = "hor" == u.dirs ? u.wSum : u.hSum, u.maRight = r(u.wToMargin, u.wSelf), 
+            u.maBottom = r(u.hToMargin, u.hSelf);
+        },
+        PropAndStyle: function() {
+            t(this);
+            var e, a = this, i = o.$pag, r = s.num, u = o.pag, p = "hor" == u.dirs, c = l.pagOutside && !p ? "self" : n.pag.sizeAuto, f = {
+                width: "",
+                height: ""
+            };
+            if (null === c ? e = p ? d.Width(i) : d.Height(i) : "full" == c ? e = p ? f.width = o.wRuby + o.viewSpace.hor : f.height = o.hRuby + o.viewSpace.ver : "self" == c && (e = p ? f.width = u.wSum : f.height = u.hSum), 
+            u.sViewport = e, o.$pag.css(f), u.wViewport = d.Width(i), u.hViewport = d.Height(i), 
+            u.sTranslate = 0, l.alignJustify && "self" !== c && p) {
+                var v = Math.max.apply(null, u.wToMargin), g = v * r, h = v;
+                (u.wViewport >= g || n.pag.isJustifyWhenLarge) && (h = ~~(u.wViewport / r));
+                var m = h - u.maRight;
+                o.$pagInner.css({
+                    width: m,
+                    height: u.hSelf[0]
+                });
+            }
+            a.GetSizeOfItems();
+            var y = u.sViewport - u.sSum, w = u.isViewLarge = y >= 0;
+            u.align = n.pag.align, w && "justify" == u.align && (u.align = "center"), w || "begin" == u.align || (u.align = "begin"), 
+            "begin" == u.align ? (u.xMin = u.xCanvas = 0, u.xMax = w ? 0 : y) : "end" == u.align ? (u.xMin = u.xCanvas = y, 
+            u.xMax = u.sViewport) : "center" == u.align && (u.xMin = u.xCanvas = d.R(y / 2), 
+            u.xMax = u.xMin + u.sSum), a.ToggleEvent();
+        },
+        PosAndSizeOfItems: function() {
+            t(this);
+            var e = o.pag, n = "hor" == e.dirs;
+            a.GetSizeOfItems();
+            var r = n ? "wToMargin" : "hToMargin";
+            for (e.pBegin = [ 0 ], i = 1; i < a.cs.num; i++) e.pBegin[i] = e.pBegin[i - 1] + e[r][i - 1];
+            var s = n ? "Tlx" : "Tly", u = {};
+            for (l.tf || (n ? u.top = "" : u.left = ""), i = 0; i < a.cs.num; i++) u[e.cssTf] = d[s](e.pBegin[i]), 
+            l.pagItemSizeSelf && (n ? u.width = e.wSelf[i] : u.height = e.hSelf[i]), o.$pagItem.eq(i).css(u);
+        },
+        PosCenterForThumbItem: function(a) {
+            t(this);
+            var i = d.Data(a), r = i.$thumbWrap, s = i.$thumbItem, l = d.Data(s);
+            if (r && s && l.isLoaded) {
+                var u = o.ns, p = n.pag.width, c = n.pag.height, f = e.isNumeric(p) ? p : d.Width(r), v = e.isNumeric(c) ? c : d.Height(r), g = f / v, h = l.rate;
+                void 0 === h && l.isImgback && (h = l.rate = d.Data(l.$imgback).rate), s.hasClass(o.ns + "transparent") && (h = 1);
+                var m = "", y = {
+                    width: "",
+                    height: "",
+                    left: "",
+                    top: ""
+                };
+                f && v && (h > g ? (m = u + "hfit", y.left = -d.R((h * v - f) / 2)) : (m = u + "wfit", 
+                y.top = -d.R((f / h - v) / 2))), s.css(y);
+                var w = "{ns}hfit{ns}wfit".replace(/\{ns\}/g, u).replace(m, "");
+                r.addClass(m).removeClass(w);
+            }
+        },
+        UpdateThumbnail: function() {
+            var a = this;
+            t(a), l.pagThumb && l.initEnd && o.$s.each(function() {
+                a.PosCenterForThumbItem(e(this));
+            });
+        },
+        PosCenterForItemCur: function(e, a) {
+            function i() {
+                if (t(r), o.isViewLarge) "ver" == o.dirs && (a = !1), r.TranslateTo(o.xCanvas, e, a); else {
+                    var i = "hor" == o.dirs ? o.wToMargin : o.hToMargin, n = d.Sum(i, s.idCur), l = -d.R(n - (o.sViewport - i[s.idCur]) / 2);
+                    l > 0 ? l = 0 : l < o.xMax && (l = o.xMax), r.TranslateTo(l);
+                }
+            }
+            var r = this, o = r.va.pag;
+            if (t(r), "hor" == o.dirs) i(); else {
+                var l = 10 + (n.speedHeight || 200);
+                clearTimeout(u.centerItemCur), u.centerItemCur = setTimeout(i, l);
+            }
+        },
+        TranslateTo: function(e, a, i) {
+            t(this);
+            var r = this, s = o.pag;
+            if (e != s.xCanvas || 0 == e || a) {
+                var l = d.GetTween(o.$pagInner), u = "hor" === s.dirs ? {
+                    x: d.R(e)
+                } : {
+                    y: d.R(e)
+                };
+                i ? l.css(o.$pagInner, u) : l.animate(o.$pagInner, u, {
+                    isNew: !0,
+                    duration: n.pag.speed,
+                    easing: n.pag.easing
+                }), s.xCanvas = e, n.pag.isArrow && r.ArrowActived(e), n.pag.isMark && r.SizePosOfMark();
+            }
+        },
+        MarginOnViewport: function() {
+            if (t(this), !l.pagOutside) if ("relative" == n.pag.cssPosition) {
+                var e = d.OuterWidth(o.$pag, !0);
+                "begin" == o.pagVer && o.$viewport.css("margin-left", e), "end" == o.pagVer && o.$viewport.css("margin-right", e);
+            } else o.$viewport.css({
+                "margin-left": "",
+                "margin-right": ""
+            });
+        },
+        VerToHor: function() {
+            t(this);
+            var e = n.pag, a = o.pag, i = null;
+            if (l.pagTabs && "ver" == e.direction) {
+                var r = d.MatchMedia(0, e.widthMinToHor, !0);
+                r || (r = d.MatchMedia(0, e.rangeMinToHor)), "ver" == a.dirs && r ? (i = a.dirs = "hor", 
+                !!o.$pag && o.$pag.stop(!0).css("height", "")) : "hor" != a.dirs || r || (i = a.dirs = "ver");
+            }
+            i && (o.$canvas.add(o.$pag).css("width", ""), o.addInfo = {
+                pagDirs: i
+            }, s.update({}, !1));
+        },
+        ArrowActived: function(e) {
+            t(this);
+            var a = o.actived, i = o.$pagArrowLeft, n = o.$pagArrowRight;
+            if (o.pag.isViewLarge) i.add(n).removeClass(a); else {
+                var r = e < o.pag.xMin - 30;
+                d.XClass(i, r, a);
+                var s = e > o.pag.xMax + 30;
+                d.XClass(n, s, a);
+            }
+        },
+        TranslatePagByTapArrow: function(e) {
+            t(this);
+            var i = o.pag;
+            if (!i.isViewLarge) {
+                var n = "left" == e, r = n ? 1 : -1, s = i.xCanvas + (i.sViewport - 10) * r, l = n ? i.xMin : i.xMax;
+                (n && s > l || !n && s < l) && (s = l), a.TranslateTo(s);
+            }
+        },
+        SizePosOfMark: function() {
+            function e(e) {
+                var t, n, r = "dMark" + e, l = o["$pagMarkItem" + e], u = "hor" == i.dirs, d = u ? "w" : "h", p = u ? "3" : "0", c = s.idCur, f = {
+                    width: "",
+                    height: ""
+                }, v = i.margin[p][c], g = v + i.border[p][c], h = g + i.padding[p][c];
+                if (l.is(":visible")) {
+                    "Margin" == e ? (n = i[d + "ToMargin"][c], t = 0) : "Border" == e ? (n = i[d + "ToBorder"][c], 
+                    t = v) : "Padding" == e ? (n = i[d + "ToPadding"][c], t = g) : (n = i[d + "Self"][c], 
+                    t = h), n !== i[r] && (f[u ? "width" : "height"] = n, l.css(f), i[r] = n);
+                    var m = "xMark" + e;
+                    if (void 0 !== i.pBegin) {
+                        var y = i.xCanvas + i.pBegin[s.idCur] + t;
+                        y != i[m] && (a.POSITION.TranslateX(l, y, !0, null, "hor" == i.dirs), i[m] = y);
+                    }
+                }
+            }
+            t(this);
+            var i = o.pag;
+            void 0 !== i.margin && (e("Self"), e("Padding"), e("Border"), e("Margin"));
+        },
+        XBufferOnMark: function(e) {
+            function i(t) {
+                var i = "xMark" + t, r = o["$pagMarkItem" + t], s = e + n[i];
+                r.is(":visible") && (a.POSITION.TranslateX(r, d.C(s), !0, null, "hor" == n.dirs), 
+                n[i] = s);
+            }
+            t(this);
+            var n = o.pag;
+            i("Self"), i("Padding"), i("Border"), i("Margin");
+        }
+    };
+}(jQuery), function(e) {
+    function t(e) {
+        a = e, i = e.o, n = e.cs, r = e.va, s = e.is, o = e.M;
+    }
+    window.rt01MODULE = window.rt01MODULE || {};
+    var a, i, n, r, s, o;
+    rt01MODULE.CAPTION = {
+        Render: function() {
+            if (t(this), i.isCap && !s.$cap) {
+                var o = "." + r.ns + i.nameCap, l = a.RENDER.SearchNode(o);
+                s.capOutside = !!l.length, r.$cap = s.capOutside ? l : e("<div/>", {
+                    class: r.ns + i.nameCap
+                }), r.$capCur = e("<div/>", {
+                    class: r.ns + "cap-cur"
+                }), r.$capLast = e("<div/>", {
+                    class: r.ns + "cap-last"
+                }), r.$capInner = e("<div/>", {
+                    class: r.ns + "capinner"
+                }), r.$capInner.append(r.$capCur, r.$capLast).appendTo(r.$cap), !s.capOutside && n.$ruby.append(r.$cap), 
+                s.$cap = !0;
+            } else !i.isCap && s.$cap && (r.$cap[s.capOutside ? "empty" : "remove"](), s.$cap = !1);
+        },
+        Toggle: function(e, n) {
+            t(this);
+            var l = o.Data(e).htmlCap, u = n.length ? o.Data(n).htmlCap : "";
+            if (r.$capCur.html(l), !s.mobile && !s.ie7) {
+                r.$capLast.html(u);
+                var d = o.OuterHeight(r.$capCur, !0), p = o.OuterHeight(r.$capLast, !0) || d;
+                r.tweenCaption.css(r.$capCur, {
+                    opacity: 0
+                }).animate(r.$capCur, {
+                    opacity: 1
+                }, {
+                    isNew: !0,
+                    duration: i.speedHeight,
+                    complete: function() {
+                        setTimeout(function() {
+                            t(a), r.$capLast.css("visibility", ""), r.$capInner.css("height", "");
+                        }, 10);
+                    }
+                }).css(r.$capLast, {
+                    opacity: 1,
+                    visibility: "visible"
+                }).animate(r.$capLast, {
+                    opacity: 0
+                }, {
+                    duration: i.speedHeight
+                }), p !== d && r.tweenCaption.css(r.$capInner, {
+                    height: p
+                }).animate(r.$capInner, {
+                    height: d
+                }, {
+                    duration: i.speedHeight
+                });
+            }
+        }
+    };
+}(jQuery), function(e) {
+    function t(e) {
+        a = e, i = e.o, n = e.cs, r = e.va, s = e.is, o = e.ti, l = e.M, u = l.Module("PAG");
+    }
+    window.rt01MODULE = window.rt01MODULE || {};
+    var a, i, n, r, s, o, l, u;
+    rt01MODULE.IMAGE = {
+        SetupAtLoadSlideBegin: function(n, o) {
+            t(this);
+            var u = r.ns, d = l.Data(n);
+            o = o || ".{ns}{imgback}, .{ns}{imglazy}, img.{ns}{layer}".replace(/\{imgback\}/, i.nameImageBack).replace(/\{imglazy\}/, i.nameImageLazy).replace(/\{layer\}/, i.nameLayer).replace(/\{ns\}/g, u);
+            var p = l.Find(n, o);
+            if (d.$pagItem) {
+                var c = ".{ns}thumbitem, .{ns}{imglazy}".replace(/\{imglazy\}/, i.nameImageLazy).replace(/\{ns\}/g, u), f = l.Find(d.$pagItem, c);
+                p = p.add(f);
+            }
+            l.Data(n, {
+                $images: e(),
+                imageLen: p.length,
+                nImage: 0
+            }), p.each(function() {
+                var t = e(this);
+                /^img/i.test(this.tagName) || (t = a.ConvertToImage(t));
+                var r = t.hasClass(u + i.nameImageBack), o = t.hasClass(u + "thumbitem"), p = r || t.hasClass(u + i.nameImageLazy), c = l.Data(t, {
+                    $slide: n,
+                    isImgOfRuby: p,
+                    isImgback: r,
+                    isThumbItem: o,
+                    isSrcOutside: !1,
+                    isLoaded: !1,
+                    src: [],
+                    styleInline: l.PStyleToJson(t),
+                    opts: r ? e.extend({}, d.opts.imageback, t.data("imageback")) : e.extend({}, d.opts.image, t.data("image"))
+                });
+                c.layer && void 0 !== c.layer.opts.isResponsive && (c.opts.isResponsive = c.layer.opts.isResponsive), 
+                r && (a.Wrap(t), l.Data(n, {
+                    $imgbackWrap: n.find("." + u + "imgback-wrap"),
+                    $imgback: t,
+                    isImgback: !0
+                }), c.opts.position = d.opts.imagePosition || c.opts.position);
+                var f = c.src, v = t.attr("src"), g = /^data\:image\//g.test(v), h = t.attr("data-" + i.nameDataLazy);
+                !g && f.push(v), void 0 === h || /^\s*$/.test(h) || f.push(h), t.removeAttr("data-" + i.nameDataLazy), 
+                s.FLICKR && t.data("flickr") ? l.Module("FLICKR").GetLinkByPhotoID(t) : a.EventLoad(t);
+            });
+        },
+        ConvertToImage: function(a) {
+            t(this);
+            var n = {}, r = i.isCap ? "image link" : a.text(), o = e("<img>", {
+                src: "data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7",
+                alt: r
+            });
+            e.each(a[0].attributes, function(e, t) {
+                var a = t.name, i = t.value;
+                o.attr(a, i), n[a] = i;
+            });
+            var l = "data-NAME".replace(/NAME/, i.nameDataLazy), u = a.attr(l) || n.href || "";
+            return o.attr(l, u).removeAttr("href"), s.ie && o.removeAttr("width height"), a.after(o).remove(), 
+            o;
+        },
+        Wrap: function(a) {
+            t(this);
+            var i = r.ns + "imgback-wrap", n = a.closest("." + i);
+            n.length || (n = e("<div/>", {
+                class: i
+            }), a.wrap(n), n = a.closest("." + i)), l.Data(n, l.Data(a)), l.Data(n, {
+                $imgItem: a
+            });
+            for (var s = [ "data-video", "data-video-link" ], o = 0, u = s.length; o < u; o++) {
+                var d = a.attr(s[o]);
+                d && (n.attr(s[o], d), a.removeAttr(s[o]));
+            }
+        },
+        EventLoad: function(e) {
+            function a() {
+                d.nImage = d.nImage + 1, d.nImage == d.imageLen && (!d.isVideoback || d.isVideoback && d.isVideobackLoaded) && setTimeout(function() {
+                    t(s), "home" == d.id ? l.Module("LAYER").LoadHomeEnd() : s.LOAD.SlideEnd(u);
+                }, 10);
+            }
+            function i() {
+                s.Properties(e), a();
+            }
+            function n(t) {
+                e.addClass(r.ns + "load-failed").attr("alt", "image load failed"), l.Message("image load failed", t), 
+                a();
+            }
+            t(this);
+            var s = this, o = l.Data(e), u = o.$slide, d = l.Data(u);
+            if (e.hasClass(r.ns + "transparent")) return i();
+            if (!o.src.length) return n("image source not found");
+            var p = new Image(), c = o.src, f = c.pop();
+            p.onload = function() {
+                t(s), i();
+            }, p.onerror = function() {
+                t(s), c.length ? s.EventLoad(e) : n(f);
+            }, e.attr("src", f), p.src = f;
+        },
+        Properties: function(e) {
+            t(this);
+            var i = l.Data(e), n = e[0], s = e.data("width") || n.width, o = e.data("height") || n.height;
+            l.Data(e, {
+                isLoaded: !0,
+                width: s,
+                height: o,
+                rate: s / o
+            });
+            var d = l.Data(i.$slide);
+            d.$images = d.$images.add(e), i.isThumbItem && (d.$thumbItem = e), i.isImgOfRuby && a.SizeResponsive(e), 
+            (i.isImgback || i.isThumbItem) && (e.on(r.ev.drag, function() {
+                return !1;
+            }), u.PosCenterForThumbItem(i.$slide));
+        },
+        SizeResponsive: function(a) {
+            function i() {
+                "auto" == u ? c.width = u : e.isNumeric(u) ? c.width = l.R(u * p) : c.width = l.R(n.width * p), 
+                "auto" == d ? c.height = d : e.isNumeric(d) ? c.height = l.R(d * p) : c.height = l.R(n.height * p), 
+                a.css(c);
+            }
+            t(this);
+            var n = l.Data(a), o = l.Data(n.$slide);
+            if (a && a.length && n.opts.isResponsive && "videoPoster" !== n.type) {
+                var u = (n = l.Data(a)).styleInline.width, d = n.styleInline.height, p = r.rate, c = {
+                    width: "",
+                    height: "",
+                    left: "",
+                    top: ""
+                }, f = o.opts.imageback.posGrid[r.index];
+                n.isImgback ? (p /= n.opts.pixelRatio, "center" == f || "tile" == f ? i() : s.heightFixed || (c.width = r.wSlide, 
+                c.height = l.R(c.width / n.rate), a.css(c))) : 1 == r.rate ? (void 0 !== u && (c.width = u), 
+                void 0 !== d && (c.height = d), a.css(c)) : i();
+            }
+        },
+        BackPosition: function(a) {
+            function i() {
+                c = r.wSlide, f = l.R(c / g);
+            }
+            function n() {
+                f = r.hRuby, c = l.R(f * g);
+            }
+            function o() {
+                var e = l.PInt(a.css("left")), t = ~~((r.wSlide - l.OuterWidth(a, !0)) / 2);
+                e !== t && a.css("left", t);
+            }
+            function u() {
+                var e = l.R((r.hRuby - l.OuterHeight(a, !0)) / 2);
+                0 == e && (e = ""), a.css("top", e);
+            }
+            t(this);
+            var d = l.Data(a), p = l.Data(d.$slide);
+            if (d.isImgback && "videoPoster" !== d.type) {
+                var c, f, v = p.opts.imageback.posGrid[r.index], g = (d.width, d.height, d.rate), h = r.wRuby / r.hRuby;
+                if ("fill" == v) s.heightFixed && (g > h ? n() : i(), a.css({
+                    width: c,
+                    height: f
+                }), o(), u()); else if ("fit" == v) s.heightFixed && (g > h ? i() : n(), a.css({
+                    width: c,
+                    height: f
+                }), o(), u()); else if ("stretch" == v) s.heightFixed && (c = r.wSlide, f = r.hRuby, 
+                a.css({
+                    width: c,
+                    height: f
+                })); else if ("tile" == v) {
+                    var m = [], y = 0, w = 0, C = 0, A = 0, x = !1, I = !1;
+                    c = l.OuterWidth(a, !0), f = l.OuterHeight(a, !0);
+                    do {
+                        C = 0, A = w, y = 0, x = !1;
+                        do {
+                            m.push([ C, A ]), C += c, (y += c) >= r.wSlide && (x = !0);
+                        } while (!x);
+                        w += f, s.heightFixed ? w >= r.hRuby && (I = !0) : I = !0;
+                    } while (!I);
+                    var E = d.$itemClone, S = a.parent("." + r.ns + "imgback-wrap");
+                    E && E.remove(), d.$itemClone = e();
+                    for (var b = 1, D = m.length; b < D; b++) {
+                        var T = a.clone();
+                        T.addClass(r.ns + "imgclone").css({
+                            left: m[b][0],
+                            top: m[b][1]
+                        }).appendTo(S), d.$itemClone = d.$itemClone.add(T);
+                    }
+                } else o(), s.heightFixed && u();
+            }
+        },
+        UpdateAllImageBy: function(a) {
+            var i = this;
+            t(i);
+            var n, s;
+            switch (a) {
+              case "size":
+                n = "$images", s = "SizeResponsive";
+                break;
 
+              case "position":
+                n = "$imgback", s = "BackPosition";
+                break;
+
+              default:
+                return;
+            }
+            r.$s.add(r.$viewport).each(function() {
+                var t = l.Data(e(this))[n];
+                t && t.each(function() {
+                    i[s](e(this));
+                });
+            });
+        }
+    };
+}(jQuery), function(e) {
+    function t(e) {
+        a = e, i = e.o, n = e.cs, r = e.va, s = e.is, o = e.ti, l = e.M, u = e.FX;
+    }
+    window.rt01MODULE = window.rt01MODULE || {};
+    var a, i, n, r, s, o, l, u;
+    rt01MODULE.VIEWCSS = {
+        GetFxCss: function(a, i) {
+            function n(t) {
+                return e.isArray(t) || (t = [ t ]), e.each(t, function(e) {
+                    s[t[e]] || t.splice(e, 1);
+                }), t;
+            }
+            t(this);
+            var s = r.rubyAnimateKeyframes, o = r.rubyAnimateOne, u = [];
+            switch (a) {
+              case "cssOne":
+                var d = i.cssOne;
+                e.isArray(d) || (d = [ d ]), e.each(d, function(e) {
+                    o[d[e]] && u.push(o[d[e]]);
+                });
+                break;
+
+              case "cssTwo":
+                var p = n(i.cssTwoOut), c = n(i.cssTwoIn);
+                p.length && c.length && (u = [ {
+                    next: [ p, c ],
+                    prev: [ p, c ]
+                } ]);
+                break;
+
+              case "cssThree":
+                var f = n(i.cssThreeNext), v = n(i.cssThreePrev);
+                f.length && v.length && (u = [ {
+                    next: [ [ "slideShortLeftOut" ], f ],
+                    prev: [ [ "slideShortRightOut" ], v ]
+                } ]);
+                break;
+
+              case "cssFour":
+                var g = n(i.cssFourNextOut), h = n(i.cssFourNextIn), m = n(i.cssFourPrevOut), y = n(i.cssFourPrevIn);
+                g.length && h.length && m.length && y.length && (u = [ {
+                    next: [ g, h ],
+                    prev: [ m, y ]
+                } ]);
+            }
+            return u.length || (u = [ o.fade ], r.fxType = "cssOne", l.Message("effect CSS need RubyAnimate object and keyframes")), 
+            u;
+        },
+        UpdateTweenFromCss: function(e, a) {
+            t(this);
+            var i = r.fxCSS.idNext, n = r.speed[i], s = l.Data(r.$s.eq(i)).opts.cssEasing, o = l.Module("RUBYANIMATE").Tween(a, n, void 0, s);
+            if (o) for (var u = 0, d = o.length; u < d; u++) {
+                var p = o[u];
+                0 == u ? r.tweenSlide.css(e, p) : r.tweenSlide.animate(e, p.prop, p.opts, !1);
+            } else r.tweenSlide.animate(e, {}, {
+                duration: n
+            }, !1);
+            r.fxCSS.isMask && r.$viewport.addClass(r.ns + "css-mask");
+        },
+        ResetTFSlideCss: function() {
+            t(this);
+            var a = r.fxCSS, i = r.$s.eq(a.idCur), s = r.$s.eq(a.idNext), o = r.$s.eq(n.idLast), l = r.$s.eq(n.idCur), u = e("").add(i).add(s).add(o).add(l), d = "{ns}css-prev {ns}css-next".replace(/\{ns\}/g, r.ns);
+            u.css("opacity", "").css(r.cssTf, "").css(r.prefix + "transform-origin", "").css("z-index", "").removeClass(d), 
+            r.$viewport.removeClass(r.ns + "css-mask");
+        },
+        ResetTweenCss: function(e, i) {
+            t(this);
+            var n, s, o = r.fxCSS, u = r.$s.eq(e), d = r.$s.eq(i), p = l.RandomInArray(r.fx[i], r.fxCssLast), c = !!p.isMask;
+            p = p[o.isNext ? "next" : "prev"], n = r.fxCssOutLast = l.RandomInArray(p[0], r.fxCssOutLast), 
+            s = r.fxCssInLast = l.RandomInArray(p[1], r.fxCssInLast), a.ResetTFSlideCss(), o.idCur = e, 
+            o.idNext = i, o.fxOut = n, o.fxIn = s, o.isMask = c, r.tweenSlide.reset(!0), u.addClass(r.ns + "css-prev"), 
+            d.addClass(r.ns + "css-next"), a.UpdateTweenFromCss(u, n), a.UpdateTweenFromCss(d, s);
+        },
+        BufferCss: function(e) {
+            t(this);
+            var i = r.fxCSS, s = n.idCur, o = s + e;
+            o < 0 ? o = n.num - 1 : o > n.num - 1 && (o = 0);
+            var u = i.idNext != o;
+            i.status && !u || (i.isNext = e > 0, a.ResetTweenCss(s, o)), i.status = "buffer";
+            var d = l.A(r.xOffset) / r.wSlide * 100;
+            r.tweenSlide.go(d);
+        },
+        RestoreCss: function() {
+            t(this), r.fxCSS.status = "restore", a.ToSlideCss();
+        },
+        ToSlideCss: function() {
+            function e() {
+                s.eventComplete(function() {
+                    a.ResetTFSlideCss(), a.TOSLIDE.End(), i.status = null;
+                });
+            }
+            t(this);
+            var a = this, i = r.fxCSS, s = r.tweenSlide;
+            if ("buffer" == i.status) i.status = "play", e(), s.resume(); else if ("restore" == i.status) e(), 
+            r.tweenSlide.reverse(); else {
+                var o = n.idLast, l = n.idCur;
+                i.isNext = r.nMove > 0, a.ResetTweenCss(o, l), e(), i.status = "play", s.restart();
+            }
+        }
+    };
+}(jQuery), function(e) {
+    function t(e) {
+        a = e, i = e.o, n = e.va;
+    }
+    window.rt01MODULE = window.rt01MODULE || {};
+    var a, i, n;
+    rt01MODULE.RUBYANIMATE = {
+        keyframeDefault: {
+            duration: 400,
+            easing: "easeOutQuad",
+            animEnd: {
+                pos: 100,
+                x: 0,
+                y: 0,
+                z: 0,
+                scale: 1,
+                skew: 0,
+                rotate: 0,
+                rotateX: 0,
+                rotateY: 0,
+                rotateZ: 0,
+                opacity: 1
+            }
+        },
+        CopyData: function(e) {
+            var t = {};
+            for (var a in e) "pos" != a && (t[a] = e[a]);
+            return t;
+        },
+        UpdateDataToKeyframe: function(i) {
+            t(this);
+            var n = window.__rubyAnimateKeyframes__ || {};
+            if (!e.isArray(i) || !i.length) return !1;
+            for (var r = [], s = 0, o = i.length; s < o; s++) {
+                var l = i[s];
+                if (e.isArray(l.pos)) {
+                    for (var u = 0, d = l.pos.length; u < d; u++) {
+                        var p = a.CopyData(l);
+                        p.pos = l.pos[u], i.push(p);
+                    }
+                    r.push(s);
+                }
+            }
+            for (var c = 0, s = 0, o = r.length; s < o; s++) i.splice(r[s] - c, 1), c++;
+            for (var f = [], s = 0, o = i.length; s < o; s++) {
+                for (var v = Number.MAX_VALUE, g = 0, u = 0, d = i.length; u < d; u++) i[u].pos < v && (v = i[u].pos, 
+                g = u);
+                f.push(i[g]), i.splice(g, 1);
+            }
+            n[name] = i = f;
+            var h = i[0];
+            return void 0 === h.pos && 1 == i.length && (h.pos = 100), 0 !== h.pos && i.unshift({
+                pos: 0
+            }), 100 != i[i.length - 1].pos && i.push(a.keyframeDefault.animEnd), i;
+        },
+        UpdateAllKeyframes: function() {
+            t(this);
+            var r = e.extend(!0, {}, i.rubyAnimateKeyframes, window.__rubyAnimateKeyframes__);
+            for (var s in r) {
+                var o = r[s];
+                r[s] = a.UpdateDataToKeyframe(o);
+            }
+            n.rubyAnimateKeyframes = r, n.rubyAnimateOne = e.extend(!0, {}, i.rubyAnimateOne, window.__rubyAnimateOne__);
+        },
+        Tween: function(i, r, s, o, l) {
+            t(this);
+            var u, d;
+            if (l = l || n.rubyAnimateKeyframes, "string" == typeof i) d = l[i]; else if (e.isArray(i) && i.length) {
+                var p = i.slice();
+                d = a.UpdateDataToKeyframe(p);
+            }
+            if (d) {
+                (u = [])[0] = a.CopyData(d[0]);
+                for (var c = 0, f = 1, v = d.length; f < v; f++) {
+                    var g = d[f], h = {
+                        prop: a.CopyData(g),
+                        opts: {}
+                    }, m = h.opts, y = g.pos;
+                    m.duration = (y - c) / 100 * r, c = y, void 0 !== s && null !== s && 1 == f && (m.delay = s), 
+                    void 0 !== o && null !== o && 1 == f && (m.easing = o), u.push(h);
+                }
+                return u;
+            }
+        },
+        OneConvertFour: function(e) {
+            var t = this.va.rubyAnimateOne;
+            return t[e] || t._default_;
+        }
+    };
+}(jQuery), function(e) {
+    window.rt01MODULE = window.rt01MODULE || {}, rt01MODULE.NESTED = {
+        Destroy: function(e) {
+            var t = this, a = e.find("." + t.va.ns);
+            if (a.length) {
+                var i = a.data(rt01VA.rubyName);
+                i && i.destroy && i.destroy(!0);
+            }
+        },
+        RefreshInSlide: function(t) {
+            var a = this.va;
+            t.find("." + a.ns).each(function() {
+                var t = e(this).data(rt01VA.rubyName);
+                t && (t.one.va.wRuby < 10 || t.one.va.hRuby < 10) && t.refresh();
+            });
+        }
+    };
+}(jQuery), jQuery, window.rt01MODULE = window.rt01MODULE || {}, rt01MODULE.CLASSADD = {
+    Filter: function(e) {
+        var t = "";
+        return void 0 !== e.classAdd && (t = e.classAdd.toString()), t;
+    },
+    Toggle: function() {
+        var e = this.va, t = this.cs, a = e.classAdd[t.idLast], i = e.classAdd[t.idCur];
+        void 0 !== a && "" != a && t.$ruby.removeClass(a), void 0 !== i && "" != i && t.$ruby.addClass(i);
+    }
+}, function(e) {
+    function t(e) {
+        a = e, n = e.o, r = e.cs, s = e.va, o = e.is;
+    }
+    window.rt01MODULE = window.rt01MODULE || {};
+    var a, n, r, s, o;
+    rt01MODULE.DISPLAY = {
+        SetupInit: function() {
+            t(this);
+            var e = !0;
+            (o.mobile && "desktop" == n.showBy || !o.mobile && "mobile" == n.showBy) && (e = !1), 
+            e ? (a.SetupVars(), a.Check(), o.awake ? a.INIT.Ready() : a.ResizeON()) : r.$ruby.remove();
+        },
+        SetupVars: function() {
+            t(this);
+            var r = a.M;
+            n.showInRange ? s.showInRange = function(t) {
+                if (e.isNumeric(t) ? t = [ [ t, 1e5 ] ] : r.ElesIsNumber(t, 2) && (t = [ t ]), !e.isArray(t)) return !1;
+                var a = {
+                    num: t.length
+                };
+                for (i = a.num - 1; i >= 0; i--) {
+                    var n = t[i];
+                    e.isNumeric(n) && (n = [ n, 1e5 ]), a[i] = {
+                        from: r.PInt(n[0]),
+                        to: r.PInt(n[1])
+                    };
+                }
+                return a;
+            }(n.showInRange) : o.showInRange = o.awake = !0;
+        },
+        Check: function() {
+            t(this);
+            var n = s.showInRange;
+            if (e.isPlainObject(s.showInRange)) for (o.showInRange = !1, i = n.num - 1; i >= 0; i--) if (a.M.MatchMedia(n[i].from, n[i].to)) {
+                o.showInRange = !0;
+                break;
+            }
+            void 0 === o.awake && o.showInRange && (o.awake = !0);
+        },
+        Toggle: function() {
+            t(this), a.Check();
+            var e = s.ns + "none";
+            r.$ruby[(o.showInRange ? "remove" : "add") + "Class"](e);
+        },
+        ResizeON: function() {
+            var e = this, t = e.cs, a = e.va, i = e.ti, n = e.is;
+            t.$ruby.addClass(a.ns + "none"), a.$w.on("resize.rubyShow" + a.rubykey, function() {
+                clearTimeout(i.showResize), i.showResize = setTimeout(function() {
+                    e.Check(), n.awake && e.ResizeOFF();
+                }, 200);
+            });
+        },
+        ResizeOFF: function() {
+            t(this), s.$w.off("resize.rubyShow" + s.rubykey), r.$ruby.removeClass(s.ns + "none"), 
+            a.INIT.Ready();
+        }
+    };
+}(jQuery);
