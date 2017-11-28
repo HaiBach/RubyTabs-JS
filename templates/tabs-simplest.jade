@@ -9,10 +9,15 @@ html(lang="en")
   //- Body
   body
     .wrapper
-      .contaner
+      .container
 
         //- Tabs here
-        .rt01
+        .rt01(data-tabs={
+          "fx" : "line",
+          "speed" : "400",
+          "pag" : { "align": "center", "typeSizeItem": "max" }
+        })
+        
           div
             .rt01pagitem OVERVIEW
             .row.font-blokk
@@ -65,16 +70,16 @@ html(lang="en")
             .rt01pagitem IMAGE LAZYLOAD
             .row
               .col4
-                a(class="rt01img card-img" href="imgs/food-thumbnail1.jpg") Food 1
+                a(class="rt01img card-img" href="../templates_old/imgs/food-thumbnail1.jpg") Food 1
               .col4
-                a(class="rt01img card-img" href="imgs/food-thumbnail2.jpg") Food 2
+                a(class="rt01img card-img" href="../templates_old/imgs/food-thumbnail2.jpg") Food 2
               .col4
-                a(class="rt01img card-img" href="imgs/food-thumbnail3.jpg") Food 3
+                a(class="rt01img card-img" href="../templates_old/imgs/food-thumbnail3.jpg") Food 3
               .col4
-                a(class="rt01img card-img" href="imgs/food-thumbnail4.jpg") Food 4
+                a(class="rt01img card-img" href="../templates_old/imgs/food-thumbnail4.jpg") Food 4
               .col4
-                a(class="rt01img card-img" href="imgs/food-thumbnail6.jpg") Food 6
+                a(class="rt01img card-img" href="../templates_old/imgs/food-thumbnail6.jpg") Food 6
               .col4
-                a(class="rt01img card-img" href="imgs/food-thumbnail7.jpg") Food 7
+                a(class="rt01img card-img" href="../templates_old/imgs/food-thumbnail7.jpg") Food 7
 
     include _footer
