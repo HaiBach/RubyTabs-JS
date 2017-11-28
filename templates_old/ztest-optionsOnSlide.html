@@ -1,0 +1,565 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <!-- Page Infomations -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="One of the best Tabs - Slider jQuery plugins">
+  <meta name="keywords" content="tabs, slider, carousel, gallery, touch, swipe, drag, css3, responsive, nested, multi, transform, transition, lazyload, fullscreen">
+  <meta name="author" content="Ruby Tabs - HaiBach">
+  
+  <!-- Title of page -->
+  <title>TEST</title>
+
+  <!-- Favicon & apple-icon -->
+  <link rel="shortcut icon" href="../libs/imgs/icons/favicon.ico">
+  <link rel="icon" sizes="192x192" href="../libs/imgs/icons/icon-highres.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="../libs/imgs/icons/touch-icon-iphone-retina.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="../libs/imgs/icons/touch-icon-ipad-retina.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="../libs/imgs/icons/touch-icon-ipad-pro.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../libs/imgs/icons/touch-icon-iphone-6-plus.png">
+
+
+  <!-- CSS link -->
+  <link rel="stylesheet" href="../libs/css/code01.css">
+  <link rel="stylesheet" href="../libs/css/code.custom.css">
+  <link rel="stylesheet" href="../ruby/rubytabs.css">
+  <link rel="stylesheet" href="../code/code.animate.css">
+
+
+  <!-- CSS embed -->
+  <style>
+    
+    /**
+     * STYLE CUSTOM FOR HOME
+     */
+    .zone-pattern2 {
+      padding-top: 50px; padding-bottom: 50px;
+      margin-bottom: 30px;
+      background-color: #cc0055 !important;
+    }
+    
+    /* Frame image */
+    .frame {
+      margin-bottom: 20px;
+      text-align: center;
+    }
+    .frame-bg         { border: none; background-color: #e5e5e5; }
+    .frame > img      { display: inline-block; zoom: 1; }
+    .frame-img1       { margin-right: 50px; }
+
+    @media only screen and (min-width: 768px) and (max-width: 959px) {
+      .frame-img1     { margin-right: 0; margin-bottom: 20px; }
+    }
+    @media only screen and (min-width: 1px) and (max-width: 767px) {
+      .frame-img1     { margin-right: 0px; }
+    }
+    
+    /* Image responsive */
+    @media only screen and (min-width: 1px) and (max-width: 698px) {
+      .img-res { display: block; width: 100%; height: auto; }
+    }
+
+
+
+    /**
+     * TABS PREVIEW
+     */
+    .tabs-preview .rt01pag {
+      border-bottom: none !important;
+    }
+    .tabs-preview .rt01viewport {
+      padding-top: 50px;
+    }
+    .tabs-preview .rt01pagitem {
+      margin-left: 12px; margin-right: 12px;
+      background-color: #fff;
+      color: #999;
+    }
+    .tabs-preview .rt01pagitem:before {
+      display: block;
+      position: absolute;
+      content: "";
+      top: 0; right: 100%;
+      width: 0; height: 0;
+      border: solid #fff;
+      border-width: 32px 0 31px 20px;
+      border-left-color: transparent !important;
+    }
+    .tabs-preview .rt01pagitem:after {
+      display: block;
+      position: absolute;
+      content: "";
+      top: 0; left: 100%;
+      width: 0; height: 0;
+      border: solid transparent;
+      border-width: 32px 0 31px 20px;
+      border-left-color: #fff;
+    }
+    .tabs-preview .rt01pagitem:hover {
+      /*color: #777;*/ 
+    }
+
+    /* PAGITEM CURRENT */
+    .tabs-preview .rt01pagitem.rt01cur {
+      background-color: #cc0055;
+      color: #fff !important;
+    }
+    .tabs-preview .rt01pagitem.rt01cur:before {
+      border-color: #cc0055;
+    }
+    .tabs-preview .rt01pagitem.rt01cur:after {
+      border-left-color: #cc0055;
+    }
+
+    /* PAGITEM FIRST - LAST */
+    .tabs-preview .rt01pagitem.rt01first {
+      border-radius: 4px 0 0 4px;
+    }
+    .tabs-preview .rt01pagitem.rt01last {
+      border-radius: 0 4px 4px 0;
+    }
+    .tabs-preview .rt01pagitem.rt01first:before,
+    .tabs-preview .rt01pagitem.rt01last:after     { display: none; }
+
+
+
+
+
+    /**
+     * SLIDER PREVIEW
+     */
+    .slider-preview .rt01viewport {
+    }
+    .slider-preview .rt01media {
+      right: 10px; top: 10px;
+    }
+
+    /* BORDER CHO SLIDE */
+    .slider-preview.rt01fx-line .rt01slide  {
+      background-color: #444;
+      border-radius: 2px;
+      /*opacity: .25;*/
+
+      -webkit-transtion: opacity .4s;
+           transition: opacity .4s;
+    }
+    .slider-preview.rt01fx-line .rt01slide.rt01cur {
+      opacity: 1;
+    }
+
+    @media only screen and (min-width: 768px) {
+      .slider-preview.rt01fx-line .rt01slide {
+        border: 10px solid #444;
+        border-radius: 4px;
+
+        -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+      }
+      .slider-preview.rt01fx-line .rt01imgback > img {
+        left: -10px !important;
+      }
+    }
+
+
+    /* PAG MARK CUSTOM STYLE 1 */
+    .mark-style1 .rt01pag     { border-bottom-color: #cc0055 !important; }
+    .mark-style1 .rt01paginner  { z-index: 2; }
+
+    .mark-style1 .rt01pagitem         { color: #777; }
+    .mark-style1 .rt01pagitem.rt01cur     { background-color: transparent !important; }
+
+    .mark-style1 .rt01pagmark {
+      position: absolute;
+      bottom: 0;
+      height: 100%;
+    }
+    .mark-style1 .rt01pagmark-item {
+      height: 100% !important;
+    }
+
+
+    /* PAG MARK CUSTOM STYLE 2 */
+    .mark-style2 .rt01pagitem:hover {
+      background-color: hsla(0,0%,0%,.5);
+      box-shadow: none;
+    }
+    .mark-style2 .rt01pagitem.rt01cur {
+      background-color: hsla(0,0%,0%,.2);
+      box-shadow: none;
+    }
+
+    .mark-style2 .rt01pagmark {
+      position: absolute;
+      top: 9px;
+    }
+    .mark-style2 .rt01pagmark-item {
+      height: 8px !important;
+      margin-left: -1px;
+      background-color: #cc0055;
+      border: 1px solid #ff0077;
+      border-radius: 50%;
+    }
+
+  </style>
+  
+
+  
+</head>
+<body>
+
+  <!-- HEADER - begin
+  ======================================================================== -->
+  <div class="wrapper header logo-left">
+  <div class="container">
+    
+    <!-- Logo - begin
+    ....................................................................  -->
+    <a class="logo" href="../templates/" data-mScale="100">
+      <img src="../libs/imgs/logo_tabs.png" alt="[logo]">
+    </a>
+    <!-- Logo - end
+    ....................................................................  -->
+
+  </div>
+  </div>
+  <!-- HEADER - end
+  ======================================================================== -->
+
+
+
+
+
+
+
+  <!-- TABS SECTION - begin
+  ======================================================================== -->
+  <div class="wrapper pattern-dark">
+
+    <!-- TABS PREVIEW - begin -->
+    <div class="rt01 tabs-preview rt01timer-linebottom ma-b-100"
+      data-tabs='{
+        "isAutoInit"   : true,
+        "fx"       : "line",
+        "cssOne"     : [ "stickVer", "glueHor", "scaleSoft", "wheelHor", "roDeal" ],
+        "speed"    : 600,
+        "pag"      : { "align": "center", "isMark": false, "sizeMarkTo": "padding" },
+        "isSwipe"    : true,
+        "swipe"    : { "isBody": true, "isAutoOnPag": true },
+
+        "idBegin"    : 2,
+        "isNav"    : true,
+        "isSlideshow"  : false,
+        "slideshow"  : { "timer": "line", "delay": 10000 },
+        "isKeyboard"   : true,
+        "isMousewheel" : false
+      }'>
+
+
+      <div data-slide='{ }'>
+        <div class="rt01pagitem">OVERVIEW
+          <br><small class="tab-desc">super easy switch slide</small>
+        </div>
+
+        <div class="container">
+        <div class="row font-blokk">
+
+          <div class="span4">
+            <div class="thumbnail-grid">
+              <img src="imgs/tabs/avatar1.jpg">
+              <div class="caption">Pellentesque habitant morbi tristique senectus et netus et malesuada fames ac turpis egestas. Vestibulum tortor quam, feugiat vitae.</div>
+            </div>
+          </div>
+
+          <div class="span4">
+            <div class="thumbnail-grid">
+              <img src="imgs/tabs/avatar2.jpg">
+              <div class="caption">Lorem ipsum dolor sit amet, consectetur adipisi elit. Deleniti, pariatur aliquam molestias aspernatur non. Facere, quibusdam.</div>
+            </div>
+          </div>
+
+          <div class="span4">
+            <div class="thumbnail-grid">
+              <img src="imgs/tabs/avatar3.jpg">
+              <div class="caption">Aenean fermentum, elit eget tincidunt condimentum, eros ipsum rutrum orci, sagittis tempus lacus enim donec consectetur io.</div>
+            </div>
+          </div>
+
+        </div>
+        </div>
+      </div>
+
+
+      <div data-slide='{ "swipe" : { "isBody" : false } }'>
+        <div class="rt01pagitem">SWIPE GESTURES
+          <br><small class="tab-desc">super easy switch slide</small>
+        </div>
+
+        <div class="container">
+        <div class="row">
+
+          <div class="span12 ma-b-20">
+            <div class="dummy-img dummy-img1 ma-t-10 ma-b-10"></div>
+          </div>
+
+          <div class="span4">
+            <p class="bo-l-h"><i>Consectetur adipisicing elit. Vel, sequi, quis, minima, dolor quisquam numquam quod in repudiandae officia nostrum porro ea voluptas eos sunt culpa odit enim. Assumenda, dolores.</i></p>
+          </div>
+
+          <div class="span8">
+            <p class="dropcap">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deleniti, pariatur aliquam molestias aspernatur non. Facere, quibusdam, reiciendis, natus laudantium debitis suscipit consequatur voluptatibus mollitia temporibus quia ratione dignissimos magnam provident.</p>
+            <p>Assumenda, repudiandae, iste magni labore culpa eum expedita eligendi odio molestiae temporibus id ab nihil ad sunt mollitia veritatis excepturi. Ullam, odit nesciunt doloribus natus non repudiandae error itaque vero?</p>
+            <p>Facere, cum, praesentium quo alias quasi enim recusandae dicta ut molestiae nam! Ad, eum, excepturi, voluptatum, animi consequatur est magnam eligendi repellendus suscipit accusantium consectetur deserunt voluptates nobis delectus explicabo?</p>
+          </div>
+
+        </div>
+        </div>
+      </div>
+
+
+      <!-- <div>
+        <div class="rt01pagitem">VIDEO
+          <br><small class="tab-desc">super easy switch slide</small>
+        </div>
+
+        <div class="video-fullwidth ma-b-50">
+          <iframe width="853" height="480" src="https://www.youtube.com/embed/FdiL1lrPL0g?showinfo=0" frameborder="0" allowfullscreen></iframe>
+        </div>
+
+        <div class="container font-blokk">
+        <div class="row">
+
+          <div class="span4">
+            <p class="bo-l-h"><i>Consectetur adipisicing elit. Vel, sequi, quis, minima, dolor quisquam numquam quod in repudiandae officia nostrum porro ea voluptas eos sunt culpa odit enim. Assumenda, dolores.</i></p>
+          </div>
+
+          <div class="span8">
+            <p class="dropcap">Lorem ipsum dolor sit amet, consectetur adipisicing elit. Deleniti, pariatur aliquam molestias aspernatur non. Facere, quibusdam, reiciendis, natus laudantium debitis suscipit consequatur voluptatibus mollitia temporibus quia ratione dignissimos magnam provident.</p>
+            <p>Assumenda, repudiandae, iste magni labore culpa eum expedita eligendi odio molestiae temporibus id ab nihil ad sunt mollitia veritatis excepturi. Ullam, odit nesciunt doloribus natus non repudiandae error itaque vero?</p>
+            <p>Facere, cum, praesentium quo alias quasi enim recusandae dicta ut molestiae nam! Ad, eum, excepturi, voluptatum, animi consequatur est magnam eligendi repellendus suscipit accusantium consectetur deserunt voluptates nobis delectus explicabo?</p>
+          </div>
+
+        </div>
+        </div>
+      </div> -->
+
+
+      <div data-slide='{ "isSwipe" : true }'>
+        <div class="rt01pagitem">HUGE EFFECTS
+          <br><small class="tab-desc">250+ effect out-in</small>
+        </div>
+
+        <div class="container">
+          <h1>Nullam porta dignissim nisl</h1>
+          
+          <div class="dummy-group ma-b-20">
+            <div class="dummy-img dummy-img2"></div>
+            <div class="dummy-img dummy-img3"></div>
+            <div class="dummy-img dummy-img4"></div>
+            <div class="dummy-img dummy-img5 dummy-img-end"></div>
+          </div>
+          
+          <p class="dropcap">Borem ipsum dolor sit amet, consectetur adipisicing elit. Vel quibusdam perferendis temporibus aspernatur iure. Temporibus, voluptatibus, earum, commodi animi blanditiis modi maxime non aliquid excepturi odit quo repellendus vel ut.</p>
+          <p>Maxime, hic, perspiciatis, accusamus repudiandae ducimus quaerat asperiores tenetur deserunt blanditiis neque quae suscipit quos nulla praesentium possimus dicta nisi voluptas quas earum minima vitae est facilis accusantium at distinctio.</p>
+          <p>Repellat, magnam, id laudantium fugiat harum aliquid eligendi quae officiis atque dolores nisi consequatur! Saepe, aut, nisi labore voluptatem ab totam ut explicabo ratione blanditiis iure. Atque, molestias accusamus dignissimos!</p>
+        </div>
+      </div>
+
+
+      <div data-slide='{ "isSwipe": false }'>
+        <div class="rt01pagitem">FLAT DESIGN
+          <br><small class="tab-desc">simple - clean - beauty</small>
+        </div>
+
+        <div class="container">
+        <div class="row">
+          <div class="span8 offset4">
+            <h2>Molestias accusamus digniss</h2>
+          </div>
+          
+          <div class="span4">
+            <p class="bo-l-h"><i>Temporibus quaerat nulla sunt.Natus, dolore, aspernatur, dolorum nulla rerum deserunt possimus enim neque temporibus eius laboriosam eum similique iusto sequi quisquam sit doloremque pariatur illo adipisci quos vitae nesciunt harum optio praesentium culpa.</i></p>
+          </div>
+
+          <div class="span8">
+            <p class="dropcap">Upsum dolor sit amet, consectetur adipisicing elit. Nulla, sapiente soluta itaque eum repellat tempora totam unde doloremque nobis. Provident, nisi, libero numquam soluta neque modi nulla ut necessitatibus ullam.</p>
+            <p>Architecto, sint, quidem nobis veniam adipisci est doloribus debitis pariatur quia corrupti repellat dolores natus facere dignissimos unde reiciendis quam nemo repudiandae modi obcaecati veritatis eius molestias voluptatem delectus saepe.</p>
+            <p>Ad, ducimus, ipsam, asperiores, sint maiores reiciendis alias officia ipsum expedita delectus magnam rerum a qui. Enim vero eaque ipsum modi perferendis sint eos sit aliquam! Placeat, assumenda animi rem.</p>
+            <p>Fugiat, ut, voluptates, nihil tenetur suscipit placeat temporibus voluptate accusantium repellendus ratione reiciendis iusto optio ad expedita incidunt odit itaque eveniet debitis a nostrum alias earum voluptas nemo laborum at!</p>
+            <p>Id, aut, tempora, dolorem illum excepturi laudantium nulla voluptates labore quasi odio reiciendis dolores ipsum dicta! Architecto, maiores laborum molestiae mollitia laboriosam quos voluptates quaerat. Ullam deleniti impedit eligendi voluptas.</p>
+          </div>
+        </div>
+        </div>
+      </div>
+
+
+      <div>
+        <div class="rt01pagitem">TRUE TABS
+          <br><small class="tab-desc">no dropdown menu</small>
+        </div>
+
+        <div class="container">
+        <div class="row">
+          
+          <div class="span4">
+            <h4>Ullam deleniti impedit eligendi voluptas</h4>
+            <div class="dummy-img dummy-img6 ma-b-10"></div>
+
+            <p class="bo-l-h ma-t-20"><i>Fugiat, ut, voluptates, nihil tenetur suscipit placeat temporibus voluptate accusantium repellendus ratione reiciendis iusto optio ad expedita incidunt.</i></p>
+          </div>
+
+          <div class="span4">
+            <p class="dropcap">Morem ipsum dolor sit amet, consectetur adipisicing elit. Esse, non fuga quod inventore quos dignissimos vero. Magnam, quaerat, quibusdam, maxime magni ullam reiciendis natus voluptas voluptatum at sequi debitis nihil.</p>
+            <p>Dolorem, tempore, commodi, non, a sint itaque magnam officia eaque rerum consectetur quas provident quaerat voluptas id adipisci tenetur dolor eius cum ratione doloribus dolore deleniti eum asperiores nihil temporibus!</p>
+            <p>Itaque libero delectus asperiores deserunt voluptatem nostrum illum esse quo architecto corrupti! Facere, voluptate, cumque, eius voluptatibus a velit quia animi labore earum quam quidem officia error voluptates! Veritatis, ratione?</p>
+          </div>
+
+          <div class="span4">
+            <p>Numquam, quibusdam error odio omnis eaque accusamus repellat ea facere. Cum, officia, est, magnam, voluptas similique optio dicta consequuntur itaque laborum dolorem inventore quidem repudiandae molestiae tempora fuga recusandae nulla.</p>
+            <p>Sed, amet iste itaque tempora quia odit deleniti molestias nulla in cumque voluptatum ut modi magni ducimus minus officiis fugiat libero ipsam cupiditate corporis unde quas quis veritatis pariatur commodi!</p>
+            <p>Laudantium, unde, molestias, a quis sed fugiat aspernatur vel magni ut autem nam accusantium temporibus voluptatum soluta iure. Rem, ab, eum at similique provident error aliquid corporis optio aperiam labore.</p>
+          </div>
+        </div>
+        </div>
+      </div>
+
+    </div>
+    <!-- TABS PREVIEW - end -->
+
+
+
+    <!-- SLIDER PREVIEW - begin -->
+    <div class="slider-preview rt01 rt01timer-arctop mark-style2"
+      data-tabs='{
+        "isAutoInit"   : false,
+        "optionsPlus"  : "slider",
+        "fx"       : "line",
+        "speed"    : 600,
+        "width"    : 940,
+        "widthSlide0"   : [ 0.7, [720, 768, 991], [940, 992, 3000] ],
+        "widthSlide"   : [ 0.7, [720, 768, 991], [940, 992, 3000] ],
+        "margin"     : [ 5, [10, 768, 991], [20, 992, 3000] ],
+        "pag"      : { "width": 8, "height": 8, "isMark": true, "sizeMarkTo": "padding" },
+
+        "isNav"    : true,
+        "isKeyboard"   : false,
+        "isSlideshow"  : true,
+        "slideshow"  : { "timer": "arc", "delay": 10000, "isAutoRun": false },
+        "arc"      : { "stroke" : "#ff0077" }
+      }'>
+
+
+      <a class="rt01img" href="imgs/slider/bing-photo1.jpg">image1</a>
+      <a class="rt01img" href="imgs/slider/bing-photo2.jpg">image2</a>
+      <a class="rt01img" href="imgs/slider/bing-photo3.jpg">image3</a>
+      <a class="rt01img" href="imgs/slider/bing-photo4.jpg">image4</a>
+      <a class="rt01img" href="imgs/slider/bing-photo5.jpg">image5</a>
+      <a class="rt01img" href="imgs/slider/bing-photo6.jpg">image6</a>
+      <!-- <a class="rt01img" href="imgs/slider/bing-photo1.jpg">image1</a> -->
+    </div>
+    <!-- SLIDER PREVIEW - end -->
+
+  </div>
+  </div>
+  <!-- TABS SECTION - end
+  ======================================================================== -->
+
+
+
+
+
+
+
+  <!-- LIST ALL FEATURES - begin
+  ======================================================================== -->
+  <div class="wrapper">
+  <div class="container">
+  <div class="row-small row-mobile">
+
+    <!-- Heading - begin -->
+    <div class="title-big-wrap">
+      <h1>LIST OF ALL FEATURES</h1>
+      <p class="muted text-center"></p>
+    </div>
+    <!-- Heading - end -->
+
+
+
+    <!-- List features - begin -->
+    <div class="span4">
+      <ul class="list round">
+        <li>HTML5 Valid and SEO Friendly Markup</li>
+        <li>CSS3 Transitions with jQuery Fallback</li>
+        <li>Hardware Accelerated CSS3 3D Transforms</li>
+        <li>Fully Responsive</li>
+        <li>Cross Browser IE8+ and Other Modern Browsers</li>
+        <li>jQuery 1.7+ Supported</li>
+        <li>Optimized for Any Screen Sizes and Touch Devices</li>
+        <li>Smart Loading Assets</li>
+        <li>Powerful API for Developers</li>
+        <li>Memory Leak Free</li>
+        <li>Optimized Script-based Animations</li>
+      </ul>
+    </div>
+
+    <div class="span4">
+      <ul class="list round">
+        <li>HTML5 Valid and SEO Friendly Markup</li>
+        <li>CSS3 Transitions with jQuery Fallback</li>
+        <li>Hardware Accelerated CSS3 3D Transforms</li>
+        <li>Fully Responsive</li>
+        <li>Cross Browser IE8+ and Other Modern Browsers</li>
+        <li>jQuery 1.7+ Supported</li>
+        <li>Optimized for Any Screen Sizes and Touch Devices</li>
+        <li>Smart Loading Assets</li>
+        <li>Powerful API for Developers</li>
+        <li>Memory Leak Free</li>
+        <li>Optimized Script-based Animations</li>
+      </ul>
+    </div>
+
+    <div class="span4">
+      <ul class="list round">
+        <li>HTML5 Valid and SEO Friendly Markup</li>
+        <li>CSS3 Transitions with jQuery Fallback</li>
+        <li>Hardware Accelerated CSS3 3D Transforms</li>
+        <li>Fully Responsive</li>
+        <li>Cross Browser IE8+ and Other Modern Browsers</li>
+        <li>jQuery 1.7+ Supported</li>
+        <li>Optimized for Any Screen Sizes and Touch Devices</li>
+        <li>Smart Loading Assets</li>
+        <li>Powerful API for Developers</li>
+        <li>Memory Leak Free</li>
+        <li>Optimized Script-based Animations</li>
+      </ul>
+    </div>
+    <!-- List features - end -->
+  </div>
+  </div>
+  </div>
+  <!-- LIST ALL FEATURES - end
+  ======================================================================== -->
+
+
+
+
+
+
+
+
+  <!-- Script - begin
+  ======================================================================== -->
+  <!-- <script type="text/javascript" src="../libs/scripts/jquery-last.min.js"></script> <!-- jQuery Libary -->
+  <script type="text/javascript" src="../libs/scripts/jquery-1.9.0.min.js"></script>
+  <script type="text/javascript" src="../ruby/rubytabs.js"></script> <!-- RubyTabs Plugins -->
+  <script type="text/javascript" src="../libs/scripts/jquery.mousewheel.min.js"></script> <!-- Mousewheel Plugins -->
+
+
+  <script type="text/javascript">
+  </script>
+  <!-- Script - end
+  ======================================================================== -->
+
+</body>
+</html>

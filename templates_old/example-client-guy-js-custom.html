@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+  <!-- Page Infomations -->
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+  <meta name="description" content="One of the best Tabs - Slider jQuery plugins">
+  <meta name="keywords" content="tabs, slider, carousel, gallery, touch, swipe, drag, css3, responsive, nested, multi, transform, transition, lazyload, fullscreen">
+  <meta name="author" content="Ruby Tabs - HaiBach">
+
+  <!-- Title of page -->
+  <title>JS CUSTOM | RUBY TABS</title>
+
+  <!-- Favicon & apple-icon -->
+  <link rel="shortcut icon" href="../libs/imgs/icons/favicon.ico">
+  <link rel="icon" sizes="192x192" href="../libs/imgs/icons/icon-highres.png">
+  <link rel="apple-touch-icon" sizes="120x120" href="../libs/imgs/icons/touch-icon-iphone-retina.png">
+  <link rel="apple-touch-icon" sizes="152x152" href="../libs/imgs/icons/touch-icon-ipad-retina.png">
+  <link rel="apple-touch-icon" sizes="167x167" href="../libs/imgs/icons/touch-icon-ipad-pro.png">
+  <link rel="apple-touch-icon" sizes="180x180" href="../libs/imgs/icons/touch-icon-iphone-6-plus.png">
+
+
+  <!-- CSS link -->
+  <link rel="stylesheet" href="../libs/css/ruby00.css">
+  <link rel="stylesheet" href="../libs/css/ruby01.css">
+  <link rel="stylesheet" href="../libs/css/styles.custom.css">
+  <link rel="stylesheet" href="../ruby/rubytabs.css">
+
+</head>
+<body>
+
+
+  <!-- TEMPLATE PREVIEW - begin
+  ======================================================================== -->
+  <div class="wrapper">
+  <div class="container">
+  <div class="row">
+
+    <!-- STYLE FOR THIS RUBY -->
+    <style>
+      #closx {
+        display: block;
+      }
+      .ruby-inner-active .rt01pagitem:not(#closx) {
+        visibility: hidden;
+      }
+
+      .ruby-container .col3 {
+        box-sizing: border-box !important;
+      }
+    </style>
+
+
+    <!-- TABS CUSTOM - begin -->
+    <div class="ruby-container">
+    <div class="rt01pag" data-rubytabs-markup="silk-container" id="ruby_anchor"></div>
+
+    <div
+      id="silk-container"
+      class="rt01 product_tabs"
+      data-tabs='{
+        "isSwipe"     : false,
+        "isDeeplinking" : true,
+        "fx"      : "cssOne",
+        "cssOne"    : "fade",
+        "pag"       : { "align": "justify", "moreClass": "nav_container", "type": "list" }
+      }'>
+
+      <div data-anchor="0" id="silktouch">
+        <div id="closx" class="rt01pagitem tab-overview btn">
+          <span class="isclose">X</span> [0]
+        </div>
+      </div>
+
+      <div data-anchor="1" id="amour">
+        <div class="rt01pagitem tab-amour col3">
+          <div class="card card1">
+            <div class="card-content">
+              <h4 class="tabs-heading">
+                <a class="tab-link" href="/luxury-carpets/silk-fibre-carpets/amour/"><span class="nav-effect">AMOUR</span></a>
+              </h4>
+            </div>
+          </div>
+        </div>
+        CONTENT [1]
+
+      </div>
+
+      <div data-anchor="2" id="mulberry">
+        <div class="rt01pagitem tab-mulberry col3">
+          <div class="card card2">
+            <div class="card-content">
+              <h4 class="tabs-heading">
+                <a class="tab-link" href="/luxury-carpets/silk-fibre-carpets/mulberry/"><span class="nav-effect">MULBERRY</span></a>
+              </h4>
+            </div>
+          </div>
+        </div>
+        CONTENT [2]
+
+      </div>
+
+      <div data-anchor="3" id="luxor-elite">
+        <div class="rt01pagitem tab-luxor-elite col3">
+          <div class="card card3">
+            <div class="card-content">
+              <h4 class="tabs-heading">
+                <a class="tab-link" href="/luxury-carpets/silk-fibre-carpets/luxor-elite/"><span class="nav-effect">LUXOR ELITE</span></a>
+              </h4>
+            </div>
+          </div>
+        </div>
+        CONTENT [3]
+
+      </div>
+
+      <div data-anchor="4" id="nusilk">
+        <div class="rt01pagitem tab-nusilk col3">
+          <div class="card card4">
+            <div class="card-content">
+              <h4 class="tabs-heading">
+                <a class="tab-link" href="/luxury-carpets/silk-fibre-carpets/nusilk/"><span class="nav-effect">NUSILK&trade;</span></a>
+              </h4>
+            </div>
+          </div>
+        </div>
+        CONTENT [4]
+      </div>
+    </div>
+
+    </div>
+    <!-- TABS CUSTOM - end -->
+
+  </div>
+  </div>
+  </div>
+  <!-- TEMPLATE PREVIEW - end
+  ======================================================================== -->
+
+
+
+
+
+
+  <!-- Script - begin
+  ======================================================================== -->
+  <script type="text/javascript" src="../libs/scripts/jquery-last.min.js"></script>
+  <script type="text/javascript" src="../libs/scripts/ruby01.js"></script>
+  <script type="text/javascript" src="../ruby/rubyanimate.js"></script> <!-- Ruby Animate -->
+  <script type="text/javascript" src="../ruby/rubytabs.js"></script> <!-- RubyTabs Plugins -->
+
+
+  <script>
+  jQuery(document).ready(function($) {
+    var ruby       = $('.rt01').rubytabs(),
+      homeTab    = 0,
+      isFirstCheck   = true,
+      $rubyContainer = $('.ruby-container');
+
+
+    // Trigger event 'selectID'
+    ruby.ev.on('selectID', function() {
+
+      // In first check (Deeeplinking check) do not execute to display all Tabs title
+      // Toggle class for 'ruby-container' object
+      if( !isFirstCheck ) {
+        ruby.idCur === homeTab ? $rubyContainer.addClass('ruby-inner-active')
+                     : $rubyContainer.removeClass('ruby-inner-active');
+      }
+
+      // Remove first check
+      isFirstCheck = false;
+    });
+  });
+  </script>
+  <!-- Script - end
+  ======================================================================== -->
+
+</body>
+</html>
