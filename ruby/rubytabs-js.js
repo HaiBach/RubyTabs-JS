@@ -581,133 +581,6 @@
                 "isNav": true
             }
         };
-        /**
-         * FUNCTION M
-         */
-        rt01VA.M = {
-            /**
-             * DISPLAY ERROR MESSAGES
-             */
-            Message: function (message, detail) {
-                if (typeof console === 'object' && message !== undefined) {
-                    var str = '[' + rt01VA.rubyName + ': ' + message + ']';
-                    if (!!detail)
-                        str += ' -> ' + detail;
-                    console.warn(str);
-                }
-            },
-            /**
-             * CONVERT 'STRING' TO 'JSON'
-             */
-            StringToJson: function (str, messageError) {
-                if (typeof str == 'string') {
-                    // Replace quotes to single quotes
-                    str = str.replace(/\u0027/g, '\u0022');
-                    /**
-                     * PARSE 'STRING' TO 'JSON'
-                     */
-                    try {
-                        str = $.parseJSON(str);
-                    }
-                    catch (e) {
-                        rt01VA.M.Message(messageError);
-                    }
-                }
-                // Return value depending on each case
-                return $.isPlainObject(str) ? $.extend(true, {}, str)
-                    : $.isArray(str) ? $.extend(true, [], str)
-                        : {};
-            },
-            /**
-             * CONVERT 'JSON' TO 'STRING'
-             */
-            JsonToString: function (json, messageError) {
-                if (typeof json == 'object') {
-                    /**
-                     * PARSE 'JSON' TO 'STRING'
-                     */
-                    try {
-                        json = JSON.stringify(json);
-                    }
-                    catch (e) {
-                        rt01VA.M.Message(messageError);
-                    }
-                }
-                return (typeof json == 'string') ? json : '';
-            },
-            /**
-             * Covert to CamelCase
-             */
-            CamelCase: function (prop) {
-                return prop.replace(/-([a-z])/gi, function (m, prop) {
-                    return prop.toUpperCase();
-                });
-            },
-            /**
-             * CONVERT VALUE TO NUMBER
-             */
-            PFloat: function (n) {
-                // Check and convert to number float
-                // Condition < 9007199254740992 : larger for incorrect results
-                if (/^\-?\d*\.?\d+/g.test(n)) {
-                    var n1 = parseFloat(n);
-                    if (n1 < 9007199254740992)
-                        return n1;
-                }
-                else if (/^(true|on)$/g.test(n))
-                    return true;
-                else if (/^(false|off)$/g.test(n))
-                    return false;
-                return 0;
-            },
-            // Convert value to number integer
-            PInt: function (v) { return /^\-?\d+/g.test(v) ? parseInt(v, 10) : 0; },
-            // Check element is Number
-            IsNumber: function (n) { return !isNaN(parseFloat(n)); },
-            /**
-             * GET SIZE OF OJBECT
-             *  + Get size not included css transformed
-             *  + Size base on "offsetWidth", "offsetHeight"
-             *  + Check getComputedStyle by document.defaultView otherwise error
-             */
-            SizeNoTransform: function ($el, type, isMargin) {
-                /**
-                 * CONDITONAL EXECUTION
-                 *  + First paramater $el : forced to Element Node
-                 */
-                if (!($el && !!$el[0]))
-                    return 0;
-                /**
-                 * INITIAL SETUP
-                 */
-                var that = this, el = $el[0], style = document.defaultView ? getComputedStyle(el) : el.currentStyle, isWidth = /Width/i.test(type), size = el[isWidth ? 'offsetWidth' : 'offsetHeight'], padding = isWidth ? that.PFloat(style.paddingLeft) + that.PFloat(style.paddingRight)
-                    : that.PFloat(style.paddingTop) + that.PFloat(style.paddingBottom), border = isWidth ? that.PFloat(style.borderLeftWidth) + that.PFloat(style.borderRightWidth)
-                    : that.PFloat(style.borderTopWidth) + that.PFloat(style.borderBottomWidth), margin = isWidth ? that.PFloat(style.marginLeft) + that.PFloat(style.marginRight)
-                    : that.PFloat(style.marginTop) + that.PFloat(style.marginBottom);
-                /**
-                 * SETUP SIZE DEPENDING ON EACH CASE
-                 */
-                // Case : get size OuterWidth - OuterHeight
-                if (/^Outer\w+/.test(type)) {
-                    if (isMargin)
-                        size += margin;
-                }
-                else if (/^Inner\w+/.test(type)) {
-                    size -= border;
-                }
-                else if (/^(Width|Height)$/.test(type)) {
-                    size -= border + padding;
-                }
-                // Return results
-                return size;
-            },
-            Width: function ($el) { return this.SizeNoTransform($el, 'Width'); },
-            Height: function ($el) { return this.SizeNoTransform($el, 'Height'); },
-            InnerWidth: function ($el) { return this.SizeNoTransform($el, 'InnerWidth'); },
-            InnerHeight: function ($el) { return this.SizeNoTransform($el, 'InnerHeight'); },
-            OuterWidth: function ($el, isMargin) { return this.SizeNoTransform($el, 'OuterWidth', isMargin); },
-            OuterHeight: function ($el, isMargin) { return this.SizeNoTransform($el, 'OuterHeight', isMargin); }
-        };
     }
     /**
      * CLASS UTILITY M
@@ -736,16 +609,18 @@
                 /**
                  * PARSE 'STRING' TO 'JSON'
                  */
+                //-?- Not support IE8
                 try {
-                    str = $.parseJSON(str);
+                    str = JSON.parse(str);
                 }
                 catch (e) {
-                    rt01VA.M.Message(messageError);
+                    M.Message(messageError);
                 }
             }
             // Return value depending on each case
-            return $.isPlainObject(str) ? $.extend(true, {}, str)
-                : $.isArray(str) ? $.extend(true, [], str)
+            console.log('fooo');
+            return M.IsPlainObject(str) ? $.extend(true, {}, str)
+                : M.IsArray(str) ? $.extend(true, [], str)
                     : {};
         };
         /**
@@ -760,7 +635,7 @@
                     json = JSON.stringify(json);
                 }
                 catch (e) {
-                    rt01VA.M.Message(messageError);
+                    M.Message(messageError);
                 }
             }
             return (typeof json == 'string') ? json : '';
@@ -792,6 +667,12 @@
         };
         // Convert value to number integer
         M.PInt = function (v) { return /^\-?\d+/g.test(v) ? parseInt(v, 10) : 0; };
+        // Check element is Plain Object
+        M.IsPlainObject = function (v) { return Object.prototype.toString.call(v) === '[object Object]'; };
+        // Check element is Empty Object
+        M.IsEmptyObject = function (v) { return M.IsPlainObject(v) && M.JsonToString(v) === '{}'; };
+        // Check element is Array
+        M.IsArray = function (v) { return Object.prototype.toString.call(v) === '[object Array]'; };
         // Check element is Number
         M.IsNumber = function (n) { return !isNaN(parseFloat(n)); };
         /**
@@ -901,7 +782,7 @@
         };
         // Check all values in the array is number
         M.ElesIsNumber = function (arr, lenCheck) {
-            var len = arr.length, isNum = $.isArray(arr) && len === lenCheck;
+            var len = arr.length, isNum = M.IsArray(arr) && len === lenCheck;
             if (isNum) {
                 for (var i = 0; i < len; i++) {
                     isNum = isNum && $.isNumeric(arr[i]);
@@ -941,7 +822,7 @@
          */
         M.RandomInArray = function (arr, except) {
             // Conditional execution : arr is array
-            if ($.isArray(arr)) {
+            if (M.IsArray(arr)) {
                 /**
                  * CASE: ARRAY HAVE 1 OBJECT
                  */
@@ -962,7 +843,7 @@
             return arr;
         };
         M.RandomInArray2 = function (arrSource, arrCopy, except) {
-            if ($.isArray(arrSource)) {
+            if (M.IsArray(arrSource)) {
                 // Reset the copy array if it empty
                 // Reset the copy array if ramaining 1 object like 'except'
                 if (!arrCopy.length || (arrCopy.length == 1 && arrCopy[0] == except)) {
@@ -1072,7 +953,7 @@
                         grid[i] = (i == 0) ? fromValue : null;
                 }
             }
-            else if ($.isArray(fromValue)) {
+            else if (M.IsArray(fromValue)) {
                 // Case: Size length < ResponsiveLevels length -> Additional item in the array of Size
                 if (fromValue.length < resLevelsLen) {
                     var valueLen = fromValue.length;
@@ -1120,7 +1001,7 @@
             /**
              * SETUP EXTEND OBJECT
              */
-            if ($.isPlainObject(opts)) {
+            if (M.IsPlainObject(opts)) {
                 opts = $.extend(true, {}, opts);
                 delete opts.$self;
                 delete opts.nsid;
@@ -1192,9 +1073,7 @@
                 var data = this[name];
                 // Case Data not exist in RubyDOM
                 if (data === undefined) {
-                    // data = M.StringToJson(this.item.getAttribute(name));
-                    data = M.StringToJson('string hello');
-                    console.log(data);
+                    return M.StringToJson(this.item.getAttribute(name));
                 }
                 else
                     return data;
@@ -1749,7 +1628,7 @@
             },
             // Check all values in the array is number
             ElesIsNumber: function (arr, lenCheck) {
-                var len = arr.length, isNum = $.isArray(arr) && len === lenCheck;
+                var len = arr.length, isNum = M.IsArray(arr) && len === lenCheck;
                 if (isNum) {
                     for (var i = 0; i < len; i++) {
                         isNum = isNum && $.isNumeric(arr[i]);
@@ -1789,7 +1668,7 @@
              */
             RandomInArray: function (arr, except) {
                 // Conditional execution : arr is array
-                if ($.isArray(arr)) {
+                if (M.IsArray(arr)) {
                     /**
                      * CASE: ARRAY HAVE 1 OBJECT
                      */
@@ -1810,7 +1689,7 @@
                 return arr;
             },
             RandomInArray2: function (arrSource, arrCopy, except) {
-                if ($.isArray(arrSource)) {
+                if (M.IsArray(arrSource)) {
                     // Reset the copy array if it empty
                     // Reset the copy array if ramaining 1 object like 'except'
                     if (!arrCopy.length || (arrCopy.length == 1 && arrCopy[0] == except)) {
@@ -1920,7 +1799,7 @@
                             grid[i] = (i == 0) ? fromValue : null;
                     }
                 }
-                else if ($.isArray(fromValue)) {
+                else if (M.IsArray(fromValue)) {
                     // Case: Size length < ResponsiveLevels length -> Additional item in the array of Size
                     if (fromValue.length < resLevelsLen) {
                         var valueLen = fromValue.length;
@@ -1968,7 +1847,7 @@
                 /**
                  * SETUP EXTEND OBJECT
                  */
-                if ($.isPlainObject(opts)) {
+                if (M.IsPlainObject(opts)) {
                     opts = $.extend(true, {}, opts);
                     delete opts.$self;
                     delete opts.nsid;
@@ -2103,7 +1982,7 @@
                  *  + Make sure convert to json if it's object
                  */
                 var optsData = $ruby.data(rt01VA.rubyData);
-                console.log(optsData);
+                console.log(M.StringToJson);
                 optsData = M.StringToJson(optsData);
                 console.log(optsData);
                 /**
@@ -2146,7 +2025,7 @@
                 else if (M.ElesIsNumber(val, 3))
                     val = [val];
                 // CONDITIONAL EXECUTION
-                if (!$.isArray(val))
+                if (!M.IsArray(val))
                     return false;
                 // SETUP CONTINUE
                 var chain = { num: val.length }, wMax = 0; // Maximun value in array[]
@@ -2183,7 +2062,7 @@
                 else if (M.ElesIsNumber(val, 4))
                     val = [val];
                 // Conditional execution
-                if (!$.isArray(val))
+                if (!M.IsArray(val))
                     return false;
                 /**
                  * SETUP CONTINUE
@@ -2303,7 +2182,7 @@
                  */
                 // Get grid size for the Responsive
                 var resLevels = o.responsiveLevels;
-                if ($.isArray(resLevels) && resLevels.length) {
+                if (M.IsArray(resLevels) && resLevels.length) {
                     // Get Grid-width / Grid-heihgt
                     va.wGrid = M.ParseGrid(o.width, true);
                     va.hGrid = M.ParseGrid(o.height, o.width === null ? true : false);
@@ -2313,7 +2192,7 @@
                 }
                 // Get type-height of Ruby
                 // is.heightFixed = $.isNumeric(o.height);
-                is.heightFixed = $.isArray(va.hGrid);
+                is.heightFixed = M.IsArray(va.hGrid);
                 // Covert to height-fixed when Fullscreen
                 if (is.fullscreen)
                     is.heightFixed = true;
@@ -2457,7 +2336,7 @@
                  */
                 if (o.fx == 'line')
                     va.fxLayout = 'line';
-                else if ($.inArray(o.fx, va.fxInLayoutDot) !== -1 || $.isArray(o.fx))
+                else if ($.inArray(o.fx, va.fxInLayoutDot) !== -1 || M.IsArray(o.fx))
                     va.fxLayout = 'dot';
                 // Convert to other layout depends on 'view' options
                 var viewListToLine = ['mask', 'coverflow3D'];
@@ -2522,7 +2401,7 @@
                  * SETUP IN CASE: HAVE RESPONSIVE
                  */
                 // is.res = $.isNumeric(o.width) && is.RESPONSIVE;
-                is.res = $.isArray(va.wGrid) && is.RESPONSIVE;
+                is.res = M.IsArray(va.wGrid) && is.RESPONSIVE;
                 if (is.res) {
                     // va.wRes = o.width;
                     va.wRes = va.wGrid[0];
@@ -2675,10 +2554,10 @@
                         // Remove 'data-slide' attribute on each slide
                         $slCur.removeAttr(nameData);
                     }
-                    else if ($.isPlainObject(va.optsUpdate) && !$.isEmptyObject(va.optsUpdate)) {
+                    else if (M.IsPlainObject(va.optsUpdate) && !$.isEmptyObject(va.optsUpdate)) {
                         optsCur = $.extend(true, optsCur, va.optsUpdate);
                     }
-                    else if ($.isPlainObject(va.optsSlides) && $.isPlainObject(va.optsSlides[i])) {
+                    else if (M.IsPlainObject(va.optsSlides) && M.IsPlainObject(va.optsSlides[i])) {
                         optsCur = $.extend(true, optsCur, va.optsSlides[i]);
                     }
                     else if (is.apiRemove) { }
@@ -3980,7 +3859,7 @@
             Margin: function () {
                 var wRuby = va.wRuby;
                 // Get the current margin in ResponsiveLevels
-                va.maGridCur = $.isArray(va.maGrid) ? va.maGrid[va.index] : null;
+                va.maGridCur = M.IsArray(va.maGrid) ? va.maGrid[va.index] : null;
                 // Case: the margin-grid available -> get margin from the option
                 if (va.maGridCur !== null) {
                     va.ma = [M.PercentToPixel(va.maGrid[va.index], wRuby), M.PercentToPixel(va.maGrid[va.index], wRuby)];
@@ -4030,9 +3909,9 @@
                  * GET THE CURRENT VALUE IN SIZE GRID
                  */
                 var index = va.index = M.GetIndexInResponsive(o.responsiveLevels);
-                va.wGridCur = $.isArray(va.wGrid) ? va.wGrid[index] : null;
-                va.hGridCur = $.isArray(va.hGrid) ? va.hGrid[index] : null;
-                va.paGridCur = $.isArray(va.paGrid) ? va.paGrid[index] : null;
+                va.wGridCur = M.IsArray(va.wGrid) ? va.wGrid[index] : null;
+                va.hGridCur = M.IsArray(va.hGrid) ? va.hGrid[index] : null;
+                va.paGridCur = M.IsArray(va.paGrid) ? va.paGrid[index] : null;
                 /**
                  * SETUP WIDTH OF SLIDE
                  * @param int va.wSlide
@@ -4175,13 +4054,13 @@
                 }
                 else {
                     va.hRuby = null;
-                    if ($.isArray(va.hGrid)) {
+                    if (M.IsArray(va.hGrid)) {
                         // Case: Height-grid current is available
                         if ($.isNumeric(va.hGridCur)) {
                             va.hRuby = va.hGridCur;
                         }
                         else {
-                            if ($.isArray(va.wGrid)) {
+                            if (M.IsArray(va.wGrid)) {
                                 va.hRuby = M.R(va.hGrid[0] * va.rate);
                             }
                         }
@@ -5094,7 +4973,7 @@
                 va.optsUpdate = va.addInfo = null;
             },
             updateOnSlides: function (options) {
-                if (!$.isPlainObject(options))
+                if (!M.IsPlainObject(options))
                     return;
                 va.optsSlides = options;
                 cs.refresh();
@@ -5207,16 +5086,6 @@
          * BEGIN INITIALIZE RUBY
          */
         INIT.Check();
-        /**
-         * CONSTRUCTOR
-         */
-        // constructor($ruby, OptsJS) {
-        //   this.$ruby = $ruby;
-        //   this.OptsJS = OptsJS;
-        //   // Initialization
-        //   console.log('foo2');
-        //   // this.INIT.Check();
-        // }
     };
     //- Class RubyTabs
     /**
@@ -5243,7 +5112,7 @@
                 /**
                  * CASE: INITIALIZE OBJECT + UPDATE PROPERTIES
                  */
-                if (Object.prototype.toString.call(opts) == '[object Object]') {
+                if (M.IsPlainObject(opts)) {
                     // CREATE NEW RUBY
                     //- if( !ruby ) new $[rubyName](item, args[0]);
                     // UPDATE PROPERTIES
@@ -5272,14 +5141,12 @@
     //- rt01MODULE.AUTOINIT = function($ruby) {
     rt01MODULE.AUTOINIT = function (selector) {
         document.querySelectorAll(selector).forEach(function ($item) {
-            var M = rt01VA.M, rubyName = rt01VA.rubyName, rubyData = rt01VA.rubyData, data = M.StringToJson($item.getAttribute('data-' + rubyData)), isJson = true;
+            var rubyName = rt01VA.rubyName, rubyData = rt01VA.rubyData, data = M.StringToJson($item.getAttribute('data-' + rubyData)), isJson = true;
             /**
              * CHECK RUBY INITIALIZATION
              *  + Remove automatically initialize for ruby
              */
-            if (!(typeof data == 'object' &&
-                !(data instanceof Array) &&
-                M.JsonToString(data) != '{}'))
+            if (M.IsEmptyObject(data))
                 return;
             /**
              * CHECK TYPE DATA INPUT
