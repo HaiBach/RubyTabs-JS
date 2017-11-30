@@ -3,7 +3,7 @@
  * @package       RubyTabs-JS
  * @author        HaiBach
  * @link          http://haibach.net/rubytabs-js
- * @version       1.7.05
+ * @version       1.7.06
  * @lastUpdate    Nov 28, 2017
  */
 
@@ -171,7 +171,6 @@ class RubyDOM {
     }
 
     let $childs = (str === undefined) ? $childs1 : $childs2;
-    console.log(str, $childs);
     return new RubyDOM($childs);
   }
 
@@ -4123,10 +4122,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
 
       // Initialize variable
       var viewClass = va.ns + o.nameViewport,
-        // viewport = $ruby.children('.'+ viewClass);
-        viewport = $ruby.children();
-        console.log($ruby);
-
+          viewport  = $ruby.children('.'+ viewClass);
 
       // Search markup viewport
       if( viewport.length ) $viewport = viewport;
