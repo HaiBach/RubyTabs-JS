@@ -7,794 +7,9 @@
  * @lastUpdate    Nov 28, 2017
  */
 
-/**
- * INITIAL SETUP
- */
+(function() {
 'use strict';
 
-
-/**
- * CLASS RUBYDOM
- */
-class RubyDOM {
-
-  // Class Constructor
-  constructor(selector) {
-    // Case: selector is One Node
-    if( !!selector && selector.nodeType ) {
-      this.$items = [selector];
-      this.length = 1;
-    }
-
-    // Case: selector is NodeList || 'String'
-    else if( RubyM.IsArray(selector)
-    || Object.prototype.toString.call(selector) === '[object NodeList]'
-    || RubyM.IsString(selector) ) {
-
-      // Collection Node DOM
-      let $items =
-        RubyM.IsArray(selector) ? selector : RubyM.IsString(selector)
-                                           ? document.querySelectorAll(selector) : selector;
-
-      // Convert Node DOM to Array
-      this.$items = [];
-      this.length = $items.length;
-
-      for( let i in $items ) {
-        this.$items.push($items[i]);
-      }
-    }
-  }
-
-  /**
-   * DATA OF DOM
-   */
-  data(name, value) {
-    let name = 'data-'+ name;
-    let $item = this.$items[0];
-
-    // GETTER
-    if( value === undefined ) {
-      let data = this[name];
-
-      // Case Data not exist in RubyDOM
-      if( data === undefined ) {
-        let valueGet = $item.getAttribute(name);
-
-        // Convert type value if is 'string'
-        if( RubyM.IsString(valueGet) ) valueGet = RubyM.StringToJson(valueGet);
-        return valueGet;
-      }
-
-      // Case: Get Data on RubyDom if exist
-      else return data;
-    }
-
-    // SETTER
-    else {
-      this['data-'+ name] = value;
-    }
-  }
-
-  // Get and Set attribute
-  attr(name, value) {
-    let $item = this.$items[0];
-
-    // GETTER
-    if( value === undefined ) {
-      return $item.getAttribute(name);
-    }
-
-    // SETTER
-    else {
-      $item.setAttribute(name, value);
-    }
-  }
-
-  // Add Class
-  addClass(str) {
-    let arrStr   = RubyM.RemoveWhiteSpace(str).split(' '),
-        strClass = this.attr('class'),
-        arrClass = RubyM.RemoveWhiteSpace(strClass).split(' '),
-        isChange = false;
-
-     for( let i = 0, len = arrStr.length; i < len; i++ ) {
-       let valueCur = arrStr[i],
-           index    = arrClass.indexOf(valueCur);
-
-       // Remove element in Array Class
-       if( index === -1 ) {
-         arrClass.push(valueCur);
-         isChange = true;
-       }
-     }
-
-     if( isChange ) {
-       this.attr('class', arrClass.join(''));
-     }
-  }
-
-  // Remove Class
-  removeClass(str) {
-    let arrStr   = RubyM.RemoveWhiteSpace(str).split(' '),
-        strClass = this.attr('class'),
-        arrClass = RubyM.RemoveWhiteSpace(strClass).split(' '),
-        isChange = false;
-
-     for( let i = 0, len = arrStr.length; i < len; i++ ) {
-       let valueCur = arrStr[i],
-           index    = arrClass.indexOf(valueCur);
-
-       // Remove element in Array Class
-       if( index !== -1 ) {
-         arrClass.splice(index, 1);
-         isChange = true;
-       }
-     }
-
-     if( isChange ) {
-       this.attr('class', arrClass.join(''));
-     }
-  }
-
-  // Search Children
-  children(str) {
-    let $childs1 = [];
-    let $childs2 = [];
-
-    // Find Children of Items
-    for( let i in this.$items ) {
-      let $childsOfItem = this.$items[i].children;
-
-      // Case: var 'str' not exist
-      for( let j = 0, lenJ = $childsOfItem.length; j < lenJ; j++ ) {
-        $childs1.push($childsOfItem[j]);
-      }
-
-
-      // Case: var 'str' is exist
-      if( str !== undefined ) {
-        let $childsByQuery = this.$items[i].querySelectorAll(str);
-
-        // Find by Query
-        for( let x = 0, lenX = $childsByQuery.length; x < lenX; x++ ) {
-          let isExist = false;
-
-          // Compare Node by Query with Node 'children'
-          for( let y in $childsOfItem ) {
-            if( $childsByQuery[x].isEqualNode($childsOfItem[y]) ) {
-              $childs2.push($childsByQuery[x]);
-            }
-          }
-        }
-      }
-    }
-
-    let $childs = (str === undefined) ? $childs1 : $childs2;
-    console.log(str, $childs);
-    return new RubyDOM($childs);
-  }
-
-  // Each
-  each(func) {
-    for( let i = 0, len = this.$items.length; i < len; i++ ) {
-
-      // Pass 'this' variable && Excute function
-      func.call(this.$items[i], i);
-    }
-  }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-/**
- * CLASS RUBY UTILITY M
- */
-class RubyM {
-  /**
-   * DISPLAY ERROR MESSAGES
-   */
-  static Message(message, detail) {
-    if( typeof console === 'object' && message !== undefined ) {
-      var str = '['+ rt01VA.rubyName +': '+ message +']';
-
-      if( !!detail ) str += ' -> '+ detail;
-      console.warn(str);
-    }
-  }
-
-  /**
-   * CONVERT 'STRING' TO 'JSON'
-   */
-  static StringToJson(str, messageError) {
-    if( typeof str == 'string' ) {
-
-      // Replace quotes to single quotes
-      str = str.replace(/\u0027/g, '\u0022');
-
-
-      /**
-       * PARSE 'STRING' TO 'JSON'
-       */
-      //-?- Not support IE8
-      try      { str = JSON.parse(str) }
-      catch(e) { M.Message(messageError) }
-    }
-
-    // Return value depending on each case
-    return RubyM.IsPlainObject(str) ? RubyM.Assign(str)
-                                    : RubyM.IsArray(str) ? RubyM.Assign(str)
-                                                         : {};
-  }
-
-  /**
-   * CONVERT 'JSON' TO 'STRING'
-   */
-  static JsonToString(json, messageError) {
-    if( typeof json == 'object' ) {
-
-      /**
-       * PARSE 'JSON' TO 'STRING'
-       */
-      try      { json = JSON.stringify(json) }
-      catch(e) { M.Message(messageError) }
-    }
-    return (typeof json == 'string') ? json : '';
-  }
-
-  /**
-   * Covert to CamelCase
-   */
-  static CamelCase(prop) {
-    return prop.replace(/-([a-z])/gi, function(m, prop) {
-      return prop.toUpperCase();
-    });
-  }
-
-  static RemoveWhiteSpace(str) {
-    return str.replace(/(^\s+)|(\s+$)/g, '').replace(/(\s\s+)/g, ' ');
-  }
-
-
-
-
-
-
-
-
-
-  /**
-   * CONVERT VALUE TO NUMBER
-   */
-  static PFloat(n) {
-
-    // Check and convert to number float
-    // Condition < 9007199254740992 : larger for incorrect results
-    if( /^\-?\d*\.?\d+/g.test(n) ) {
-      var n1 = parseFloat(n);
-      if (n1 < 9007199254740992 ) return n1;
-    }
-
-
-    // Case : value Boolean
-    else if( /^(true|on)$/g.test(n) ) return true;
-    else if( /^(false|off)$/g.test(n) ) return false;
-    return 0;
-  }
-
-  // Convert value to number integer
-  static PInt(v) { return /^\-?\d+/g.test(v) ? parseInt(v, 10) : 0; }
-
-  // Check element is Plain Object
-  static IsPlainObject(v) { return Object.prototype.toString.call(v) === '[object Object]' }
-  // Check element is Empty Object
-  static IsEmptyObject(v) { return RubyM.IsPlainObject(v) && RubyM.JsonToString(v) === '{}' }
-  // Check element is Array
-  static IsArray(v) { return Object.prototype.toString.call(v) === '[object Array]' }
-  // Check element is Number
-  static IsNumber(n) { return !isNaN( parseFloat(n) ) }
-  // Check element is String
-  static IsString(v) { return Object.prototype.toString.call(v) === '[object String]' }
-
-  /**
-   * ASSIGN 2 OR MORE OBJECT INTO ONE OBJECT
-   */
-  static Assign() {
-    let args = arguments, objNew;
-
-    // Loop for merge all object in Arguments
-    for( let i = 0, len = args.length; i < len; i++ ) {
-
-      /**
-       * Detect type of object
-       */
-      if( RubyM.IsPlainObject(args[i])
-      && (objNew === undefined || RubyM.IsArray(objNew)) ) {
-        objNew = {};
-      }
-      else if( RubyM.IsArray(args[i])
-      && (objNew === undefined || RubyM.IsPlainObject(objNew)) ) {
-        objNew = [];
-      }
-      else if( args[i] === undefined || args[i] === null ) {
-        continue;
-      }
-      else if(Object.prototype.toString.call(objNew) !== Object.prototype.toString.call(args[i]) )  {
-        objNew = args[i];
-        continue;
-      }
-
-      /**
-       * Get all elements in Object
-       */
-      for( let key in args[i] ) {
-        let value = args[i][key];
-
-        // Case: type 2 value is 'object'
-        if( RubyM.IsPlainObject(value) && RubyM.IsPlainObject(objNew[key]) ) {
-          objNew[key] = RubyM.Assign(objNew[key], value);
-        }
-        // Case: type 2 value different
-        else objNew[key] = value;
-      }
-    }
-    return objNew;
-  }
-
-
-
-
-
-
-
-
-
-  /**
-   * GET SIZE OF OJBECT
-   *  + Get size not included css transformed
-   *  + Size base on "offsetWidth", "offsetHeight"
-   *  + Check getComputedStyle by document.defaultView otherwise error
-   */
-  static SizeNoTransform($el, type, isMargin) {
-
-    /**
-     * CONDITONAL EXECUTION
-     *  + First paramater $el : forced to Element Node
-     */
-    if( !($el && !!$el[0]) ) return 0;
-
-
-
-    /**
-     * INITIAL SETUP
-     */
-    var that  = this,
-      el    = $el[0],
-      style   = document.defaultView ? getComputedStyle(el) : el.currentStyle,
-
-      isWidth = /Width/i.test(type),
-      size  = el[isWidth ? 'offsetWidth' : 'offsetHeight'],
-
-      padding = isWidth ? that.PFloat(style.paddingLeft) + that.PFloat(style.paddingRight)
-                : that.PFloat(style.paddingTop) + that.PFloat(style.paddingBottom),
-
-      border  = isWidth ? that.PFloat(style.borderLeftWidth) + that.PFloat(style.borderRightWidth)
-                : that.PFloat(style.borderTopWidth) + that.PFloat(style.borderBottomWidth),
-
-      margin  = isWidth ? that.PFloat(style.marginLeft) + that.PFloat(style.marginRight)
-                : that.PFloat(style.marginTop) + that.PFloat(style.marginBottom);
-
-
-
-    /**
-     * SETUP SIZE DEPENDING ON EACH CASE
-     */
-    // Case : get size OuterWidth - OuterHeight
-    if( /^Outer\w+/.test(type) ) {
-      if( isMargin ) size += margin;
-    }
-
-    // Case : get size InnerWidth - InnerHeight
-    else if( /^Inner\w+/.test(type) ) {
-      size -= border;
-    }
-
-    // Case : get size Width - Height
-    else if( /^(Width|Height)$/.test(type) ) {
-      size -= border + padding;
-    }
-
-    // Return results
-    return size;
-  }
-
-  static Width($el) { return this.SizeNoTransform($el, 'Width') }
-  static Height($el) { return this.SizeNoTransform($el, 'Height') }
-  static InnerWidth($el) { return this.SizeNoTransform($el, 'InnerWidth') }
-  static InnerHeight($el) { return this.SizeNoTransform($el, 'InnerHeight') }
-  static OuterWidth($el, isMargin) { return this.SizeNoTransform($el, 'OuterWidth', isMargin) }
-  static OuterHeight($el, isMargin) { return this.SizeNoTransform($el, 'OuterHeight', isMargin) }
-
-
-  /**
-   * METHODS RELATE TO MATH
-   */
-  static A(v) { return Math.abs(v) }
-  static R(v) { return Math.round(v) }
-  static C(v) { return Math.ceil(v) }
-  static Ra() { return Math.random() }
-  static Rm(m ,n) { return M.Ra() * (n - m) + m }
-  static Sum(a, to) {
-    var total = 0;
-    if( to < 0 ) return total;
-
-    // Case not 'to' paramater
-    if( to === undefined ) to = a.length;
-
-    // Loop plus all values in the array[]
-    for( var i = 0; i < to; i++ ) {
-      total += a[i];
-    }
-    return total;
-  }
-
-
-
-  /**
-   * METHODS RELATE TO CONVERT NUMBER
-   */
-  // Convert value to percent(%)
-  static PPercent(v, source) {
-    if( v > 0 && v < 1 ) v *= source;
-    return M.R(v);
-  }
-
-  // Parse the value have percent unit to Pixel unit
-  static PercentToPixel(value, source) {
-    var result = null;
-
-    // Case: The value is string with format '+/-100%'
-    if( /^\-?\d*\.?\d+\%$/.test(value) ) {
-      result = M.R(M.PFloat(value) * source / 100);
-    }
-    // Case: The value is numeric
-    else if( RubyM.IsNumber(value) ) {
-      result = value;
-    }
-    return result;
-  }
-
-  // Convert string of style to json
-  static PStyleToJson($obj) {
-    var style = $obj.attr('style'),
-      re  = /\s*([\w-]+)\s*:\s*([^;]*)/g,
-      json  = {},
-      match;
-
-    // Merge Width/Height attributes on object into json
-    if( $obj.attr('width') !== undefined )  json.width = $obj.attr('width');
-    if( $obj.attr('height') !== undefined ) json.height = $obj.attr('height');
-
-    // Create loop to get value each object
-    while( match = re.exec(style) ) {
-      json[ match[1] ] = match[2];
-    }
-
-    // Convert value pixel of Width/Height to number
-    var rePixel = /^-?\d*.?\d+px$/;
-    if( rePixel.test(json.width) )  json.width = parseFloat(json.width);
-    if( rePixel.test(json.height) ) json.height = parseFloat(json.height);
-
-    return json;
-  }
-
-  // Check all values in the array is number
-  static ElesIsNumber(arr, lenCheck) {
-    var len   = arr.length,
-      isNum = RubyM.IsArray(arr) && len === lenCheck;
-
-    if( isNum ) {
-      for( var i = 0; i < len; i++ ) {
-        isNum = isNum && RubyM.IsNumber(arr[i]);
-      }
-    }
-    return isNum;
-  }
-
-
-
-
-
-  /**
-   * METHODS RELATE TO TRANSFORM + TRANSITION
-   */
-  static Tl(x,y,u) {
-    var u = u || 'px';
-    return va.tl0 + x + u +', '+ y + u + va.tl1;
-  }
-
-  // Translate x/y, support fallback transition
-  static Tlx(x,u) {
-    var u = u || 'px';
-    return is.tf ? (va.tlx0 + x + u + va.tlx1) : (x + u);
-  }
-  static Tly(y,u) {
-    var u = u || 'px';
-    return is.tf ? (va.tly0 + y + u + va.tly1) : (y + u);
-  }
-
-  // Remove transform on object
-  static TfRemove($obj) {
-    var tf = {};
-    tf[cssTf] = '';
-    $obj.css(tf);
-  }
-
-
-
-  /**
-   * METHODS RELATE TO ARRAY[]
-   */
-  static Shift($obj, isShift) { return isShift ? $obj.shift() : $obj.pop() }
-  static Push($obj, v, isPush) { return isPush ? $obj.push(v) : $obj.unshift(v) }
-
-  /**
-   * RANDOM EFFECT IN THE EFFECT ARRAY[]
-   */
-  static RandomInArray(arr, except) {
-
-    // Conditional execution : arr is array
-    if( RubyM.IsArray(arr) ) {
-
-      /**
-       * CASE: ARRAY HAVE 1 OBJECT
-       */
-      if( arr.length === 1 ) return arr[0];
-
-
-
-      /**
-       * CASE: ARRAY HAVE MULTIPLE OBJECT
-       */
-      var itemCur     = RubyM.Assign([], arr),
-        indexItemLast = $.inArray(except, itemCur);
-
-      // Remove the newly effect
-      // If not found in effect array -> add 1 to fixed select
-      if( indexItemLast === -1 ) indexItemLast = itemCur.length + 1;
-      itemCur.splice(indexItemLast, 1);
-
-      // Select random effect in the new array has removed old effect
-      return itemCur[ M.R(M.Rm(0, itemCur.length - 1)) ];
-    }
-    return arr;
-  }
-
-  static RandomInArray2(arrSource, arrCopy, except) {
-    if( RubyM.IsArray(arrSource) ) {
-
-      // Reset the copy array if it empty
-      // Reset the copy array if ramaining 1 object like 'except'
-      if( !arrCopy.length || (arrCopy.length == 1 && arrCopy[0] == except) ) {
-        arrCopy = RubyM.Assign(arrCopy, arrSource);
-      }
-
-      // Remove 'except' first
-      if( except !== undefined ) {
-        var indexExcept = $.inArray(except, arrCopy);
-        if( indexExcept !== -1 ) arrCopy.splice(indexExcept, 1);
-      }
-
-
-
-      // Get random value in the copy array
-      var idCur   = M.R(M.Rm(0, arrCopy.length - 1)),
-        itemCur = arrCopy[idCur];
-
-      // Remove value selected in the copy array
-      arrCopy.splice(idCur, 1);
-
-      // Return value selected
-      return itemCur;
-    }
-    return arrSource;
-  }
-
-
-
-
-
-  /**
-   * OTHER METHODS
-   */
-  // Swipe swap variable
-  static SwapVaOnSwipe() { return va.$swipeCur.is($canvas) ? va.can : va.pag; }
-
-  // Toggle add/removeClass on object
-  static XClass($obj, isAdd, str) { $obj[(isAdd ? 'add' : 'remove') +'Class'](str); }
-
-  // Capitalize the first letter of sting
-  static ProperCase(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
-
-  // Convert '{ns}' to namespace
-  static NS(str) {
-    return (typeof str == 'string') ?  str.replace(/\{ns\}/g, va.ns)
-                    : '';
-  }
-
-  /**
-   * CHECK WIDTH VALUE OF WINDOW/RUBY IN RANGE - SIMILAR MEDIA CSS
-   */
-  static MatchMedia(min, max, isWidthOfRuby) {
-
-    /**
-     * CASE: GET WIDTH OF RUBY
-     */
-    if( !!isWidthOfRuby ) {
-      var wRuby = M.OuterWidth($ruby);
-      if( min <= wRuby && wRuby <= max ) return true;
-    }
-
-
-    /**
-     * CASE: GET WIDTH OF WINDOW BROWSER
-     */
-    else {
-      // Case : browser support matchMedia
-      if( !!window.matchMedia ) {
-        var str = '(min-width: WMINpx) and (max-width: WMAXpx)'.replace('WMIN', min).replace('WMAX', max);
-        if( window.matchMedia(str).matches ) return true;
-      }
-
-      // Case default : not support matchMedia
-      else {
-        var wWin = $w.width();
-        if( min <= wWin && wWin <= max ) return true;
-      }
-    }
-
-    return false;
-  }
-
-  /**
-   * SEARCH FOR NECESSARY VALUE IN ARRAY
-   * @return int  Value width of ruby
-   */
-  static GetValueInRange(value, valueName) {
-    var name = !!valueName ? valueName : 'value';
-
-    // additional : allow default value & get minimun value
-    var wMin = 1e5, id = -1;
-    for( i = value.num - 1; i >= 0; i-- ) {
-
-      // 'from' & 'to' compared to width window
-      if( M2.MatchMedia(value[i].from, value[i].to ) ) {
-
-        if( wMin >= value[i].to ) {
-          wMin = value[i].to;
-          id = i;
-        }
-      }
-    }
-
-    // Return value
-    return (id > -1 ? value[id][name] : null);
-  }
-
-  // Get index in Responsive Level
-  static GetIndexInResponsive(resLevels) {
-    var index = null;
-    for( var i = 0, len = resLevels.length; i < len; i++ ) {
-
-      var min = resLevels[i],
-        max = (i === 0) ? 10000 : resLevels[i - 1];
-
-      if( M2.MatchMedia(min, max) ) {
-        index = i;
-        break;
-      }
-    }
-
-    // Case: not found index
-    if( index === null ) index = resLevels.length - 1;
-    return index;
-  }
-
-  // Parse Grid from a value
-  static ParseGrid(fromValue, isInherit) {
-    var resLevelsLen = o.responsiveLevels.length,
-      grid     = null;
-
-    // Case: Size is Numeric
-    if( RubyM.IsNumber(fromValue) || typeof fromValue === 'string' ) {
-      grid = [];
-
-      for( var i = 0; i < resLevelsLen; i++ ) {
-        if( isInherit ) grid[i] = fromValue;
-        else      grid[i] = (i == 0) ? fromValue : null;
-      }
-    }
-    // Case: Size is array
-    else if( RubyM.IsArray(fromValue) ) {
-
-      // Case: Size length < ResponsiveLevels length -> Additional item in the array of Size
-      if( fromValue.length < resLevelsLen ) {
-        var valueLen  = fromValue.length;
-          valueLast = fromValue[valueLen - 1];
-
-        grid = fromValue.slice();
-        for( var i = valueLen; i < resLevelsLen; i++ ) {
-          grid[i] = isInherit ? valueLast : null;
-        }
-      }
-
-      // Case else: copy array
-      else grid = fromValue.slice();
-    }
-    return grid;
-  }
-
-  /**
-   * SEARCH ELEMENTS EXCEPT FORM RUBY-NESTED
-   *  + Remove nested ruby
-   */
-  static Find($target, selector) {
-
-    var $result     = $target.find(selector),
-      $rubyNested   = $target.find('.' + va.ns),
-      $resultNested = $rubyNested.find(selector);
-
-    // Loai bo doi tuong trong Ruby Nested
-    $result = $result.not($resultNested);
-    return $result;
-  }
-
-
-
-
-
-
-  /**
-   * GET TWEEN ANIMATE STORED IN 'DATA' OF OBJECT
-   */
-  static GetTween($obj) {
-    var objData = M2.Data($obj);
-
-    // Get tween animate on self object
-    objData.tweenSelf = objData.tweenSelf || new RubyTween();
-    return objData.tweenSelf;
-  }
-
-  /**
-   * RETURN MODULES COMBINE WITH PROPERTIES
-   */
-  static Module(name) {
-    return RubyM.Assign(rt01MODULE[name], one);
-  }
-}
-
-
-
-
-
-
-
-
-
-
-
-
-
-(function() {
 
 /**
  * INITIALIZE GLOBAL VARIABLES IN JAVASCRIPT
@@ -806,8 +21,9 @@ if( !window.rt01VA ) {
     "rubyName"  : "rubytabs",
     "rubyData"  : "tabs",
     "namespace" : "rt01",
-    "$ruby"     : $(),
-    "numID"     : 0
+
+    "$ruby"   : $(),
+    "numID"   : 0
   };
 
   /**
@@ -1209,7 +425,7 @@ if( !window.rt01VA ) {
               "position"    : "top",
 
               // Event to open hotspot. List of value : "tap", "hover"
-              "eventToOpen"   : 'tap',
+              "eventToOpen"   : "tap",
 
               "animIn"    : [{ "y": "100%", "opacity": 0 }, { "y": 0, "opacity": 1, "duration": 200 }],
               "animOut"     : [{ "y": 0 }, { "y": "100%", "opacity": 0, "duration": 200 }],
@@ -1523,8 +739,84 @@ if( !window.rt01VA ) {
       "isNav"    : true
     }
   };
+}
 
 
+
+
+
+
+
+
+
+
+/**
+ * CLASS RUBY UTILITY M
+ */
+class M {
+  /**
+   * DISPLAY ERROR MESSAGES
+   */
+  static Message(message, detail) {
+    if( typeof console === 'object' && message !== undefined ) {
+      var str = '['+ rt01VA.rubyName +': '+ message +']';
+
+      if( !!detail ) str += ' -> '+ detail;
+      console.warn(str);
+    }
+  }
+
+  /**
+   * CONVERT 'STRING' TO 'JSON'
+   */
+  static StringToJson(str, messageError) {
+    if( typeof str == 'string' ) {
+
+      // Replace quotes to single quotes
+      str = str.replace(/\u0027/g, '\u0022');
+
+
+      /**
+       * PARSE 'STRING' TO 'JSON'
+       */
+      //-?- Not support IE8
+      try      { str = JSON.parse(str) }
+      catch(e) { M.Message(messageError) }
+    }
+
+    // Return value depending on each case
+    return M.IsPlainObject(str) ? M.Assign(str)
+                                : M.IsArray(str) ? M.Assign(str)
+                                                 : {};
+  }
+
+  /**
+   * CONVERT 'JSON' TO 'STRING'
+   */
+  static JsonToString(json, messageError) {
+    if( typeof json == 'object' ) {
+
+      /**
+       * PARSE 'JSON' TO 'STRING'
+       */
+      try      { json = JSON.stringify(json) }
+      catch(e) { M.Message(messageError) }
+    }
+    return (typeof json == 'string') ? json : '';
+  }
+
+  /**
+   * Covert to CamelCase
+   */
+  static CamelCase(prop) {
+    return prop.replace(/-([a-z])/gi, function(m, prop) {
+      return prop.toUpperCase();
+    });
+  }
+
+  static RemoveWhiteSpace(str) {
+    return str.replace(/(^\s+)|(\s+$)/g, '').replace(/(\s\s+)/g, ' ');
+  }
 
 
 
@@ -1535,167 +827,619 @@ if( !window.rt01VA ) {
 
 
   /**
-   * FUNCTION M
+   * CONVERT VALUE TO NUMBER
    */
-  rt01VA.M = {
+  static PFloat(n) {
 
-    /**
-     * DISPLAY ERROR MESSAGES
-     */
-    Message : function(message, detail) {
-      if( typeof console === 'object' && message !== undefined ) {
-        var str = '['+ rt01VA.rubyName +': '+ message +']';
-
-        if( !!detail ) str += ' -> '+ detail;
-        console.warn(str);
-      }
-    },
-
-    /**
-     * CONVERT 'STRING' TO 'JSON'
-     */
-    StringToJson : function(str, messageError) {
-      if( typeof str == 'string' ) {
-
-        // Replace quotes to single quotes
-        str = str.replace(/\u0027/g, '\u0022');
+    // Check and convert to number float
+    // Condition < 9007199254740992 : larger for incorrect results
+    if( /^\-?\d*\.?\d+/g.test(n) ) {
+      var n1 = parseFloat(n);
+      if (n1 < 9007199254740992 ) return n1;
+    }
 
 
-        /**
-         * PARSE 'STRING' TO 'JSON'
-         */
-        try    { str = $.parseJSON(str) }
-        catch(e) { rt01VA.M.Message(messageError) }
-      }
+    // Case : value Boolean
+    else if( /^(true|on)$/g.test(n) ) return true;
+    else if( /^(false|off)$/g.test(n) ) return false;
+    return 0;
+  }
 
-      // Return value depending on each case
-      return RubyM.IsPlainObject(str) ? $.extend(true, {}, str)
-                    : $.isArray(str) ? $.extend(true, [], str)
-                             : {};
-    },
+  // Convert value to number integer
+  static PInt(v) { return /^\-?\d+/g.test(v) ? parseInt(v, 10) : 0; }
 
-    /**
-     * CONVERT 'JSON' TO 'STRING'
-     */
-    JsonToString : function(json, messageError) {
-      if( typeof json == 'object' ) {
+  // Check element is Plain Object
+  static IsPlainObject(v) { return Object.prototype.toString.call(v) === '[object Object]' }
+  // Check element is Empty Object
+  static IsEmptyObject(v) { return M.IsPlainObject(v) && M.JsonToString(v) === '{}' }
+  // Check element is Array
+  static IsArray(v) { return Object.prototype.toString.call(v) === '[object Array]' }
+  // Check element is Number
+  static IsNumber(n) { return !isNaN( parseFloat(n) ) }
 
-        /**
-         * PARSE 'JSON' TO 'STRING'
-         */
-        try    { json = JSON.stringify(json) }
-        catch(e) { rt01VA.M.Message(messageError) }
-      }
-      return (typeof json == 'string') ? json : '';
-    },
+  /**
+   * ASSIGN 2 OR MORE OBJECT INTO ONE OBJECT
+   */
+  static Assign() {
+    let args = arguments, objNew;
 
-
-
-
-
-
-
-
-
-
-    /**
-     * CONVERT VALUE TO NUMBER
-     */
-    PFloat : function(n) {
-
-      // Check and convert to number float
-      // Condition < 9007199254740992 : larger for incorrect results
-      if( /^\-?\d*\.?\d+/g.test(n) ) {
-        var n1 = parseFloat(n);
-        if (n1 < 9007199254740992 ) return n1;
-      }
-
-
-      // Case : value Boolean
-      else if( /^(true|on)$/g.test(n) ) return true;
-      else if( /^(false|off)$/g.test(n) ) return false;
-      return 0;
-    },
-
-    // Convert value to number integer
-    PInt : function(v) { return /^\-?\d+/g.test(v) ? parseInt(v, 10) : 0; },
-
-
-
-
-
-
-
-
-
-
-    /**
-     * GET SIZE OF OJBECT
-     *  + Get size not included css transformed
-     *  + Size base on "offsetWidth", "offsetHeight"
-     *  + Check getComputedStyle by document.defaultView otherwise error
-     */
-    SizeNoTransform : function($el, type, isMargin) {
+    // Loop for merge all object in Arguments
+    for( let i = 0, len = args.length; i < len; i++ ) {
 
       /**
-       * CONDITONAL EXECUTION
-       *  + First paramater $el : forced to Element Node
+       * Detect type of object
        */
-      if( !($el && !!$el[0]) ) return 0;
+      if( M.IsPlainObject(args[i])
+      && (objNew === undefined || M.IsArray(objNew)) ) {
+        objNew = {};
+      }
+      else if( M.IsArray(args[i])
+      && (objNew === undefined || M.IsPlainObject(objNew)) ) {
+        objNew = [];
+      }
+      else if( args[i] === undefined || args[i] === null ) {
+        continue;
+      }
+      else if(Object.prototype.toString.call(objNew) !== Object.prototype.toString.call(args[i]) )  {
+        objNew = args[i];
+        continue;
+      }
+
+      /**
+       * Get all elements in Object
+       */
+      for( let key in args[i] ) {
+        let value = args[i][key];
+
+        // Case: type 2 value is 'object'
+        if( M.IsPlainObject(value) && M.IsPlainObject(objNew[key]) ) {
+          objNew[key] = M.Assign(objNew[key], value);
+        }
+        // Case: type 2 value different
+        else objNew[key] = value;
+      }
+    }
+    return objNew;
+  }
+
+
+
+
+
+
+
+
+
+  /**
+   * GET SIZE OF OJBECT
+   *  + Get size not included css transformed
+   *  + Size base on "offsetWidth", "offsetHeight"
+   *  + Check getComputedStyle by document.defaultView otherwise error
+   */
+  static SizeNoTransform($el, type, isMargin) {
+
+    /**
+     * CONDITONAL EXECUTION
+     *  + First paramater $el : forced to Element Node
+     */
+    if( !($el && !!$el[0]) ) return 0;
+
+
+
+    /**
+     * INITIAL SETUP
+     */
+    var that  = this,
+      el    = $el[0],
+      style   = document.defaultView ? getComputedStyle(el) : el.currentStyle,
+
+      isWidth = /Width/i.test(type),
+      size  = el[isWidth ? 'offsetWidth' : 'offsetHeight'],
+
+      padding = isWidth ? that.PFloat(style.paddingLeft) + that.PFloat(style.paddingRight)
+                : that.PFloat(style.paddingTop) + that.PFloat(style.paddingBottom),
+
+      border  = isWidth ? that.PFloat(style.borderLeftWidth) + that.PFloat(style.borderRightWidth)
+                : that.PFloat(style.borderTopWidth) + that.PFloat(style.borderBottomWidth),
+
+      margin  = isWidth ? that.PFloat(style.marginLeft) + that.PFloat(style.marginRight)
+                : that.PFloat(style.marginTop) + that.PFloat(style.marginBottom);
+
+
+
+    /**
+     * SETUP SIZE DEPENDING ON EACH CASE
+     */
+    // Case : get size OuterWidth - OuterHeight
+    if( /^Outer\w+/.test(type) ) {
+      if( isMargin ) size += margin;
+    }
+
+    // Case : get size InnerWidth - InnerHeight
+    else if( /^Inner\w+/.test(type) ) {
+      size -= border;
+    }
+
+    // Case : get size Width - Height
+    else if( /^(Width|Height)$/.test(type) ) {
+      size -= border + padding;
+    }
+
+    // Return results
+    return size;
+  }
+
+  static Width($el) { return this.SizeNoTransform($el, 'Width') }
+  static Height($el) { return this.SizeNoTransform($el, 'Height') }
+  static InnerWidth($el) { return this.SizeNoTransform($el, 'InnerWidth') }
+  static InnerHeight($el) { return this.SizeNoTransform($el, 'InnerHeight') }
+  static OuterWidth($el, isMargin) { return this.SizeNoTransform($el, 'OuterWidth', isMargin) }
+  static OuterHeight($el, isMargin) { return this.SizeNoTransform($el, 'OuterHeight', isMargin) }
+
+
+  /**
+   * METHODS RELATE TO MATH
+   */
+  static A(v) { return Math.abs(v) }
+  static R(v) { return Math.round(v) }
+  static C(v) { return Math.ceil(v) }
+  static Ra() { return Math.random() }
+  static Rm(m ,n) { return M.Ra() * (n - m) + m }
+  static Sum(a, to) {
+    var total = 0;
+    if( to < 0 ) return total;
+
+    // Case not 'to' paramater
+    if( to === undefined ) to = a.length;
+
+    // Loop plus all values in the array[]
+    for( var i = 0; i < to; i++ ) {
+      total += a[i];
+    }
+    return total;
+  }
+
+
+
+  /**
+   * METHODS RELATE TO CONVERT NUMBER
+   */
+  // Convert value to percent(%)
+  static PPercent(v, source) {
+    if( v > 0 && v < 1 ) v *= source;
+    return M.R(v);
+  }
+
+  // Parse the value have percent unit to Pixel unit
+  static PercentToPixel(value, source) {
+    var result = null;
+
+    // Case: The value is string with format '+/-100%'
+    if( /^\-?\d*\.?\d+\%$/.test(value) ) {
+      result = M.R(M.PFloat(value) * source / 100);
+    }
+    // Case: The value is numeric
+    else if( M.IsNumber(value) ) {
+      result = value;
+    }
+    return result;
+  }
+
+  // Convert string of style to json
+  static PStyleToJson($obj) {
+    var style = $obj.attr('style'),
+      re  = /\s*([\w-]+)\s*:\s*([^;]*)/g,
+      json  = {},
+      match;
+
+    // Merge Width/Height attributes on object into json
+    if( $obj.attr('width') !== undefined )  json.width = $obj.attr('width');
+    if( $obj.attr('height') !== undefined ) json.height = $obj.attr('height');
+
+    // Create loop to get value each object
+    while( match = re.exec(style) ) {
+      json[ match[1] ] = match[2];
+    }
+
+    // Convert value pixel of Width/Height to number
+    var rePixel = /^-?\d*.?\d+px$/;
+    if( rePixel.test(json.width) )  json.width = parseFloat(json.width);
+    if( rePixel.test(json.height) ) json.height = parseFloat(json.height);
+
+    return json;
+  }
+
+  // Check all values in the array is number
+  static ElesIsNumber(arr, lenCheck) {
+    var len   = arr.length,
+      isNum = M.IsArray(arr) && len === lenCheck;
+
+    if( isNum ) {
+      for( var i = 0; i < len; i++ ) {
+        isNum = isNum && M.IsNumber(arr[i]);
+      }
+    }
+    return isNum;
+  }
+
+
+
+
+
+  /**
+   * METHODS RELATE TO TRANSFORM + TRANSITION
+   */
+  static Tl(x,y,u) {
+    var u = u || 'px';
+    return va.tl0 + x + u +', '+ y + u + va.tl1;
+  }
+
+  // Translate x/y, support fallback transition
+  static Tlx(x,u) {
+    var u = u || 'px';
+    return is.tf ? (va.tlx0 + x + u + va.tlx1) : (x + u);
+  }
+  static Tly(y,u) {
+    var u = u || 'px';
+    return is.tf ? (va.tly0 + y + u + va.tly1) : (y + u);
+  }
+
+  // Remove transform on object
+  static TfRemove($obj) {
+    var tf = {};
+    tf[cssTf] = '';
+    $obj.css(tf);
+  }
+
+
+
+  /**
+   * METHODS RELATE TO ARRAY[]
+   */
+  static Shift($obj, isShift) { return isShift ? $obj.shift() : $obj.pop() }
+  static Push($obj, v, isPush) { return isPush ? $obj.push(v) : $obj.unshift(v) }
+
+  /**
+   * RANDOM EFFECT IN THE EFFECT ARRAY[]
+   */
+  static RandomInArray(arr, except) {
+
+    // Conditional execution : arr is array
+    if( M.IsArray(arr) ) {
+
+      /**
+       * CASE: ARRAY HAVE 1 OBJECT
+       */
+      if( arr.length === 1 ) return arr[0];
 
 
 
       /**
-       * INITIAL SETUP
+       * CASE: ARRAY HAVE MULTIPLE OBJECT
        */
-      var that  = this,
-        el    = $el[0],
-        style   = document.defaultView ? getComputedStyle(el) : el.currentStyle,
+      var itemCur     = M.Assign([], arr),
+        indexItemLast = $.inArray(except, itemCur);
 
-        isWidth = /Width/i.test(type),
-        size  = el[isWidth ? 'offsetWidth' : 'offsetHeight'],
+      // Remove the newly effect
+      // If not found in effect array -> add 1 to fixed select
+      if( indexItemLast === -1 ) indexItemLast = itemCur.length + 1;
+      itemCur.splice(indexItemLast, 1);
 
-        padding = isWidth ? that.PFloat(style.paddingLeft) + that.PFloat(style.paddingRight)
-                  : that.PFloat(style.paddingTop) + that.PFloat(style.paddingBottom),
+      // Select random effect in the new array has removed old effect
+      return itemCur[ M.R(M.Rm(0, itemCur.length - 1)) ];
+    }
+    return arr;
+  }
 
-        border  = isWidth ? that.PFloat(style.borderLeftWidth) + that.PFloat(style.borderRightWidth)
-                  : that.PFloat(style.borderTopWidth) + that.PFloat(style.borderBottomWidth),
+  static RandomInArray2(arrSource, arrCopy, except) {
+    if( M.IsArray(arrSource) ) {
 
-        margin  = isWidth ? that.PFloat(style.marginLeft) + that.PFloat(style.marginRight)
-                  : that.PFloat(style.marginTop) + that.PFloat(style.marginBottom);
-
-
-
-      /**
-       * SETUP SIZE DEPENDING ON EACH CASE
-       */
-      // Case : get size OuterWidth - OuterHeight
-      if( /^Outer\w+/.test(type) ) {
-        if( isMargin ) size += margin;
+      // Reset the copy array if it empty
+      // Reset the copy array if ramaining 1 object like 'except'
+      if( !arrCopy.length || (arrCopy.length == 1 && arrCopy[0] == except) ) {
+        arrCopy = M.Assign(arrCopy, arrSource);
       }
 
-      // Case : get size InnerWidth - InnerHeight
-      else if( /^Inner\w+/.test(type) ) {
-        size -= border;
+      // Remove 'except' first
+      if( except !== undefined ) {
+        var indexExcept = $.inArray(except, arrCopy);
+        if( indexExcept !== -1 ) arrCopy.splice(indexExcept, 1);
       }
 
-      // Case : get size Width - Height
-      else if( /^(Width|Height)$/.test(type) ) {
-        size -= border + padding;
+
+
+      // Get random value in the copy array
+      var idCur   = M.R(M.Rm(0, arrCopy.length - 1)),
+        itemCur = arrCopy[idCur];
+
+      // Remove value selected in the copy array
+      arrCopy.splice(idCur, 1);
+
+      // Return value selected
+      return itemCur;
+    }
+    return arrSource;
+  }
+
+
+
+
+
+  /**
+   * OTHER METHODS
+   */
+  // Swipe swap variable
+  static SwapVaOnSwipe() { return va.$swipeCur.is($canvas) ? va.can : va.pag; }
+
+  // Toggle add/removeClass on object
+  static XClass($obj, isAdd, str) { $obj[(isAdd ? 'add' : 'remove') +'Class'](str); }
+
+  // Capitalize the first letter of sting
+  static ProperCase(str) { return str.charAt(0).toUpperCase() + str.slice(1); }
+
+  // Convert '{ns}' to namespace
+  static NS(str) {
+    return (typeof str == 'string') ?  str.replace(/\{ns\}/g, va.ns)
+                    : '';
+  }
+
+  /**
+   * CHECK WIDTH VALUE OF WINDOW/RUBY IN RANGE - SIMILAR MEDIA CSS
+   */
+  static MatchMedia(min, max, isWidthOfRuby) {
+
+    /**
+     * CASE: GET WIDTH OF RUBY
+     */
+    if( !!isWidthOfRuby ) {
+      var wRuby = M.OuterWidth($ruby);
+      if( min <= wRuby && wRuby <= max ) return true;
+    }
+
+
+    /**
+     * CASE: GET WIDTH OF WINDOW BROWSER
+     */
+    else {
+      // Case : browser support matchMedia
+      if( !!window.matchMedia ) {
+        var str = '(min-width: WMINpx) and (max-width: WMAXpx)'.replace('WMIN', min).replace('WMAX', max);
+        if( window.matchMedia(str).matches ) return true;
       }
 
-      // Return results
-      return size;
-    },
+      // Case default : not support matchMedia
+      else {
+        var wWin = $w.width();
+        if( min <= wWin && wWin <= max ) return true;
+      }
+    }
 
-    Width     : function($el) { return this.SizeNoTransform($el, 'Width') },
-    Height    : function($el) { return this.SizeNoTransform($el, 'Height') },
-    InnerWidth  : function($el) { return this.SizeNoTransform($el, 'InnerWidth') },
-    InnerHeight : function($el) { return this.SizeNoTransform($el, 'InnerHeight') },
-    OuterWidth  : function($el, isMargin) { return this.SizeNoTransform($el, 'OuterWidth', isMargin) },
-    OuterHeight : function($el, isMargin) { return this.SizeNoTransform($el, 'OuterHeight', isMargin) }
-  };
+    return false;
+  }
+
+  /**
+   * SEARCH FOR NECESSARY VALUE IN ARRAY
+   * @return int  Value width of ruby
+   */
+  static GetValueInRange(value, valueName) {
+    var name = !!valueName ? valueName : 'value';
+
+    // additional : allow default value & get minimun value
+    var wMin = 1e5, id = -1;
+    for( i = value.num - 1; i >= 0; i-- ) {
+
+      // 'from' & 'to' compared to width window
+      if( M2.MatchMedia(value[i].from, value[i].to ) ) {
+
+        if( wMin >= value[i].to ) {
+          wMin = value[i].to;
+          id = i;
+        }
+      }
+    }
+
+    // Return value
+    return (id > -1 ? value[id][name] : null);
+  }
+
+  // Get index in Responsive Level
+  static GetIndexInResponsive(resLevels) {
+    var index = null;
+    for( var i = 0, len = resLevels.length; i < len; i++ ) {
+
+      var min = resLevels[i],
+        max = (i === 0) ? 10000 : resLevels[i - 1];
+
+      if( M2.MatchMedia(min, max) ) {
+        index = i;
+        break;
+      }
+    }
+
+    // Case: not found index
+    if( index === null ) index = resLevels.length - 1;
+    return index;
+  }
+
+  // Parse Grid from a value
+  static ParseGrid(fromValue, isInherit) {
+    var resLevelsLen = o.responsiveLevels.length,
+      grid     = null;
+
+    // Case: Size is Numeric
+    if( M.IsNumber(fromValue) || typeof fromValue === 'string' ) {
+      grid = [];
+
+      for( var i = 0; i < resLevelsLen; i++ ) {
+        if( isInherit ) grid[i] = fromValue;
+        else      grid[i] = (i == 0) ? fromValue : null;
+      }
+    }
+    // Case: Size is array
+    else if( M.IsArray(fromValue) ) {
+
+      // Case: Size length < ResponsiveLevels length -> Additional item in the array of Size
+      if( fromValue.length < resLevelsLen ) {
+        var valueLen  = fromValue.length;
+          valueLast = fromValue[valueLen - 1];
+
+        grid = fromValue.slice();
+        for( var i = valueLen; i < resLevelsLen; i++ ) {
+          grid[i] = isInherit ? valueLast : null;
+        }
+      }
+
+      // Case else: copy array
+      else grid = fromValue.slice();
+    }
+    return grid;
+  }
+
+  /**
+   * SEARCH ELEMENTS EXCEPT FORM RUBY-NESTED
+   *  + Remove nested ruby
+   */
+  static Find($target, selector) {
+
+    var $result     = $target.find(selector),
+      $rubyNested   = $target.find('.' + va.ns),
+      $resultNested = $rubyNested.find(selector);
+
+    // Loai bo doi tuong trong Ruby Nested
+    $result = $result.not($resultNested);
+    return $result;
+  }
+
+
+
+
+
+
+  /**
+   * GET TWEEN ANIMATE STORED IN 'DATA' OF OBJECT
+   */
+  static GetTween($obj) {
+    var objData = M2.Data($obj);
+
+    // Get tween animate on self object
+    objData.tweenSelf = objData.tweenSelf || new RubyTween();
+    return objData.tweenSelf;
+  }
+
+  /**
+   * RETURN MODULES COMBINE WITH PROPERTIES
+   */
+  static Module(name) {
+    return M.Assign(rt01MODULE[name], one);
+  }
 }
+
+
+
+
+
+
+//- class RubyObject
+/**
+ * CLASS RUBYDOM
+ */
+class RubyDOM {
+
+  // Class Constructor
+  constructor(selector) {
+    this.$items = document.querySelectorAll(selector)
+  }
+
+  /**
+   * DATA OF DOM
+   */
+  data(name, value) {
+    let name = 'data-'+ name;
+
+    // GETTER
+    if( value === undefined ) {
+      let data = this[name];
+
+      // Case Data not exist in RubyDOM
+      if( data === undefined ) {
+        return M.StringToJson(this.item.getAttribute(name));
+      }
+
+      // Case: Get Data on RubyDom if exist
+      else return data;
+    }
+
+    // SETTER
+    else {
+      this['data-'+ name] = value;
+    }
+  }
+
+  // Get and Set attribute
+  attr(name, value) {
+    // GETTER
+    if( value === undefined ) {
+      return this.item.getAttribute(name);
+    }
+
+    // SETTER
+    else {
+      this.item.setAttribute(name, value);
+    }
+  }
+
+  // Add Class
+  addClass(str) {
+    let arrStr   = M.RemoveWhiteSpace(str).split(' '),
+        strClass = this.attr('class'),
+        arrClass = M.RemoveWhiteSpace(strClass).split(' '),
+        isChange = false;
+
+     for( let i = 0, len = arrStr.length; i < len; i++ ) {
+       let valueCur = arrStr[i],
+           index    = arrClass.indexOf(valueCur);
+
+       // Remove element in Array Class
+       if( index === -1 ) {
+         arrClass.push(valueCur);
+         isChange = true;
+       }
+     }
+
+     if( isChange ) {
+       this.attr('class', arrClass.join(''));
+     }
+  }
+
+  // Remove Class
+  removeClass(str) {
+    let arrStr   = M.RemoveWhiteSpace(str).split(' '),
+        strClass = this.attr('class'),
+        arrClass = M.RemoveWhiteSpace(strClass).split(' '),
+        isChange = false;
+
+     for( let i = 0, len = arrStr.length; i < len; i++ ) {
+       let valueCur = arrStr[i],
+           index    = arrClass.indexOf(valueCur);
+
+       // Remove element in Array Class
+       if( index !== -1 ) {
+         arrClass.splice(index, 1);
+         isChange = true;
+       }
+     }
+
+     if( isChange ) {
+       this.attr('class', arrClass.join(''));
+     }
+  }
+
+  // Search Childrent
+  childrent(str) {
+    let $items = this.item
+  }
+}
+
 
 
 
@@ -1709,7 +1453,8 @@ if( !window.rt01VA ) {
 /**
  * MAIN RUBYTABS PLUGIN
  */
-window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
+//- $[rt01VA.rubyName] = function($ruby, OptsJS) {
+var FnRubyTabs = function($ruby, OptsJS) {
 
   /**
    * GLOBAL VARIABLES IN THE PLUGIN
@@ -1758,10 +1503,10 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
 
     Check : function() {
 
-      M.Browser();              // Detect the name browser
-      M.CssName();              // CSS: get prefixed css style
-      M.FirstSetup();             // Initialize the variables at first
-      M.RunEvent('init');           // Trigger callback event 'init'
+      M2.Browser();              // Detect the name browser
+      M2.CssName();              // CSS: get prefixed css style
+      M2.FirstSetup();             // Initialize the variables at first
+      M2.RunEvent('init');           // Trigger callback event 'init'
 
 
 
@@ -1789,7 +1534,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
 
 
     Ready : function() {
-      M.RunEvent('ready');                // Trigger event 'ready'
+      M2.RunEvent('ready');                // Trigger event 'ready'
       $ruby.removeClass(va.ns + 'none');          // Remove initially hidden rubytabs
 
       is.RUBYANIMATE && RUBYANIMATE.UpdateAllKeyframes(); // Update RubyAnimate keyframe into rubytabs
@@ -1857,7 +1602,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
 
     Load : function() {
       is.initLoaded = true;                 // Store rubytabs initially loaded
-      M.RunEvent('loaded');                 // Trigger event 'loaded'
+      M2.RunEvent('loaded');                 // Trigger event 'loaded'
 
       is.pag && !is.pagList && PAG.TypeSizeItem();    // Support for 'POSSIZE.CombineAtFirst()' below + position tabs vertical at first
 
@@ -1868,7 +1613,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
       EVENTS.Setup();                   // Arrange & setup the events
       EVENTS.LoadAll();                   // Setup event loaded everything
 
-      M.LastSetup();                     // Setup everything left after initialize
+      M2.LastSetup();                     // Setup everything left after initialize
       is.initEnd = true;                  // Notify the initialization end
 
 
@@ -1897,7 +1642,8 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
   /**
    * METHODS M EXTEND
    */
-  M = $.extend(true, {}, rt01VA.M, {
+  // M = M.Assign(rt01VA.M, {
+  M2 = {
 
     /**
      * FIRST SETUP OF VARIABLE IN RUBY
@@ -1922,7 +1668,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
        *  + Store 'cs' variable into ruby
        */
       cs.one = one;
-      cs = $.extend(true, cs, API);
+      cs = M.Assign(cs, API);
       //- $.data($ruby[0], rt01VA.rubyName, cs);
 
 
@@ -2229,8 +1975,8 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
       $slCur.addClass(current).removeClass(deactived);
 
       // Callback event toggle
-      idLast !== undefined && M.RunEvent('deselectID', idLast);
-      M.RunEvent('selectID', idCur);
+      idLast !== undefined && M2.RunEvent('deselectID', idLast);
+      M2.RunEvent('selectID', idCur);
 
 
       // Setting number of slide left & right into layer center(no loop)
@@ -2297,7 +2043,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
       /**
        * SETUP CONTINUE
        */
-      var classes  = o.className[type],
+      var classes = o.className[type],
         class0   = va.ns + classes[0],
         class1   = va.ns + classes[1],
         classAdd = value ? class1 : class0,
@@ -2338,13 +2084,13 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
          */
         if( is.ssRunInto ) {
           is.into = false;
-          M.Scroll.Check();
+          M2.Scroll.Check();
 
           var t = 200;
           $w.off(va.ev.scroll);
           $w.on(va.ev.scroll, function() {
             clearTimeout(ti.scroll);
-            ti.scroll = setTimeout(function() { !is.ssPauseAbsolute && M.Scroll.Check() }, t);
+            ti.scroll = setTimeout(function() { !is.ssPauseAbsolute && M2.Scroll.Check() }, t);
           });
         }
 
@@ -2362,7 +2108,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
        * CHECK RUBY INTO DISPLAY AREA
        */
       Check : function(isNoGo) {
-        M.Scroll.Position();
+        M2.Scroll.Position();
 
         // Check ruby in display area of browser
         var isInto = !(va.topW > va.botRuby || va.botW < va.topRuby),
@@ -2401,103 +2147,10 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
 
 
 
-
-    /**
-     * METHODS RELATE TO MATH
-     */
-    A   : function(v)     { return Math.abs(v) },
-    R   : function(v)     { return Math.round(v) },
-    C   : function(v)     { return Math.ceil(v) },
-    Ra  : function()      { return Math.random() },
-    Rm  : function(m ,n)    { return M.Ra() * (n - m) + m },
-    Sum : function(a, to) {
-      var total = 0;
-      if( to < 0 ) return total;
-
-      // Case not 'to' paramater
-      if( to === undefined ) to = a.length;
-
-      // Loop plus all values in the array[]
-      for( var i = 0; i < to; i++ ) {
-        total += a[i];
-      }
-      return total;
-    },
-
-
-
-    /**
-     * METHODS RELATE TO CONVERT NUMBER
-     */
-    // Convert value to percent(%)
-    PPercent : function(v, source) {
-      if( v > 0 && v < 1 ) v *= source;
-      return M.R(v);
-    },
-
-    // Parse the value have percent unit to Pixel unit
-    PercentToPixel : function(value, source) {
-      var result = null;
-
-      // Case: The value is string with format '+/-100%'
-      if( /^\-?\d*\.?\d+\%$/.test(value) ) {
-        result = M.R(M.PFloat(value) * source / 100);
-      }
-      // Case: The value is numeric
-      else if( RubyM.IsNumber(value) ) {
-        result = value;
-      }
-      return result;
-    },
-
-    // Convert string of style to json
-    PStyleToJson : function($obj) {
-      var style = $obj.attr('style'),
-        re  = /\s*([\w-]+)\s*:\s*([^;]*)/g,
-        json  = {},
-        match;
-
-      // Merge Width/Height attributes on object into json
-      if( $obj.attr('width') !== undefined )  json.width = $obj.attr('width');
-      if( $obj.attr('height') !== undefined ) json.height = $obj.attr('height');
-
-      // Create loop to get value each object
-      while( match = re.exec(style) ) {
-        json[ match[1] ] = match[2];
-      }
-
-      // Convert value pixel of Width/Height to number
-      var rePixel = /^-?\d*.?\d+px$/;
-      if( rePixel.test(json.width) )  json.width = parseFloat(json.width);
-      if( rePixel.test(json.height) ) json.height = parseFloat(json.height);
-
-      return json;
-    },
-
-    // Check all values in the array is number
-    ElesIsNumber : function(arr, lenCheck) {
-      var len   = arr.length,
-        isNum = $.isArray(arr) && len === lenCheck;
-
-      if( isNum ) {
-        for( var i = 0; i < len; i++ ) {
-          isNum = isNum && RubyM.IsNumber(arr[i]);
-        }
-      }
-      return isNum;
-    },
-
-
-
-
-
     /**
      * METHODS RELATE TO TRANSFORM + TRANSITION
      */
-    Tl : function(x,y,u) {
-      var u = u || 'px';
-      return va.tl0 + x + u +', '+ y + u + va.tl1;
-    },
+
 
     // Translate x/y, support fallback transition
     Tlx : function(x,u) {
@@ -2509,86 +2162,6 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
       return is.tf ? (va.tly0 + y + u + va.tly1) : (y + u);
     },
 
-    // Remove transform on object
-    TfRemove : function($obj) {
-      var tf = {};
-      tf[cssTf] = '';
-      $obj.css(tf);
-    },
-
-
-
-    /**
-     * METHODS RELATE TO ARRAY[]
-     */
-    Shift : function($obj, isShift) { return isShift ? $obj.shift() : $obj.pop() },
-    Push  : function($obj, v, isPush) { return isPush ? $obj.push(v) : $obj.unshift(v) },
-
-    /**
-     * RANDOM EFFECT IN THE EFFECT ARRAY[]
-     */
-    RandomInArray : function(arr, except) {
-
-      // Conditional execution : arr is array
-      if( $.isArray(arr) ) {
-
-        /**
-         * CASE: ARRAY HAVE 1 OBJECT
-         */
-        if( arr.length === 1 ) return arr[0];
-
-
-
-        /**
-         * CASE: ARRAY HAVE MULTIPLE OBJECT
-         */
-        var itemCur     = $.extend(true, [], arr),
-          indexItemLast = $.inArray(except, itemCur);
-
-        // Remove the newly effect
-        // If not found in effect array -> add 1 to fixed select
-        if( indexItemLast === -1 ) indexItemLast = itemCur.length + 1;
-        itemCur.splice(indexItemLast, 1);
-
-        // Select random effect in the new array has removed old effect
-        return itemCur[ M.R(M.Rm(0, itemCur.length - 1)) ];
-      }
-      return arr;
-    },
-
-    RandomInArray2 : function(arrSource, arrCopy, except) {
-      if( $.isArray(arrSource) ) {
-
-        // Reset the copy array if it empty
-        // Reset the copy array if ramaining 1 object like 'except'
-        if( !arrCopy.length || (arrCopy.length == 1 && arrCopy[0] == except) ) {
-          arrCopy = $.extend(true, arrCopy, arrSource);
-        }
-
-        // Remove 'except' first
-        if( except !== undefined ) {
-          var indexExcept = $.inArray(except, arrCopy);
-          if( indexExcept !== -1 ) arrCopy.splice(indexExcept, 1);
-        }
-
-
-
-        // Get random value in the copy array
-        var idCur   = M.R(M.Rm(0, arrCopy.length - 1)),
-          itemCur = arrCopy[idCur];
-
-        // Remove value selected in the copy array
-        arrCopy.splice(idCur, 1);
-
-        // Return value selected
-        return itemCur;
-      }
-      return arrSource;
-    },
-
-
-
-
 
     /**
      * OTHER METHODS
@@ -2596,17 +2169,6 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
     // Swipe swap variable
     SwapVaOnSwipe : function() { return va.$swipeCur.is($canvas) ? va.can : va.pag; },
 
-    // Toggle add/removeClass on object
-    XClass : function($obj, isAdd, str) { $obj[(isAdd ? 'add' : 'remove') +'Class'](str); },
-
-    // Capitalize the first letter of sting
-    ProperCase : function(str) { return str.charAt(0).toUpperCase() + str.slice(1); },
-
-    // Convert '{ns}' to namespace
-    NS : function(str) {
-      return (typeof str == 'string') ?  str.replace(/\{ns\}/g, va.ns)
-                      : '';
-    },
 
     /**
      * CHECK WIDTH VALUE OF WINDOW/RUBY IN RANGE - SIMILAR MEDIA CSS
@@ -2654,7 +2216,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
       for( i = value.num - 1; i >= 0; i-- ) {
 
         // 'from' & 'to' compared to width window
-        if( M.MatchMedia(value[i].from, value[i].to ) ) {
+        if( M2.MatchMedia(value[i].from, value[i].to ) ) {
 
           if( wMin >= value[i].to ) {
             wMin = value[i].to;
@@ -2675,7 +2237,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
         var min = resLevels[i],
           max = (i === 0) ? 10000 : resLevels[i - 1];
 
-        if( M.MatchMedia(min, max) ) {
+        if( M2.MatchMedia(min, max) ) {
           index = i;
           break;
         }
@@ -2692,7 +2254,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
         grid     = null;
 
       // Case: Size is Numeric
-      if( RubyM.IsNumber(fromValue) || typeof fromValue === 'string' ) {
+      if( M.IsNumber(fromValue) || typeof fromValue === 'string' ) {
         grid = [];
 
         for( var i = 0; i < resLevelsLen; i++ ) {
@@ -2701,7 +2263,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
         }
       }
       // Case: Size is array
-      else if( $.isArray(fromValue) ) {
+      else if( M.IsArray(fromValue) ) {
 
         // Case: Size length < ResponsiveLevels length -> Additional item in the array of Size
         if( fromValue.length < resLevelsLen ) {
@@ -2738,7 +2300,6 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
 
 
 
-
     /**
      * GET OBJECT PROPERTIES IN 'DATA' VARIABLE
      *  + Allow pass number parameter for slide
@@ -2750,7 +2311,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
       /**
        * CONVERT NUMBER PARAMETER TO JQUERY OBJECT
        */
-      if( RubyM.IsNumber($obj) && (0 <= $obj && $obj < cs.num) ) {
+      if( M.IsNumber($obj) && (0 <= $obj && $obj < cs.num) ) {
         $obj = va.$s.eq($obj);
       }
       else if( $obj === 'home' ) {
@@ -2770,9 +2331,9 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
       /**
        * SETUP EXTEND OBJECT
        */
-      if( RubyM.IsPlainObject(opts) ) {
+      if( M.IsPlainObject(opts) ) {
 
-        opts = $.extend(true, {}, opts);
+        opts = M.Assign(opts);
         delete opts.$self;
         delete opts.nsid;
       }
@@ -2789,7 +2350,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
       for( nsid in vData ) {
 
         if( $obj.is(vData[nsid]['$self']) ) {
-          return $.extend(true, vData[nsid], opts);
+          return M.Assign(vData[nsid], opts);
         }
       }
 
@@ -2806,20 +2367,8 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
       vData[nsid] = { '$self': $obj, 'nsid': nsid };
 
       // Return the newly created 'data'
-      return $.extend(true, vData[nsid], opts);
+      return M.Assign(vData[nsid], opts);
     },
-
-    /**
-     * GET TWEEN ANIMATE STORED IN 'DATA' OF OBJECT
-     */
-    GetTween : function($obj) {
-      var objData = M.Data($obj);
-
-      // Get tween animate on self object
-      objData.tweenSelf = objData.tweenSelf || new RubyTween();
-      return objData.tweenSelf;
-    },
-
 
 
 
@@ -2828,7 +2377,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
      * RETURN MODULES COMBINE WITH PROPERTIES
      */
     Module : function(name) {
-      return $.extend({}, rt01MODULE[name], one);
+      return M.Assign(rt01MODULE[name], one);
     },
 
     // Execute the events
@@ -2862,87 +2411,87 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
     MergeAllModules : function() {
 
       // Move module available to 'one' variable
-      one.INIT    = INIT;
-      one.M       = M;
-      one.PROP    = PROP;
+      one.INIT      = INIT;
+      one.M         = M;
+      one.PROP      = PROP;
       one.RENDER    = RENDER;
-      one.LOAD    = LOAD;
+      one.LOAD      = LOAD;
       one.EVENTS    = EVENTS;
       one.POSITION  = POSITION;
-      one.SIZE    = SIZE;
+      one.SIZE      = SIZE;
       one.POSSIZE   = POSSIZE;
       one.TOSLIDE   = TOSLIDE;
-      one.FX      = FX;
-      one.VIEW    = VIEW;
+      one.FX        = FX;
+      one.VIEW      = VIEW;
 
 
 
       // Embbed 'one' variable into module outside
-      SWIPE     = M.Module('SWIPE');
-      RESPONSIVE  = M.Module('RESPONSIVE');
-      NAV       = M.Module('NAV');
-      PAG       = M.Module('PAG');
-      CAPTION     = M.Module('CAPTION');
-      IMAGE     = M.Module('IMAGE');
-      VIDEOBACK   = M.Module('VIDEOBACK');
-      VIDEOIFRAME   = M.Module('VIDEOIFRAME');
-      IFRAME    = M.Module('IFRAME');
-      HOTSPOT     = M.Module('HOTSPOT');
-      LAYER     = M.Module('LAYER');
-      LAYERPARALLAX = M.Module('LAYERPARALLAX');
-      PARALLAX    = M.Module('PARALLAX');
-      RUBYANIMATE   = M.Module('RUBYANIMATE');
-      SLIDESHOW   = M.Module('SLIDESHOW');
-      TIMER     = M.Module('TIMER');
-      FLICKR    = M.Module('FLICKR');
-      DISPLAY     = M.Module('DISPLAY');
-      DEEPLINKING   = M.Module('DEEPLINKING');
-      COOKIE    = M.Module('COOKIE');
-      FULLSCREEN  = M.Module('FULLSCREEN');
-      NESTED    = M.Module('NESTED');
-      CLASSADD    = M.Module('CLASSADD');
-      OLD       = M.Module('OLD');
-      APIREMOTE   = M.Module('APIREMOTE');
+      SWIPE         = M2.Module('SWIPE');
+      RESPONSIVE    = M2.Module('RESPONSIVE');
+      NAV           = M2.Module('NAV');
+      PAG           = M2.Module('PAG');
+      CAPTION       = M2.Module('CAPTION');
+      IMAGE         = M2.Module('IMAGE');
+      VIDEOBACK     = M2.Module('VIDEOBACK');
+      VIDEOIFRAME   = M2.Module('VIDEOIFRAME');
+      IFRAME        = M2.Module('IFRAME');
+      HOTSPOT       = M2.Module('HOTSPOT');
+      LAYER         = M2.Module('LAYER');
+      LAYERPARALLAX = M2.Module('LAYERPARALLAX');
+      PARALLAX      = M2.Module('PARALLAX');
+      RUBYANIMATE   = M2.Module('RUBYANIMATE');
+      SLIDESHOW     = M2.Module('SLIDESHOW');
+      TIMER         = M2.Module('TIMER');
+      FLICKR        = M2.Module('FLICKR');
+      DISPLAY       = M2.Module('DISPLAY');
+      DEEPLINKING   = M2.Module('DEEPLINKING');
+      COOKIE        = M2.Module('COOKIE');
+      FULLSCREEN    = M2.Module('FULLSCREEN');
+      NESTED        = M2.Module('NESTED');
+      CLASSADD      = M2.Module('CLASSADD');
+      OLD           = M2.Module('OLD');
+      APIREMOTE     = M2.Module('APIREMOTE');
 
-      API       = $.extend(
-                API,
-                rt01MODULE.APIMORE
-              );
+      API = M.Assign(
+        API,
+        rt01MODULE.APIMORE
+      );
 
-      VIEW      = $.extend(
-                VIEW,
-                rt01MODULE.VIEWMATH,
-                rt01MODULE.VIEWCSS,
-                rt01MODULE.VIEWCOVERFLOW3D,
-                one
-              );
+      VIEW = M.Assign(
+        VIEW,
+        rt01MODULE.VIEWMATH,
+        rt01MODULE.VIEWCSS,
+        rt01MODULE.VIEWCOVERFLOW3D,
+        one
+      );
 
 
       // Check module outside exist
-      is.SWIPE     = !!rt01MODULE.SWIPE;
-      is.RESPONSIVE  = !!rt01MODULE.RESPONSIVE;
-      is.NAV       = !!rt01MODULE.NAV;
-      is.PAG       = !!rt01MODULE.PAG;
-      is.CAP       = !!rt01MODULE.CAPTION;
-      is.IMAGE     = !!rt01MODULE.IMAGE;
-      is.VIDEOBACK   = !!rt01MODULE.VIDEOBACK;
+      is.SWIPE         = !!rt01MODULE.SWIPE;
+      is.RESPONSIVE    = !!rt01MODULE.RESPONSIVE;
+      is.NAV           = !!rt01MODULE.NAV;
+      is.PAG           = !!rt01MODULE.PAG;
+      is.CAP           = !!rt01MODULE.CAPTION;
+      is.IMAGE         = !!rt01MODULE.IMAGE;
+      is.VIDEOBACK     = !!rt01MODULE.VIDEOBACK;
       is.VIDEOIFRAME   = !!rt01MODULE.VIDEOIFRAME;
-      is.IFRAME    = !!rt01MODULE.IFRAME;
-      is.HOTSPOT     = !!rt01MODULE.HOTSPOT;
-      is.LAYER     = !!rt01MODULE.LAYER;
+      is.IFRAME        = !!rt01MODULE.IFRAME;
+      is.HOTSPOT       = !!rt01MODULE.HOTSPOT;
+      is.LAYER         = !!rt01MODULE.LAYER;
       is.LAYERPARALLAX = !!rt01MODULE.LAYERPARALLAX;
-      is.PARALLAX    = !!rt01MODULE.PARALLAX;
+      is.PARALLAX      = !!rt01MODULE.PARALLAX;
       is.RUBYANIMATE   = !!rt01MODULE.RUBYANIMATE;
-      is.SLIDESHOW   = !!rt01MODULE.SLIDESHOW;
-      is.TIMER     = !!rt01MODULE.TIMER;
-      is.FLICKR    = !!rt01MODULE.FLICKR;
-      is.DISPLAY     = !!rt01MODULE.DISPLAY;
+      is.SLIDESHOW     = !!rt01MODULE.SLIDESHOW;
+      is.TIMER         = !!rt01MODULE.TIMER;
+      is.FLICKR        = !!rt01MODULE.FLICKR;
+      is.DISPLAY       = !!rt01MODULE.DISPLAY;
       is.DEEPLINKING   = !!rt01MODULE.DEEPLINKING;
-      is.COOKIE    = !!rt01MODULE.COOKIE;
-      is.FULLSCREEN  = !!rt01MODULE.FULLSCREEN;
-      is.NESTED    = !!rt01MODULE.NESTED;
-      is.CLASSADD    = !!rt01MODULE.CLASSADD;
-      is.APIREMOTE   = !!rt01MODULE.APIREMOTE;
+      is.COOKIE        = !!rt01MODULE.COOKIE;
+      is.FULLSCREEN    = !!rt01MODULE.FULLSCREEN;
+      is.NESTED        = !!rt01MODULE.NESTED;
+      is.CLASSADD      = !!rt01MODULE.CLASSADD;
+      is.APIREMOTE     = !!rt01MODULE.APIREMOTE;
     },
 
     /**
@@ -2958,7 +2507,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
        *  + Make sure convert to json if it's object
        */
       var optsData = $ruby.data(rt01VA.rubyData);
-      optsData = RubyM.StringToJson(optsData);
+      optsData = M.StringToJson(optsData);
 
 
       /**
@@ -2974,11 +2523,11 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
       if( !nameOptsPlus )             nameOptsPlus = optsDefault.type;
 
       var optsPlus = rt01VA.optsPlus[nameOptsPlus];
-      o = $.extend(true, o, optsDefault, optsPlus, OptsJS, optsData);
+      o = M.Assign(o, optsDefault, optsPlus, OptsJS, optsData);
 
-      if( !is.tf )  o = $.extend(true, o, o.fallback);
-      if( is.mobile ) o = $.extend(true, o, o.mobile);
-      else      o = $.extend(true, o, o.desktop);
+      if( !is.tf )  o = M.Assign(o, o.fallback);
+      if( is.mobile ) o = M.Assign(o, o.mobile);
+      else      o = M.Assign(o, o.desktop);
     },
 
 
@@ -3004,12 +2553,12 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
        *  + Case 1: nummber
        *  + Case 2: array has 3 item & value of each item is number
        */
-      if   ( RubyM.IsNumber(val) )     val = [[val, 0, 100000]];
+      if   ( M.IsNumber(val) )     val = [[val, 0, 100000]];
       else if( M.ElesIsNumber(val, 3) ) val = [val];
 
 
       // CONDITIONAL EXECUTION
-      if( !$.isArray(val) ) return false;
+      if( !M.IsArray(val) ) return false;
 
 
       // SETUP CONTINUE
@@ -3020,7 +2569,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
         var a = val[i];
 
         // Additional automated missing value
-        if( RubyM.IsNumber(a) ) a = [a, 0, 100000];
+        if( M.IsNumber(a) ) a = [a, 0, 100000];
 
         // Convert string to other type
         a[1] = M.PInt(a[1]);
@@ -3049,12 +2598,12 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
     Chain4 : function(val) {
 
       // Convert to standard array
-      if   ( RubyM.IsNumber(val) )     val = [[val, val, 0, 100000]];
+      if   ( M.IsNumber(val) )     val = [[val, val, 0, 100000]];
       else if( M.ElesIsNumber(val, 2) ) val = [[val[0], val[1], 0, 100000]];
       else if( M.ElesIsNumber(val, 4) ) val = [val];
 
       // Conditional execution
-      if( !$.isArray(val) ) return false;
+      if( !M.IsArray(val) ) return false;
 
 
 
@@ -3068,7 +2617,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
         var a = val[i];
 
         // Additional automated missing value
-        if( RubyM.IsNumber(a) ) a = [a, a, 0, 100000];
+        if( M.IsNumber(a) ) a = [a, a, 0, 100000];
 
         // Case: auto set from/to
         if( a.length == 2 ) { a[2] = 0; a[3] = 1e5; }
@@ -3199,9 +2748,9 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
         /**
          * ADDITION: DATA FOR RUBY LIKE DATA SLIDE
          */
-        M.Data($viewport, {
+        M2.Data($viewport, {
           'id'      : 'home',
-          'opts'    : $.extend(true, {}, o),
+          'opts'    : M.Assign(o),
           'tweenLayer'  : new RubyTween()
         });
       }
@@ -3218,7 +2767,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
         wSlide = (!!o[fxName] && !!o[fxName][wName]) ? o[fxName][wName]
                                : o[wName];
 
-      va.wSlideGrid = M.ParseGrid(wSlide, true);
+      va.wSlideGrid = M2.ParseGrid(wSlide, true);
 
 
 
@@ -3228,20 +2777,20 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
        */
       // Get grid size for the Responsive
       var resLevels = o.responsiveLevels;
-      if( $.isArray(resLevels) && resLevels.length ) {
+      if( M.IsArray(resLevels) && resLevels.length ) {
 
         // Get Grid-width / Grid-heihgt
-        va.wGrid = M.ParseGrid(o.width, true);
-        va.hGrid = M.ParseGrid(o.height, o.width === null ? true : false);
+        va.wGrid = M2.ParseGrid(o.width, true);
+        va.hGrid = M2.ParseGrid(o.height, o.width === null ? true : false);
 
         // Get grid-padding for Responsive
-        va.maGrid = M.ParseGrid(o.margin, true);
-        va.paGrid = M.ParseGrid(o.padding2, false);
+        va.maGrid = M2.ParseGrid(o.margin, true);
+        va.paGrid = M2.ParseGrid(o.padding2, false);
       }
 
       // Get type-height of Ruby
-      // is.heightFixed = RubyM.IsNumber(o.height);
-      is.heightFixed = $.isArray(va.hGrid);
+      // is.heightFixed = M.IsNumber(o.height);
+      is.heightFixed = M.IsArray(va.hGrid);
       // Covert to height-fixed when Fullscreen
       if( is.fullscreen ) is.heightFixed = true;
     },
@@ -3421,7 +2970,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
       if( o.fx == 'line') va.fxLayout = 'line';
 
       // If 'o.fx' is name of list 'o.fxMathName' or is array -> convert to 'dot' layout
-      else if( $.inArray(o.fx, va.fxInLayoutDot) !== -1 || $.isArray(o.fx) ) va.fxLayout = 'dot';
+      else if( $.inArray(o.fx, va.fxInLayoutDot) !== -1 || M.IsArray(o.fx) ) va.fxLayout = 'dot';
 
       // Convert to other layout depends on 'view' options
       var viewListToLine = ['mask', 'coverflow3D'];
@@ -3512,8 +3061,8 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
       /**
        * SETUP IN CASE: HAVE RESPONSIVE
        */
-      // is.res = RubyM.IsNumber(o.width) && is.RESPONSIVE;
-      is.res = $.isArray(va.wGrid) && is.RESPONSIVE;
+      // is.res = M.IsNumber(o.width) && is.RESPONSIVE;
+      is.res = M.IsArray(va.wGrid) && is.RESPONSIVE;
       if( is.res ) {
 
         // va.wRes = o.width;
@@ -3583,7 +3132,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
       // Check size of pagItem = size of Item
       // If there is fixed size -> size Self pagItem = false
       is.pagItemSizeSelf = (op.typeSizeItem == 'self' && !is.alignJustify);
-      if( RubyM.IsNumber(op.width) || RubyM.IsNumber(op.height) ) is.pagItemSizeSelf = false;
+      if( M.IsNumber(op.width) || M.IsNumber(op.height) ) is.pagItemSizeSelf = false;
     },
 
     Slideshow : function() {
@@ -3687,7 +3236,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
       va.$s.each(function(i) {
 
         var $slCur  = $(this),
-          slData  = M.Data($slCur),
+          slData  = M2.Data($slCur),
           optsCur = slData['opts'] || {};
 
 
@@ -3697,7 +3246,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
          *  + Store ID for each pagitem
          */
         slData['id'] = i;
-        is.pag && M.Data(va.$pagItem.eq(i), { 'id': i });
+        is.pag && M2.Data(va.$pagItem.eq(i), { 'id': i });
 
 
 
@@ -3708,28 +3257,28 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
          *  + Case: update properties of each slide
          *  + Case: change number of slide || add slide by api
          */
-        if( va.fx[i] === undefined || RubyM.IsEmptyObject(optsCur) || slData.loadBy == 'apiAdd' ) {
+        if( va.fx[i] === undefined || $.isEmptyObject(optsCur) || slData.loadBy == 'apiAdd' ) {
           var nameData = 'data-'+ o.nameDataSlide,
             optsData = $slCur.data(o.nameDataSlide),
             msgError = 'options on "XX" in Slide YY not valid'
                   .replace(/XX/, nameData)
                   .replace(/YY/, i);
 
-          optsData = RubyM.StringToJson(optsData, msgError);
-          optsCur  = $.extend(true, optsCur, o, optsData);
+          optsData = M.StringToJson(optsData, msgError);
+          optsCur  = M.Assign(optsCur, o, optsData);
 
           // Remove 'data-slide' attribute on each slide
           $slCur.removeAttr(nameData);
         }
 
         // Case: update properties of ruby
-        else if( RubyM.IsPlainObject(va.optsUpdate) && !RubyM.IsEmptyObject(va.optsUpdate) ) {
-          optsCur = $.extend(true, optsCur, va.optsUpdate);
+        else if( M.IsPlainObject(va.optsUpdate) && !$.isEmptyObject(va.optsUpdate) ) {
+          optsCur = M.Assign(optsCur, va.optsUpdate);
         }
 
         // Case: update properties of each slide
-        else if( RubyM.IsPlainObject(va.optsSlides) && RubyM.IsPlainObject(va.optsSlides[i]) ) {
-          optsCur = $.extend(true, optsCur, va.optsSlides[i]);
+        else if( M.IsPlainObject(va.optsSlides) && M.IsPlainObject(va.optsSlides[i]) ) {
+          optsCur = M.Assign(optsCur, va.optsSlides[i]);
         }
 
         // Case: remove slide by api
@@ -3758,7 +3307,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
         va.slot[i]  = optsCur.slot;
         va.speed[i] = optsCur.speed;
         va.delay[i] = optsCur.slideshow.delay;
-        optsCur.imageback.posGrid = M.ParseGrid(optsCur.imageback.position, true);
+        optsCur.imageback.posGrid = M2.ParseGrid(optsCur.imageback.position, true);
         slData['opts'] = optsCur;
 
         // Check minimum value of 'speed' & 'delay'
@@ -3888,7 +3437,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
      * UPDATE 'MASK' ON CAVAS
      */
     CanvasMask : function() {
-      var isMaskCur = M.Data(cs.idCur)['opts']['isMask'],
+      var isMaskCur = M2.Data(cs.idCur)['opts']['isMask'],
         classMask = va.ns + 'mask';
 
 
@@ -3938,7 +3487,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
      */
     Resize : function() {
       // console.log('resize');
-      M.RunEvent('resize');                 // Trigger event 'resize'
+      M2.RunEvent('resize');                 // Trigger event 'resize'
 
       // Setup size of pagItem
       // + Search value of wItem/hItem
@@ -3992,7 +3541,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
       }, 30);
 
       SIZE.AnimHeightForRuby(true);             // animHeightForRuby: update make image shake
-      M.RunEvent('resizeEnd');              // Trigger event 'resizeEnd'
+      M2.RunEvent('resizeEnd');              // Trigger event 'resizeEnd'
     }
   },
 
@@ -4038,7 +3587,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
         isSlideshow : false,
         name    : null
       };
-      o  = $.extend(true, o, options);
+      o  = M.Assign(o, options);
 
       // Layout line
       if( o.fx === null ) { o.fx = va.fxLayout = 'line' }
@@ -4123,9 +3672,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
 
       // Initialize variable
       var viewClass = va.ns + o.nameViewport,
-        // viewport = $ruby.children('.'+ viewClass);
-        viewport = $ruby.children();
-        console.log($ruby);
+        viewport  = $ruby.children('.'+ viewClass);
 
 
       // Search markup viewport
@@ -4194,7 +3741,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
        * STORE CANVAS INTO GLOBAL VARIABLE
        */
       $canvas = va.$canvas = $viewport.children('.'+ canvasClass);
-      M.Data($canvas, { 'tagName': tagCanvas, 'pos' : { 'x' : 0 } });
+      M2.Data($canvas, { 'tagName': tagCanvas, 'pos' : { 'x' : 0 } });
     },
 
     /**
@@ -4237,7 +3784,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
 
       // Slide without wrapper, only one element link '<a>', '<img>'
       else {
-        var canvasTag = M.Data($canvas)['tagName'],
+        var canvasTag = M2.Data($canvas)['tagName'],
           slTag   = (canvasTag == 'ul') ? '<li/>' : divdiv,
           $wrapper  = $(slTag, { 'class': slClass });
 
@@ -4278,7 +3825,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
 
       // Slide: initialize properties in data to get info without error
       var FALSE = false;
-      M.Data($sl, {
+      M2.Data($sl, {
         'link'     : link,
         'linkTarget' : linkTarget,
         'isLoading'  : FALSE,
@@ -4311,7 +3858,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
        */
       var ns     = va.ns,
         capHTML  = '',
-        slData   = M.Data($slCur),
+        slData   = M2.Data($slCur),
         $imgback = $slCur.find('.' + ns + o.nameImageBack);
 
       // First, get content of Imageback
@@ -4343,7 +3890,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
        * SETUP PAGINATION ITEM
        */
       // Pagination item: search '.pagitem' -> store into data slide
-      var $pagItem = M.Find($slCur, M.NS('.{ns}pagitem'));
+      var $pagItem = M2.Find($slCur, M.NS('.{ns}pagitem'));
 
       // Case: create new node if not exist
       if( !$pagItem.length ) {
@@ -4395,7 +3942,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
       /**
        * KEEP SEARCHING OBJECT INSIDE RUBY
        */
-      var $findNext = M.Find($ruby, classSearch);
+      var $findNext = M2.Find($ruby, classSearch);
 
       // Return object found
       return $findNext.length ? $findNext : $();
@@ -4431,7 +3978,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
           break;
       }
 
-      // Insert new children found into parent
+      // Insert new childrent found into parent
       $parent.append($child);
     },
 
@@ -4457,13 +4004,13 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
         $loader = $(markup);
 
       // Store loader into data slide & insert to parent
-      M.Data($save)[name] = $loader;
+      M2.Data($save)[name] = $loader;
       $parent.append($loader);
     },
 
     LoaderRemove : function($slide, name) {
 
-      var $loader = M.Data($slide)[name];
+      var $loader = M2.Data($slide)[name];
       $loader && $loader.remove();
     },
 
@@ -4548,7 +4095,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
        * CHECK LOADING STATUS OF SLIDE
        */
       function IsSlideLoading(id) {
-        return M.Data(va.$s.eq(id))['isLoading'];
+        return M2.Data(va.$s.eq(id))['isLoading'];
       }
 
 
@@ -4834,7 +4381,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
          *  + If is.preloaded == false -> 'LOAD.SlideBegin()' be paused -> load new slide switch to 'LOAD.ParalletWhenSlideBegin()'
          *  + Additional condition: 'LOAD.Add()' not work -> avoid runing multiple function same time
          */
-        if( IDToLoad.length && is.preloaded && va.nLoadParallel >= oLazySmart.amountEachLoad && !M.Data($slide)['isLoadAdd'] ) {
+        if( IDToLoad.length && is.preloaded && va.nLoadParallel >= oLazySmart.amountEachLoad && !M2.Data($slide)['isLoadAdd'] ) {
 
           for( i = va.nLoadParallel; i > 0; i-- ) {
             LOAD.Next();
@@ -4847,7 +4394,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
      * LOADING ADD NEW SLIDE WHEN TOGGLE TO OTHER SLIDE
      */
     Add : function($slide) {
-      var slData = M.Data($slide);
+      var slData = M2.Data($slide);
 
 
       // Check slide is complete loading
@@ -4915,18 +4462,18 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
      * SETUP CURRENT SLIDE AT FIRST
      */
     SlideBegin : function($slide) {
-      var slData = M.Data($slide);
+      var slData = M2.Data($slide);
 
       // Ver 1.5 - 24/09/2016 : fixed when add new slide by api, $slide = undefined
       if( !$slide.length ) return;
 
       // Load: setup begin
-      M.RunEvent('loadBegin', $slide, slData.id);
+      M2.RunEvent('loadBegin', $slide, slData.id);
 
       // Setup load all slide same time
       LOAD.ParallelWhenSlideBegin();
 
-      // Remove class 'sleep' -> diplay the children of slide
+      // Remove class 'sleep' -> diplay the childrent of slide
       $slide.removeClass(va.ns +'sleep');
 
       // Status loading of current slide
@@ -4941,8 +4488,8 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
       if( slData.id === va.idBegin ) {
 
         // Toggle current slide at first
-        cs.idCur == 0 && M.RunEvent('start');
-        M.ToggleSlide();
+        cs.idCur == 0 && M2.RunEvent('start');
+        M2.ToggleSlide();
       }
 
 
@@ -4968,7 +4515,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
     SlideEnd : function($slide) {
 
       var hSlide  = M.OuterHeight($slide, true),
-        slData  = M.Data($slide),
+        slData  = M2.Data($slide),
         id    = slData.id,
         ns    = va.ns;
 
@@ -5117,8 +4664,8 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
        * SETUP EVENTS TRIGGER
        */
       // Events trigger: slide loaded
-      M.RunEvent('loadSlide.' + id);
-      M.RunEvent('loadEnd', $slide, id);
+      M2.RunEvent('loadSlide.' + id);
+      M2.RunEvent('loadEnd', $slide, id);
 
 
 
@@ -5136,7 +4683,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
     LoadedAllSlides : function() {
 
       // Trigger event 'loadAll'
-      M.RunEvent('loadAll');
+      M2.RunEvent('loadAll');
 
       // Add new class to notice on Ruby
       is.loadAll = true;
@@ -5246,7 +4793,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
 
 
       // Transform: add _xPlus
-      if( RubyM.IsNumber(xPlus) ) x += xPlus;
+      if( M.IsNumber(xPlus) ) x += xPlus;
 
       // Setup Tween CSS for object
       var isHor = isHorCustom === undefined ? is.dirsHor : isHorCustom,
@@ -5408,7 +4955,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
                   .appendTo($canvas);
 
           // Store into data of slide
-          M.Data($slClone, { '$slSource': $slCur });
+          M2.Data($slClone, { '$slSource': $slCur });
 
           // Add new clone slide into variable -> remove all clone slide after translate done
           va.$slClone = va.$slClone.add($slClone);
@@ -5463,7 +5010,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
        * GET VALUE OF CURRENT POSITION -> SUPPORT GET POSITION OF CANVAS HAS MOVED
        */
       var xCur = $canvas.css(cssTf);
-      if( is.tf ) xCur = (xCur == 'none') ? xBack : M.ValueX(xCur);
+      if( is.tf ) xCur = (xCur == 'none') ? xBack : M2.ValueX(xCur);
       else    xCur = (xCur == 'auto') ? xBack : M.PInt(xCur);
 
 
@@ -5624,7 +5171,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
       var wRuby  = va.wRuby;
 
       // Get the current margin in ResponsiveLevels
-      va.maGridCur = $.isArray(va.maGrid) ? va.maGrid[va.index] : null;
+      va.maGridCur = M.IsArray(va.maGrid) ? va.maGrid[va.index] : null;
 
       // Case: the margin-grid available -> get margin from the option
       if( va.maGridCur !== null ) {
@@ -5694,10 +5241,10 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
       /**
        * GET THE CURRENT VALUE IN SIZE GRID
        */
-      var index = va.index = M.GetIndexInResponsive(o.responsiveLevels);
-      va.wGridCur = $.isArray(va.wGrid) ? va.wGrid[index] : null;
-      va.hGridCur = $.isArray(va.hGrid) ? va.hGrid[index] : null;
-      va.paGridCur = $.isArray(va.paGrid) ? va.paGrid[index] : null;
+      var index = va.index = M2.GetIndexInResponsive(o.responsiveLevels);
+      va.wGridCur = M.IsArray(va.wGrid) ? va.wGrid[index] : null;
+      va.hGridCur = M.IsArray(va.hGrid) ? va.hGrid[index] : null;
+      va.paGridCur = M.IsArray(va.paGrid) ? va.paGrid[index] : null;
 
 
 
@@ -5771,7 +5318,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
          *  + Remove effect if (speedHeight == null) || resize event
          */
         if( o.speedHeight === null || isUpdateResize ) {
-          M.Scroll.Check();
+          M2.Scroll.Check();
         }
 
         else {
@@ -5789,7 +5336,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
                 $viewport.css('height', '');
 
                 // Update value of variable ralative scroll browser
-                M.Scroll.Check();
+                M2.Scroll.Check();
               }
             });
         }
@@ -5925,16 +5472,16 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
       else {
         va.hRuby = null;
 
-        if( $.isArray(va.hGrid) ) {
+        if( M.IsArray(va.hGrid) ) {
 
           // Case: Height-grid current is available
-          if( RubyM.IsNumber(va.hGridCur) ) {
+          if( M.IsNumber(va.hGridCur) ) {
             va.hRuby = va.hGridCur;
           }
 
           // Case: The value of current Height-grid is 'null'
           else {
-            if( $.isArray(va.wGrid) ) {
+            if( M.IsArray(va.wGrid) ) {
               va.hRuby = M.R(va.hGrid[0] * va.rate);
             }
           }
@@ -6303,7 +5850,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
       $ruby.addClass(va.ns +'fxRun');
 
       is.slideNext = isIDFixed ? (nSlide - cs.idCur > 0) : (nSlide > 0);
-      M.RunEvent('fxBegin');
+      M2.RunEvent('fxBegin');
 
 
 
@@ -6311,7 +5858,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
       /**
        * SETUP OTHER ELEMENTS WHEN SLIDE LOADED
        */
-      if( M.Data(va.$s.eq(idCur))['isLoaded'] ) {
+      if( M2.Data(va.$s.eq(idCur))['isLoaded'] ) {
 
         is.HOTSPOT && HOTSPOT.Reset(idCur);           // Reset initial status of Hotspot
         // is.LAYER && LAYER.Reset(idCur);             // Reset Tween current animate
@@ -6332,9 +5879,9 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
        * MAIN SETUP
        */
       // Callback func: start && before
-      isIDFixed ? (nSlide == 0) && M.RunEvent('start')
-            : (idCur + nSlide == 0 || idCur + nSlide - num == 0 ) && M.RunEvent('start');
-      M.RunEvent('before');
+      isIDFixed ? (nSlide == 0) && M2.RunEvent('start')
+            : (idCur + nSlide == 0 || idCur + nSlide - num == 0 ) && M2.RunEvent('start');
+      M2.RunEvent('before');
 
       // ID: convert to ts.num
       if( isIDFixed ) va.ts.num -= idCur;
@@ -6499,15 +6046,15 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
 
       // Past new value to current ID
       // Combine with 'swapID' event
-      M.RunEvent('beforeSwapIDCur');
+      M2.RunEvent('beforeSwapIDCur');
       cs.idCur = idCur;
-      M.RunEvent('afterSwapIDCur');
+      M2.RunEvent('afterSwapIDCur');
 
 
       // Add timer for effect in 'Dot' layout : browser Chrome error -> slide shake
       // In week CPU, remove timer if click continuously
-      if( !!ts.isDelayWhenToggleID ) setTimeout(M.ToggleSlide, 10);
-      else               M.ToggleSlide();
+      if( !!ts.isDelayWhenToggleID ) setTimeout(M2.ToggleSlide, 10);
+      else               M2.ToggleSlide();
 
 
 
@@ -6571,7 +6118,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
       // Notice of end effect
       is.fxRun = false;
       $ruby.removeClass(va.ns + 'fxRun');
-      M.RunEvent('fxEnd');
+      M2.RunEvent('fxEnd');
 
       // Update & start play Layer of current slide
       if( is.LAYER ) {
@@ -6586,8 +6133,8 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
       is.LAYERPARALLAX && LAYERPARALLAX.ToggleEvent(idCur);
 
       // Other setup
-      M.RunEvent('after');            // Trigger event 'after'
-      idCur == num - 1 && M.RunEvent('end');    // Trigger event 'end'
+      M2.RunEvent('after');            // Trigger event 'after'
+      idCur == num - 1 && M2.RunEvent('end');    // Trigger event 'end'
 
 
 
@@ -6683,7 +6230,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
 
         // Register event swipe start
         $item.on(va.ev.swipe.start, function(e) {
-          var itemData = M.Data($(this)),
+          var itemData = M2.Data($(this)),
             i    = EVENTS.GetEventRight(e);
 
           itemData.isMobileTap = true;
@@ -6691,7 +6238,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
 
         // Register event swipe move
         $item.on(va.ev.swipe.move, function(e) {
-          var itemData = M.Data( $(this) ),
+          var itemData = M2.Data( $(this) ),
             i    = EVENTS.GetEventRight(e);
 
           itemData.isMobileTap = false;
@@ -6802,7 +6349,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
         $doc.on(va.ev.key, function(e) {
 
           // Check ruby display on the current screen browser
-          M.Scroll.Check(true);
+          M2.Scroll.Check(true);
           if( is.into ) {
             var keyCode = e.keyCode,
               optsKB  = o.keyboard;
@@ -6857,7 +6404,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
       $wheel.off(nameWheel +' '+ nameMouseWheel);
 
       // Setup data wheel of object
-      var wheelData = M.Data($wheel);
+      var wheelData = M2.Data($wheel);
       if( !wheelData.wheelValue ) wheelData.wheelValue = { 'type': null, 'delta': 0 };
 
       var wheelValue = wheelData.wheelValue;
@@ -7048,7 +6595,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
           // Fullscreen: find current page at first
           if( is.fullscreen ) va.hRuby = $w.height();
           // Update variable relative to scroll page
-          is.slideshow && !is.ssPauseAbsolute && M.Scroll.Check();
+          is.slideshow && !is.ssPauseAbsolute && M2.Scroll.Check();
 
           // Ruby: toggle showInRange
           !!o.showInRange && is.DISPLAY && DISPLAY.Toggle();
@@ -7154,7 +6701,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
 
       // Case: hove timer
       else {
-        if( !RubyM.IsNumber(speedCur) ) speedCur = va.speed[cs.idCur];
+        if( !M.IsNumber(speedCur) ) speedCur = va.speed[cs.idCur];
 
         // Create timer
         clearTimeout(ti.fxEnd);
@@ -7211,10 +6758,10 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
 
         // Check valid of selector
         if( $sl.length && va.$s.is($sl) ) {
-          var slideID = M.Data($sl)['id'];
+          var slideID = M2.Data($sl)['id'];
 
           // Move to Slide
-          RubyM.IsNumber(slideID) && TOSLIDE.Run(slideID, true);
+          M.IsNumber(slideID) && TOSLIDE.Run(slideID, true);
         }
       }
 
@@ -7224,7 +6771,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
       /**
        * CONVERT ID TO 'NUMBER' IF IT IS 'STRING NUMBER'
        */
-      if( RubyM.IsNumber(id) ) id = M.PInt(id);
+      if( M.IsNumber(id) ) id = M.PInt(id);
 
 
 
@@ -7269,10 +6816,10 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
     update : function(options, isNoRefresh) {
 
       // Store old options & update new options with deep level
-      one.oo = oo = $.extend(true, {}, o);
-      one.vava = vava = $.extend(true, {}, va);
-      one.isis = isis = $.extend(true, {}, is);
-      o = $.extend(true, o, options);
+      one.oo = oo = M.Assign(o);
+      one.vava = vava = M.Assign(va);
+      one.isis = isis = M.Assign(is);
+      o = M.Assign(o, options);
       va.optsUpdate = options;
 
       // Check ruby toggle display
@@ -7281,7 +6828,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
     },
 
     updateOnSlides : function(options) {
-      if( !RubyM.IsPlainObject(options) ) return;
+      if( !M.IsPlainObject(options) ) return;
 
       va.optsSlides = options;
       cs.refresh();
@@ -7311,7 +6858,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
 
       // Toggle slide depends on Deeplinking - Cookie
       PROP.DeepLinkCookie();
-      M.ToggleSlide();
+      M2.ToggleSlide();
 
       UPDATE.Reset();
       UPDATE.Resize();
@@ -7397,7 +6944,7 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
     slideCur   : function() { return va.$s.eq(cs.idCur) },
     slideAll   : function() { return va.$s },
     opts     : function() { return o },
-    optsCur    : function() { return M.Data(cs.idCur).opts },
+    optsCur    : function() { return M2.Data(cs.idCur).opts },
     variable   : function() { return va },
     browser    : function() { return va.browser },
     isMobile   : function() { return is.mobile },
@@ -7485,59 +7032,73 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
 
 
 
+
+//- Class RubyTabs
 /**
- * CREATE NEW RUBY BY JQUERY
- *  + Method: var ruby = $('...').rubytabs();
- *  + Method: var ruby = new rubytabs($item);
+ * CLASS RUBYTABS
+ * CREATE NEW RUBYTABS JAVASCRIPT
+ *    + Method: var ruby = new RubyTabs(selector, opts)
  */
-window[rt01VA.rubyName] = function($items, opts, value) {
-  var rubyName = rt01VA.rubyName,
-      rubyData = null;
+class RubyTabs {
+  constructor(selector, opts) {
+    // this.items = document.querySelectorAll(selector);
+    this.$items = new RubyDOM(selector);
+    this.opts  = opts;
+  }
 
-
-  /**
-   * SETUP EACH OBJECT
-   */
-  $items.each(function() {
-    var $self = new RubyDOM(this),
-        ruby  = $self.data(rubyName);
-
-    // Parameter 1 is allways object -> to easy check
-    if( opts === undefined ) opts = {};
-
+  // Initialazation
+  init() {
+    var rubyName = rt01VA.rubyName,
+        rubyData = null;
 
     /**
-     * CASE: INITIALIZE OBJECT + UPDATE PROPERTIES
+     * SETUP EACH OBJECT
      */
-    if( RubyM.IsPlainObject(opts) ) {
+    for( var i = 0, len = this.items.length; i < len; i++ ) {
+      let item = this.items[i],
+          opts = this.opts,
+          data = item.getAttribute('data-' + rubyName);
 
-      // CREATE NEW RUBY
-      //- if( !ruby ) new $[rubyName]($self, opts);
+      // Parameter 2 ('optsions') is allways object -> to easy check
+      if( opts === undefined ) opts = {};
 
 
-      // UPDATE PROPERTIES
-      //- else if( !RubyM.IsEmptyObject(opts) ) ruby.update(opts);
+      /**
+       * CASE: INITIALIZE OBJECT + UPDATE PROPERTIES
+       */
+      if( M.IsPlainObject(opts) ) {
 
-      new window[rubyName + 'Main']($self, opts);
+        // CREATE NEW RUBY
+        //- if( !ruby ) new $[rubyName](item, args[0]);
 
-      // Store data of ruby
-      rubyData = $self.data(rubyName);
+        // UPDATE PROPERTIES
+        //- else if( !$.isEmptyObject(args[0]) ) ruby.update(args[0]);
+        //- new RubyTabsFn(item, opts);
+
+        let $
+        // let $item = new RubyDOM(item),
+        //     ruby  = new FnRubyTabs($item, opts);
+
+
+        // Store data of ruby
+        //- rubyData = $item.data(rubyName);
+      }
+
+
+      /**
+       * CASE: CALL API - AFTER INITIATED RUBY
+       */
+      // else {
+      //   try    { ruby[args[0]](args[1]) }
+      //   catch(e) { !!window.console && console.warn('['+ rubyName +': function not exist!]') }
+      // }
     }
 
-
-    /**
-     * CASE: CALL API - AFTER INITIATED RUBY
-     */
-    //-
-    // else {
-    //   try      { ruby[opts](value) }
-    //   catch(e) { !!window.console && console.warn('['+ rubyName +': function not exist!]') }
-    // }
-  });
-
-  // Return data ruby
-  return rubyData;
+    // Return data ruby
+    return rubyData;
+  }
 }
+
 
 
 
@@ -7551,12 +7112,13 @@ window[rt01VA.rubyName] = function($items, opts, value) {
 /**
  * AUTOMATICALLY INITIALIZE RUBY
  */
-rt01MODULE.AUTOINIT = function($ruby) {
+//- rt01MODULE.AUTOINIT = function($ruby) {
+rt01MODULE.AUTOINIT = function(selector) {
+  document.querySelectorAll(selector).forEach(function($item) {
 
-  $ruby.each(function(i) {
-    var $self    = new RubyDOM(this),
-        data     = $self.data(rt01VA.rubyData) || {},
-        rubyName = rt01VA.rubyName,
+    var rubyName = rt01VA.rubyName,
+        rubyData = rt01VA.rubyData,
+        data     = M.StringToJson( $item.getAttribute('data-' + rubyData) ),
         isJson   = true;
 
 
@@ -7564,22 +7126,21 @@ rt01MODULE.AUTOINIT = function($ruby) {
      * CHECK RUBY INITIALIZATION
      *  + Remove automatically initialize for ruby
      */
-    if( RubyM.IsPlainObject(data) && RubyM.IsEmptyObject(data) ) return;
-
+    if( M.IsEmptyObject(data) ) return;
 
 
 
     /**
-     * CHECK & SETUP MAIN DATA TO GET VALUE OF 'ISAUTOINIT' OPTION
+     * CHECK TYPE DATA INPUT
      */
     if( typeof data === 'string' ) {
 
       // Convert to json
-      var msgError = 'main options on "data-XX" not valid'.replace(/XX/, rt01VA.rubyData);
-      data = RubyM.StringToJson(data, msgError);
+      var msgError = 'main options on "data-XX" not valid'.replace(/XX/, rubyData);
+      data = M.StringToJson(data, msgError);
 
       // Check is json
-      if( RubyM.IsEmptyObject(data) ) isJson = false;
+      if( M.JsonToString(data) == '{}' ) isJson = false;
     }
 
 
@@ -7604,14 +7165,18 @@ rt01MODULE.AUTOINIT = function($ruby) {
      */
     // Case valid initialization: create new ruby
     // case unvalid initialization: hidden object
-    (isJson && isAutoInit && !$self.data(rubyName))
-      ? new window[rubyName]($self)
-      : $self.addClass(rt01VA.namespace + 'none');
+    //-
+    // (isJson && isAutoInit && !$self.data(rubyName))
+    //   ? $self[rubyName]()
+    //   : $self.addClass(rt01VA.namespace + 'none');
+    let ruby = new RubyTabs(selector);
+    ruby.init();
   });
 };
 
+//- $(document).ready(function() { rt01MODULE.AUTOINIT( $('.' + rt01VA.namespace) ) });
 document.addEventListener('DOMContentLoaded', function() {
-  rt01MODULE.AUTOINIT( new RubyDOM('.'+ rt01VA.namespace) )
+  rt01MODULE.AUTOINIT('.' + rt01VA.namespace);
 });
 
 })();
