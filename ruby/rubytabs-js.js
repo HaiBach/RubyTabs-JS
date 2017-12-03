@@ -3,7 +3,7 @@
  * @package       RubyTabs-JS
  * @author        HaiBach
  * @link          http://haibach.net/rubytabs-js
- * @version       1.7.07
+ * @version       1.7.08
  * @lastUpdate    Nov 28, 2017
  */
 /**
@@ -273,6 +273,20 @@ var RubyDOM = /** @class */ (function () {
             // Update variable
             this.length = this.$items.length;
         }
+        return this;
+    };
+    // Remove element from Array
+    RubyDOM.prototype.not = function ($nodes) {
+        for (var i = 0, len = $nodes.length; i < len; i++) {
+            var $nodeCur = $nodes.$items[i];
+            for (var j = 0, lenJ = this.$items.length; j < lenJ; j++) {
+                if ($nodeCur.isEqualNode(this.$items[j])) {
+                    this.$items.splice(j, 1);
+                }
+            }
+        }
+        // Update variable
+        this.length = this.$items.length;
         return this;
     };
     return RubyDOM;
@@ -2164,7 +2178,6 @@ var RubyM = /** @class */ (function () {
                 var $result = $target.find(selector), $rubyNested = $target.find('.' + va.ns), $resultNested = $rubyNested.find(selector);
                 // Loai bo doi tuong trong Ruby Nested
                 // console.log($result, $resultNested);
-                console.log($target, selector, $result);
                 $result = $result.not($resultNested);
                 return $result;
             },
@@ -2224,7 +2237,6 @@ var RubyM = /** @class */ (function () {
             GetTween: function ($obj) {
                 var objData = M.Data($obj);
                 // Get tween animate on self object
-                console.log(objData, $obj);
                 objData.tweenSelf = objData.tweenSelf || new RubyTween();
                 return objData.tweenSelf;
             },

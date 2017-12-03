@@ -3,7 +3,7 @@
  * @package       RubyTabs-JS
  * @author        HaiBach
  * @link          http://haibach.net/rubytabs-js
- * @version       1.7.07
+ * @version       1.7.08
  * @lastUpdate    Nov 28, 2017
  */
 
@@ -359,6 +359,23 @@ class RubyDOM {
       // Update variable
       this.length = this.$items.length;
     }
+    return this;
+  }
+
+  // Remove element from Array
+  not($nodes) {
+    for( let i = 0, len = $nodes.length; i < len; i++ ) {
+      let $nodeCur = $nodes.$items[i];
+
+      for( let j = 0, lenJ = this.$items.length; j < lenJ; j++ ) {
+        if( $nodeCur.isEqualNode(this.$items[j]) ) {
+          this.$items.splice(j, 1);
+        }
+      }
+    }
+
+    // Update variable
+    this.length = this.$items.length;
     return this;
   }
 }
@@ -2911,7 +2928,6 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
 
       // Loai bo doi tuong trong Ruby Nested
       // console.log($result, $resultNested);
-      console.log($target, selector, $result);
       $result = $result.not($resultNested);
       return $result;
     },
@@ -2998,7 +3014,6 @@ window[rt01VA.rubyName + 'Main'] = function($ruby, OptsJS) {
       var objData = M.Data($obj);
 
       // Get tween animate on self object
-      console.log(objData, $obj);
       objData.tweenSelf = objData.tweenSelf || new RubyTween();
       return objData.tweenSelf;
     },
